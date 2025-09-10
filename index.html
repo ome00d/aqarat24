@@ -1,0 +1,1469 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AQARAT 24</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #023E8A; --primary-hover: #012a60; --background-color: #f8f9fa;
+            --card-background: #ffffff; --text-color: #202124; --text-light: #5f6368;
+            --border-color: #e8eaed; --shadow: 0 1px 2px rgba(60,64,67,0.3), 0 2px 6px 2px rgba(60,64,67,0.15);
+            --favorite-color: #ffc107; --rent-color: #f39c12; --sold-color: #e74c3c;
+            --pending-color: #5bc0de;
+        }
+        body.dark-mode {
+            --primary-color: #4A90E2; --primary-hover: #63a0e8; --background-color: #1a1a1b;
+            --card-background: #272728; --text-color: #e8eaed; --text-light: #9aa0a6;
+            --border-color: #3c4043; --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 2px 6px 2px rgba(0,0,0,0.15);
+        }
+        
+        .form-group input, .form-group select, .form-group textarea, .submit-btn, .list-card, .profile-header, .stat-card, 
+        .my-posts-controls, .form-container, #location-picker-map, .spec-item, #single-post-map, #logout-btn, .detail-header, 
+        .detail-main-info, .detail-gallery img, .contact-list li, .grid-card, .story-card, .grid-card .property-image-container, .story-card .property-image-container { 
+            border-radius: 20px !important; 
+        }
+        
+        .info-section { margin-top: 20px; border: 1px solid var(--border-color); border-radius: 20px; overflow: hidden; }
+        .info-section summary { padding: 15px; font-weight: 600; cursor: pointer; display: flex; justify-content: space-between; align-items: center; background-color: var(--card-background); }
+        .info-section summary:hover { background-color: var(--background-color); }
+        .info-section summary::after { content: '\\f078'; font-family: 'Font Awesome 6 Free'; font-weight: 900; transition: transform 0.3s ease; }
+        .info-section[open] > summary::after { transform: rotate(-180deg); }
+        .info-section .info-content { padding: 0 15px 15px 15px; background-color: var(--card-background); }
+        .info-section .info-content ul { list-style-type: none; padding-right: 20px; margin: 0; }
+        html[dir="ltr"] .info-section .info-content ul { padding-right: 0; padding-left: 20px; }
+        .info-section .info-content li { padding: 8px 0; border-bottom: 1px solid var(--border-color); font-size: 0.9em; }
+        .info-section .info-content li:last-child { border-bottom: none; }
+        .info-section .info-content li::before { content: '•'; color: var(--primary-color); font-weight: bold; display: inline-block; width: 1em; margin-right: -1em; margin-left: 0.5em;}
+        html[dir="ltr"] .info-section .info-content li::before { margin-left: -1em; margin-right: 0.5em;}
+        body, .property-card, .form-container, .contact-list li, .stat-card, .my-posts-controls, #logout-btn, .spec-item, .detail-header, .detail-main-info {
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        body { font-family: 'Poppins', Tahoma, sans-serif; margin: 0; background-color: var(--background-color); color: var(--text-color); }
+        
+        header { 
+            background: var(--card-background);
+            padding: 10px 15px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1002;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        header h1 {
+            margin: 0;
+            font-size: 1.6em; 
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .header-icon {
+            font-size: 1.3em;
+            color: var(--text-light);
+            text-decoration: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .header-icon:hover {
+            background-color: var(--background-color);
+            color: var(--primary-color);
+        }
+
+        main { padding: 20px 20px 100px 20px; }
+        .page-content { display: none; }
+        .page-content.active { display: block; }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 15px;
+            left: 15px;
+            right: 15px;
+            width: auto;
+            height: 70px;
+            background: var(--card-background);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 10px;
+            box-sizing: border-box;
+            border-radius: 35px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            border: 1px solid var(--border-color);
+            z-index: 1001;
+        }
+        
+        .bottom-nav .nav-group {
+            display: flex;
+            justify-content: space-around;
+            flex-basis: calc(50% - 40px);
+        }
+
+        .bottom-nav a {
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 25px;
+            color: var(--text-light);
+            gap: 6px;
+            padding: 8px;
+            width: 42px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .bottom-nav a i {
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+        
+        .bottom-nav a span {
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+            display: none;
+        }
+        
+        .bottom-nav a.active {
+            width: 110px;
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .bottom-nav a.active span {
+            display: inline;
+        }
+
+        #fab-add-btn {
+            order: 0;
+            width: 55px;
+            height: 55px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(2, 62, 138, 0.3);
+            transform: translateY(-20px);
+            border: 4px solid var(--card-background);
+            margin: 0 10px;
+        }
+        #fab-add-btn:active {
+            transform: translateY(-20px) scale(0.9);
+        }
+        #fab-add-btn i {
+            font-size: 24px;
+        }
+
+        .form-container { background: var(--card-background); padding: 20px; box-shadow: var(--shadow); }
+        
+        .form-section-title {
+            font-size: 1.1em; font-weight: 600; color: var(--primary-color);
+            margin-top: 25px; margin-bottom: 20px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .form-section-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background-color: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9em; color: var(--text-light); }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; font-size: 1em; border: 1px solid var(--border-color); background-color: var(--background-color); color: var(--text-color); box-sizing: border-box; transition: border-color 0.2s, box-shadow 0.2s; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary-color); box-shadow: 0 0 0 2px rgba(2,62,138, 0.2); outline: none; }
+        .form-group .input-with-icon { position: relative; }
+        .form-group .input-with-icon i { position: absolute; top: 50%; transform: translateY(-50%); right: 15px; color: var(--text-light); }
+        html[dir="ltr"] .form-group .input-with-icon i { right: auto; left: 15px; }
+        .form-group .input-with-icon input { padding-right: 40px; }
+        html[dir="ltr"] .form-group .input-with-icon input { padding-right: 12px; padding-left: 40px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+        .submit-btn { background-color: var(--primary-color); color: white; cursor: pointer; margin-top: 20px; border: none; font-weight: 600; padding: 14px; width: 100%; font-size: 1.1em; transition: background-color 0.2s; }
+        .submit-btn:hover { background-color: var(--primary-hover); }
+        .image-upload-box { width: 100%; height: 180px; border: 2px dashed var(--border-color); display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; background-size: cover; background-position: center; transition: border-color 0.3s; }
+        .image-upload-box:hover { border-color: var(--primary-color); }
+        .image-upload-box .upload-icon { text-align: center; color: var(--text-light); }
+        #image-upload-input { display: none; }
+        
+        #image-previews-container { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px; }
+        .img-preview-wrapper { position: relative; width: 80px; height: 80px; }
+        .img-preview-wrapper img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
+        .delete-img-btn {
+            position: absolute; top: -5px; right: -5px;
+            width: 20px; height: 20px; background-color: #dc3545; color: white;
+            border-radius: 50%; display: flex; justify-content: center; align-items: center;
+            cursor: pointer; font-size: 12px; border: 1px solid white;
+        }
+
+        .segmented-control {
+            display: flex; width: 100%; border-radius: 10px; overflow: hidden; gap: 10px;
+        }
+        .segmented-control button {
+            flex: 1; padding: 10px; border: 1px solid var(--border-color);
+            background-color: var(--card-background); color: var(--text-light);
+            font-weight: 600; font-family: 'Poppins', sans-serif;
+            cursor: pointer; transition: all 0.2s ease;
+            border-radius: 10px;
+        }
+        .segmented-control button.active {
+            background-color: var(--primary-color); color: white; border-color: var(--primary-color);
+        }
+        .segmented-control i {
+            margin-left: 8px;
+        }
+        html[dir=ltr] .segmented-control i {
+            margin-left: 0; margin-right: 8px;
+        }
+
+        .property-type-selector {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            scrollbar-width: none;
+        }
+        .property-type-selector::-webkit-scrollbar {
+            display: none;
+        }
+        .property-type-selector button {
+            flex: 0 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 80px;
+            height: 80px;
+            border: 1px solid var(--border-color);
+            background-color: var(--background-color);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .property-type-selector button i {
+            font-size: 1.8em;
+            color: var(--text-light);
+            margin-bottom: 5px;
+            transition: color 0.2s ease;
+        }
+        .property-type-selector button span {
+            font-size: 0.8em;
+            font-weight: 600;
+            color: var(--text-light);
+            transition: color 0.2s ease;
+        }
+        .property-type-selector button.active {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        .property-type-selector button.active i,
+        .property-type-selector button.active span {
+            color: white;
+        }
+
+        .number-selector, .direction-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .number-selector button, .direction-selector button {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            background-color: var(--card-background);
+            color: var(--text-light);
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-radius: 10px;
+            min-width: 50px;
+            text-align: center;
+        }
+        .number-selector button.active, .direction-selector button.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .form-notice {
+            margin: 25px 0 20px 0;
+            padding: 15px;
+            border-radius: 12px;
+            background-color: #e7f3ff;
+            border-right: 5px solid var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        body.dark-mode .form-notice {
+            background-color: #2c3e50;
+            border-right-color: var(--primary-color);
+        }
+        html[dir="ltr"] .form-notice {
+            border-right: none;
+            border-left: 5px solid var(--primary-color);
+        }
+        .form-notice i {
+            font-size: 1.8em;
+            color: var(--primary-color);
+        }
+        .form-notice p {
+            margin: 0;
+            font-size: 0.9em;
+            line-height: 1.5;
+            color: var(--text-color);
+        }
+
+        body.map-is-active header { display: none; }
+        body.map-is-active main { padding: 0; }
+        body.map-is-active #main-map-container { height: 100vh; }
+        
+        #main-map-container, #location-picker-map { width: 100%; z-index: 1; }
+        #main-map-container { height: 100%; }
+        #location-picker-map { height: 300px; }
+        
+        .map-controls {
+            position: absolute;
+            bottom: 30px;
+            right: 15px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .map-controls button {
+            width: 44px; height: 44px;
+            background-color: var(--card-background);
+            border-radius: 22px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+            font-size: 1.2em;
+            color: var(--primary-color);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .map-controls button:active {
+            transform: scale(0.95);
+            background-color: var(--background-color);
+        }
+        
+        .user-location-marker {
+            background-color: #4A90E2;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 0 10px rgba(74, 144, 226, 0.8);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(74, 144, 226, 0.7); }
+            70% { box-shadow: 0 0 0 20px rgba(74, 144, 226, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(74, 144, 226, 0); }
+        }
+
+        .leaflet-control-layers {
+            background: var(--card-background);
+            border-radius: 12px !important;
+            box-shadow: var(--shadow);
+            border: none;
+        }
+        .leaflet-control-layers-toggle {
+            background-image: none !important;
+            width: 44px !important;
+            height: 44px !important;
+        }
+        .leaflet-control-layers-toggle::after {
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            content: '\\f279';
+            font-size: 1.3em;
+            color: var(--text-color);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        body.dark-mode .leaflet-control-layers-toggle::after {
+            color: var(--text-light);
+        }
+        .leaflet-control-layers-expanded { padding: 10px; }
+        .leaflet-control-layers-base label {
+            display: block; padding: 8px 15px; margin-bottom: 5px;
+            border-radius: 8px; cursor: pointer; transition: background-color 0.2s ease;
+            font-weight: 600;
+        }
+        .leaflet-control-layers-base label:hover {
+            background-color: var(--background-color);
+        }
+        .leaflet-control-layers-base input { display: none; }
+        .leaflet-control-layers-base input:checked + span { color: var(--primary-color); }
+
+        .property-card { position: relative; overflow: hidden; cursor: pointer; }
+        .favorite-toggle { position: absolute; top: 10px; right: 10px; font-size: 1.5em; color: #fff; cursor: pointer;
+            text-shadow: 0 0 5px rgba(0,0,0,0.7); z-index: 10; transition: color 0.2s; }
+        .favorite-toggle.is-favorite { color: var(--favorite-color); }
+        .zero-badge { position: absolute; top: 10px; left: 10px; background-color: rgba(2, 62, 138, 0.8); color: white; padding: 4px 10px; border-radius: 8px; font-size: 0.8em; font-weight: 700; z-index: 10; backdrop-filter: blur(4px); }
+        .property-image-container { width: 100%; height:100%; }
+        .property-image-container img { width: 100%; height: 100%; object-fit: cover; }
+        .price { font-size: 1.5em; color: var(--sold-color); margin-bottom: 10px; font-weight: 700; }
+        .card-actions { display: flex; gap: 10px; padding: 15px; background-color: var(--background-color); border-top: 1px solid var(--border-color); }
+        .action-btn { flex-grow: 1; padding: 10px; border: none; color: white; cursor: pointer; font-weight: 600; }
+        .edit-btn { background-color: #ffc107; color: #333; }
+        .delete-btn { background-color: #dc3545; }
+        .sold-btn { background-color: #28a745; }
+        .approve-btn { background-color: var(--pending-color); }
+        
+        .profile-header { display: flex; flex-direction: column; align-items: center; padding: 20px; background-color: var(--card-background); margin-bottom: 20px; box-shadow: var(--shadow); }
+        #profile-pic-container { position: relative; cursor: pointer; }
+        #profile-pic { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 4px solid var(--primary-color); }
+        #profile-pic-edit-icon { position: absolute; bottom: 5px; right: 5px; background-color: white; border-radius: 50%; padding: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        #username-display { font-size: 1.5em; font-weight: 700; margin-top: 10px; color: var(--text-color); }
+        #edit-profile-btn { background: none; border: none; color: var(--primary-color); cursor: pointer; font-weight: 600; }
+        #profile-pic-input { display: none; }
+        .stats-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+        .stat-card { background-color: var(--card-background); padding: 15px; text-align: center; box-shadow: var(--shadow); }
+        .stat-card i { font-size: 2em; color: var(--primary-color); }
+        .stat-card .stat-number { font-size: 1.8em; font-weight: 700; display: block; }
+        .stat-card .stat-label { font-size: 0.8em; color: var(--text-light); }
+        .my-posts-controls { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; background-color: var(--card-background); padding: 10px; box-shadow: var(--shadow); }
+        .filter-btn { padding: 8px 15px; border: 1px solid var(--border-color); background-color: var(--background-color); color: var(--text-color); border-radius: 20px; cursor: pointer; font-weight: 600; flex-grow: 1;}
+        .filter-btn.active { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
+        #search-my-posts { padding: 8px 15px; border-radius: 20px; flex-grow: 2; min-width: 150px; }
+        #logout-btn { display: block; width: 100%; padding: 15px; border: none; background-color: #dc3545; color: white; font-size: 1.1em; font-weight: 700; cursor: pointer; margin-top: 20px; }
+        #logout-btn i { margin-right: 10px; }
+        html[dir="ltr"] #logout-btn i { margin-right: 0; margin-left: 10px; }
+        .contact-list { list-style: none; padding: 0; }
+        .contact-list li { background: var(--card-background); padding: 15px; margin-bottom: 10px; display: flex; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .contact-list li i { color: var(--primary-color); font-size: 1.5em; margin-left: 15px; }
+        html[dir="ltr"] .contact-list li i { margin-left: 0; margin-right: 15px; }
+        .contact-list li a { text-decoration: none; color: var(--text-color); font-weight: bold; font-size: 1.1em; direction: ltr; text-align: left; }
+        .empty-page-message { text-align: center; color: var(--text-light); padding: 40px; grid-column: 1 / -1; }
+        .section-title { font-size: 1.4em; font-weight: 700; color: var(--text-color); margin-bottom: 15px; margin-top: 0; }
+        .posts-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+        
+        .grid-card .property-image-container {
+            aspect-ratio: 1 / 1;
+        }
+        .posts-grid.story-view {
+             grid-template-columns: repeat(2, 1fr);
+        }
+        .story-card .property-image-container {
+            aspect-ratio: 9 / 16;
+        }
+
+        .grid-card-info { position: absolute; bottom: 0; left: 0; right: 0; padding: 8px; color: white; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 120%); }
+        .location-price { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+        .grid-card-info h3, .story-card-info h3 { font-size: 0.9em; margin: 0; color: #fff; text-shadow: 1px 1px 2px rgba(0,0,0,0.7); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .grid-card-info .price, .story-card-info .price { font-size: 1em; color: #fff; font-weight: bold; margin: 0; flex-shrink: 0; margin-right: 5px; }
+        .story-card-info { position: absolute; bottom: 0; left: 0; right: 0; padding: 10px; color: white; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 100%); display: flex; flex-direction: column; gap: 5px; }
+        
+        .story-card-extra-details {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            font-size: 0.75em;
+            opacity: 0.9;
+            color: #ddd;
+            margin-top: 5px;
+        }
+        .story-card-extra-details span {
+            display: flex;
+            align-items: center;
+            background-color: rgba(0,0,0,0.3);
+            padding: 2px 6px;
+            border-radius: 6px;
+        }
+        .story-card-extra-details i {
+            margin-left: 4px;
+        }
+        html[dir=ltr] .story-card-extra-details i {
+            margin-left: 0;
+            margin-right: 4px;
+        }
+        
+        .list-card { background: var(--card-background); box-shadow: var(--shadow); border: 1px solid var(--border-color); margin-bottom: 20px; display: flex; flex-direction: column; }
+        .list-card .property-image-container { aspect-ratio: 16/10; }
+        .list-card .property-card-info { padding: 15px; }
+        .list-card .property-card-details { display: flex; flex-wrap: wrap; gap: 15px; font-size: 0.9em; padding-top: 10px; margin-top: 10px; border-top: 1px solid var(--border-color); }
+        
+        .overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); color: white; display: flex;
+            justify-content: center; align-items: center; font-size: 1.5em;
+            font-weight: 700; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            z-index: 9; backdrop-filter: blur(2px);
+        }
+        .overlay.pending { background-color: rgba(91, 192, 222, 0.7); }
+
+        #post-detail-page { padding: 0; background-color: var(--card-background); }
+        .detail-header { padding: 10px 15px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); }
+        .back-btn { background: none; border: none; font-size: 1.5em; cursor: pointer; color: var(--text-color); }
+        .detail-title { font-size: 1.2em; font-weight: 700; margin: 0; flex-grow: 1; text-align: center; }
+        .detail-fav-btn { font-size: 1.5em; background: none; border: none; cursor: pointer; color: #ccc; }
+        .detail-fav-btn.is-favorite { color: var(--favorite-color); }
+        
+        .detail-gallery {
+            display: flex;
+            overflow-x: auto;
+            gap: 10px;
+            padding: 20px;
+            scrollbar-width: none;
+            -ms-overflow-style: none; 
+        }
+        .detail-gallery::-webkit-scrollbar { display: none; }
+        .detail-gallery img {
+            width: 80vw;
+            max-width: 300px;
+            height: auto;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .detail-main-info { padding: 20px; border-bottom: 1px solid var(--border-color); }
+        .detail-main-info h2 { margin-top: 0; margin-bottom: 10px; font-size: 1.6em; }
+        .detail-main-info .price { font-size: 2em; }
+        .detail-specs { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 20px; padding: 20px; }
+        .spec-item { background-color: var(--background-color); padding: 15px; text-align: center; }
+        .spec-item i { font-size: 1.8em; color: var(--primary-color); margin-bottom: 8px; }
+        .spec-item .label { font-size: 0.8em; color: var(--text-light); display: block; }
+        .spec-item .value { font-size: 1.1em; font-weight: 600; display: block; }
+        #single-post-map { height: 250px; margin: 20px; z-index: 1; }
+        .leaflet-popup-content-wrapper { border-radius: 8px; }
+        .map-popup { text-align: right; }
+        .map-popup img { width: 100%; height: 80px; object-fit: cover; border-radius: 4px; }
+        .map-popup h4 { margin: 5px 0; font-size: 1em; }
+        .map-popup .price { font-size: 1.1em; color: var(--sold-color); font-weight: bold; }
+        .map-popup button { margin-top: 8px; padding: 5px 10px; background-color: var(--primary-color); color: white; border: none; border-radius: 5px; cursor: pointer; width: 100%; }
+        .switch { position: relative; display: inline-block; width: 60px; height: 34px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 26px; width: 26px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--primary-color); }
+        input:checked + .slider:before { transform: translateX(26px); }
+        .custom-map-marker {
+            background-color: var(--primary-color); width: 30px; height: 30px; border-radius: 50%;
+            border: 2px solid #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            display: flex; justify-content: center; align-items: center;
+        }
+        .custom-map-marker.rent { background-color: var(--rent-color); }
+        .custom-map-marker.sold { background-color: var(--sold-color); }
+        .custom-map-marker i { color: #fff; font-size: 14px; }
+        .picker-map-marker {
+            background-color: var(--rent-color); width: 20px; height: 20px; border-radius: 50%;
+            border: 3px solid #fff; box-shadow: 0 0 10px rgba(0,0,0,0.5); cursor: move;
+        }
+        .leaflet-control-layers-toggle {
+            background-image: none;
+        }
+        #toast-notification {
+            position: fixed;
+            bottom: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0,0,0,0.8);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 25px;
+            z-index: 10000;
+            transition: bottom 0.5s ease-in-out;
+            font-size: 0.9em;
+        }
+        #toast-notification.show {
+            bottom: 80px;
+        }
+
+        .developer-info {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: var(--background-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            text-align: center;
+        }
+        .developer-info .dev-title {
+            font-size: 0.8em;
+            color: var(--text-light);
+            margin: 0 0 10px 0;
+            font-weight: 600;
+        }
+        .developer-info .dev-name {
+            font-size: 1.1em;
+            color: var(--text-color);
+            font-weight: 700;
+            margin: 0;
+        }
+        .developer-info .dev-contact {
+            margin-top: 5px;
+        }
+        .developer-info .dev-contact a {
+            text-decoration: none;
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 1em;
+            direction: ltr;
+        }
+        .developer-info .dev-contact i {
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="#" class="header-icon" id="settings-header-btn"><i class="fa-solid fa-gear"></i></a>
+        <h1>AQARAT 24</h1>
+        <a href="#" class="header-icon" id="profile-header-btn"><i class="fa-solid fa-user"></i></a>
+    </header>
+    <main>
+        <div id="home-page" class="page-content active">
+            <h2 class="section-title" data-translate="allPosts"></h2>
+            <div id="posts-grid-container" class="posts-grid"></div>
+            <div id="load-more-container" style="text-align: center; padding: 20px;">
+                <button id="load-more-btn" class="submit-btn" style="width: auto; padding: 10px 30px;"></button>
+            </div>
+        </div>
+        <div id="apartments-page" class="page-content">
+            <h2 class="section-title" data-translate="apartment"></h2>
+            <div id="apartments-grid-container" class="posts-grid"></div>
+        </div>
+        <div id="add-page" class="page-content"></div>
+        <div id="map-page" class="page-content">
+            <div id="main-map-container"></div>
+            <div class="map-controls">
+                <button id="refresh-map-btn"><i class="fa-solid fa-arrows-rotate"></i></button>
+                <button id="locate-me-btn"><i class="fa-solid fa-location-crosshairs"></i></button>
+            </div>
+        </div>
+        <div id="profile-page" class="page-content"></div>
+        <div id="favorites-page" class="page-content"></div>
+        <div id="settings-page" class="page-content"></div>
+        <div id="post-detail-page" class="page-content"></div>
+    </main>
+    
+    <nav class="bottom-nav">
+        <div class="nav-group">
+            <a href="#" class="nav-link active" data-page="home-page"><i class="fa-solid fa-house"></i><span data-translate="navHome"></span></a>
+            <a href="#" class="nav-link" data-page="apartments-page"><i class="fa-solid fa-building"></i><span data-translate="apartment"></span></a>
+        </div>
+        <a href="#" id="fab-add-btn" class="nav-link" data-page="add-page"><i class="fa-solid fa-plus"></i></a>
+        <div class="nav-group">
+            <a href="#" class="nav-link" data-page="favorites-page"><i class="fa-solid fa-star"></i><span data-translate="navFavorites"></span></a>
+            <a href="#" class="nav-link" data-page="map-page"><i class="fa-solid fa-map-location-dot"></i><span data-translate="navMap"></span></a>
+        </div>
+    </nav>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const translations = {
+        navHome: { "ku-bad": "مال", "ku-sor": "سەرەکی", "ar": "الرئيسية", "en": "Home" },
+        navFavorites: { "ku-bad": "هەلبژارتی", "ku-sor": "دڵخوازەکان", "ar": "المفضلة", "en": "Favorites" },
+        navAdd: { "ku-bad": "زیدە کرن", "ku-sor": "زیادکردن", "ar": "إضافة", "en": "Add" },
+        navMap: { "ku-bad": "نەخشە", "ku-sor": "نەخشە", "ar": "الخريطة", "en": "Map" },
+        editProfileName: { "ku-bad": "دەستکاریا ناڤی بکە", "ku-sor": "دەستکاری ناو بکە", "ar": "تعديل الاسم", "en": "Edit Name" },
+        allPosts: { "ku-bad": "هەمی پۆست", "ku-sor": "هەموو پۆستەکان", "ar": "كل الإعلانات", "en": "All Posts" },
+        forSale: { "ku-bad": "بۆ فرۆتنێ", "ku-sor": "بۆ فرۆشتن", "ar": "للبيع", "en": "For Sale" },
+        forRent: { "ku-bad": "بۆ کرێ", "ku-sor": "بۆ کرێ", "ar": "للإيجار", "en": "For Rent" },
+        searchPlaceholder: { "ku-bad": "ل پۆستێن خۆ بگەڕه...", "ku-sor": "لە پۆستەکانت بگەڕێ...", "ar": "ابحث في إعلاناتك...", "en": "Search your posts..." },
+        all: { "ku-bad": "هەمی", "ku-sor": "هەمووی", "ar": "الكل", "en": "All" },
+        sold: { "ku-bad": "فرۆشتی", "ku-sor": "فرۆشراوەکان", "ar": "المباعة", "en": "Sold" },
+        rented: { "ku-bad": "ب کرێدای", "ku-sor": "بەکرێدراوەکان", "ar": "المؤجرة", "en": "Rented" },
+        logout: { "ku-bad": "دەرکەفتن", "ku-sor": "چوونەدەرەوە", "ar": "خروج", "en": "Logout" },
+        editBtn: { "ku-bad": "دەستکاری", "ku-sor": "دەستکاری", "ar": "تعديل", "en": "Edit" },
+        deleteBtn: { "ku-bad": "ژێبرن", "ku-sor": "سڕینەوە", "ar": "حذف", "en": "Delete" },
+        markSold: { "ku-bad": "فرۆشتن", "ku-sor": "فرۆشتن", "ar": "تم البيع", "en": "Mark Sold" },
+        wasSold: { "ku-bad": "هاتە فرۆتن", "ku-sor": "فرۆشرا", "ar": "تم البيع", "en": "Sold" },
+        wasRented: { "ku-bad": "هاتە کرێدان", "ku-sor": "بەکرێدرا", "ar": "تم التأجير", "en": "Rented" },
+        settingsTitle: { "ku-bad": "سێتینگ", "ku-sor": "ڕێکخستنەکان", "ar": "الإعدادات", "en": "Settings" },
+        language: { "ku-bad": "زمان", "ku-sor": "زمان", "ar": "اللغة", "en": "Language" },
+        colorMode: { "ku-bad": "دۆخێ ڕەنگی", "ku-sor": "دۆخی ڕەنگ", "ar": "وضع الألوان", "en": "Color Mode" },
+        lightMode: { "ku-bad": "ڕۆناهی", "ku-sor": "ڕووناکی", "ar": "فاتح", "en": "Light" },
+        darkMode: { "ku-bad": "تاری", "ku-sor": "تاریک", "ar": "داكن", "en": "Dark" },
+        contactUs: { "ku-bad": "پەیوەندیێ ب مە بکە", "ku-sor": "پەیوەندیمان پێوە بکە", "ar": "تواصل معنا", "en": "Contact Us" },
+        addFormTitle: { "ku-bad": "مولکەکێ نوو زێدە بکە", "ku-sor": "موڵکێکی نوێ زیاد بکە", "ar": "إضافة عقار جديد", "en": "Add New Property" },
+        editFormTitle: { "ku-bad": "دەستکاریا پۆستی بکە", "ku-sor": "دەستکاری پۆست بکە", "ar": "تعديل الإعلان", "en": "Edit Post" },
+        mainInfo: { "ku-bad": "پێزانینێن سەرەکی", "ku-sor": "زانیاری سەرەکی", "ar": "المعلومات الأساسية", "en": "Basic Info" },
+        propertySpecs: { "ku-bad": "تایبەتمەندیێن مولکی", "ku-sor": "تایبەتمەندی موڵک", "ar": "مواصفات العقار", "en": "Property Specs" },
+        propertyImage: { "ku-bad": "وێنێ مولکی", "ku-sor": "وێنەی موڵک", "ar": "صورة العقار", "en": "Property Image" },
+        chooseImage: { "ku-bad": "وێنەیەکێ هەلبژێرە", "ku-sor": "وێنەیەک هەڵبژێرە", "ar": "اختر صورة", "en": "Choose Image" },
+        listingType: { "ku-bad": "جورێ داخازیێ", "ku-sor": "جۆری داواکاری", "ar": "نوع الطلب", "en": "Listing Type" },
+        propertyType: { "ku-bad": "جورێ مولکی", "ku-sor": "جۆری موڵک", "ar": "نوع العقار", "en": "Property Type" },
+        price: { "ku-bad": "بها", "ku-sor": "نرخ", "ar": "السعر", "en": "Price" },
+        phone: { "ku-bad": "ژمارا موبایلێ", "ku-sor": "ژمارەی مۆبایل", "ar": "رقم الهاتف", "en": "Phone Number" },
+        location: { "ku-bad": "ناڤ و نیشان", "ku-sor": "ناونیشان", "ar": "العنوان", "en": "Location" },
+        area: { "ku-bad": "ڕووبەر (م²)", "ku-sor": "ڕووبەر (م²)", "ar": "المساحة (م²)", "en": "Area (m²)" },
+        direction: { "ku-bad": "ئاراستە", "ku-sor": "ئاراستە", "ar": "الاتجاه", "en": "Direction" },
+        floors: { "ku-bad": "ژمارا نهومان", "ku-sor": "ژمارەی نهۆمەکان", "ar": "عدد الطوابق", "en": "Number of Floors" },
+        bedrooms: { "ku-bad": "ژ. نڤستنێ", "ku-sor": "ژ. نوستن", "ar": "غرف نوم", "en": "Bedrooms" },
+        bathrooms: { "ku-bad": "ژ. گەرماڤا", "ku-sor": "ژ. گەرماو", "ar": "حمامات", "en": "Bathrooms" },
+        garden: { "ku-bad": "باخچە؟", "ku-sor": "باخچە؟", "ar": "حديقة؟", "en": "Garden?" },
+        mapLocation: { "ku-bad": "جهی لسەر نەخشەیی", "ku-sor": "شوێن لەسەر نەخشە", "ar": "الموقع على الخريطة", "en": "Location on Map" },
+        postButton: { "ku-bad": "پۆست بکە", "ku-sor": "بڵاوی بکەرەوە", "ar": "نشر الإعلان", "en": "Post" },
+        updateButton: { "ku-bad": "نوو بکە", "ku-sor": "نوێکردنەوە", "ar": "تحديث", "en": "Update" },
+        yes: { "ku-bad": "بەلێ", "ku-sor": "بەڵێ", "ar": "نعم", "en": "Yes" },
+        no: { "ku-bad": "نەخێر", "ku-sor": "نەخێر", "ar": "لا", "en": "No" },
+        house: { "ku-bad": "خانی", "ku-sor": "خانوو", "ar": "منزل", "en": "House" },
+        apartment: { "ku-bad": "شوقە", "ku-sor": "شوقە", "ar": "شقة", "en": "Apartment" },
+        villa: { "ku-bad": "ڤێلا", "ku-sor": "ڤێلا", "ar": "فيلا", "en": "Villa" },
+        farm: { "ku-bad": "مەزرەعە", "ku-sor": "کێڵگە", "ar": "مزرعة", "en": "Farm" },
+        land: { "ku-bad": "ئەرد", "ku-sor": "زەوی", "ar": "أرض", "en": "Land" },
+        commercial: { "ku-bad": "بازرگانی", "ku-sor": "بازرگانی", "ar": "تجاري", "en": "Commercial" },
+        favEmpty: { "ku-bad": "هیچ پۆستەکێ هەلبژارتی نینە.", "ku-sor": "هیچ پۆستێکی دڵخواز نییە.", "ar": "لا توجد إعلانات مفضلة.", "en": "No favorite posts." },
+        confirmDelete: { "ku-bad": "تو پشتراستی دێ ڤی پۆستی ژێبەی؟", "ku-sor": "دڵنیایت لە سڕینەوەی ئەم پۆستە؟", "ar": "هل أنت متأكد من حذف هذا الإعلان؟", "en": "Are you sure you want to delete this post?" },
+        promptNewName: { "ku-bad": "ناڤێ خۆ یێ نوو بنڤیسە:", "ku-sor": "ناوە نوێکەت بنووسە:", "ar": "اكتب اسمك الجديد:", "en": "Enter your new name:" },
+        viewDetails: { "ku-bad": "پێزانینان ببینە", "ku-sor": "ورده‌كاری ببینه‌", "ar": "عرض التفاصيل", "en": "View Details" },
+        postNotFound: { "ku-bad": "ئەڤ پۆستە نەهاتە دیتن.", "ku-sor": "ئەم پۆستە نەدۆزرایەوە.", "ar": "لم يتم العثور על الإعلان.", "en": "Post not found." },
+        locationFound: { "ku-bad": "جهێ تە هاتە دیتن.", "ku-sor": "شوێنەکەت دۆزرایەوە.", "ar": "تم العثور على موقعك.", "en": "Location found." },
+        locationNotFound: { "ku-bad": "نەشهێین جهێ تە ببینین.", "ku-sor": "نەتوانرا شوێنەکەت بدۆزرێتەوە.", "ar": "لم نتمكن من العثور على موقعك.", "en": "Could not find your location." },
+        buyerTipsTitle: { "ku-bad": "ئامۆژگاری بۆ کڕیاران", "ku-sor": "ئامۆژگاری بۆ کڕیاران", "ar": "نصائح للمشترين", "en": "Tips for Buyers" },
+        buyerTip1: { "ku-bad": "بودجە و داراییا خۆ دیار بکە.", "ku-sor": "بودجە و داراییت دیاری بکە.", "ar": "حدد ميزانيتك وتمويلك.", "en": "Determine your budget and financing." },
+        buyerTip2: { "ku-bad": "پشکنینەکا تەمام بۆ مولکی بکە.", "ku-sor": "پشکنینێکی تەواو بۆ موڵکەکە بکە.", "ar": "قم بفحص العقار بشكل كامل.", "en": "Thoroughly inspect the property." },
+        buyerTip3: { "ku-bad": "پشتراست بە ژ بەلگەنامەیێن یاسایی.", "ku-sor": "دڵنیابە لە بەڵگەنامە یاساییەکان.", "ar": "تأكد من المستندات القانونية.", "en": "Verify the legal documents." },
+        buyerTip4: { "ku-bad": "لسەر بهای دانوستاندنێ بکە.", "ku-sor": "لەسەر نرخەکەی دانوستان بکە.", "ar": "تفاوض على السعر.", "en": "Negotiate the price." },
+        buyerTip5: { "ku-bad": "جهـ و خزمەتگوزارییان ل بەرچاڤ بگرە.", "ku-sor": "شوێن و خزمەتگوزارییەکان لەبەرچاو بگرە.", "ar": "فكر في الموقع والخدمات.", "en": "Consider the location and amenities." },
+        sellerTipsTitle: { "ku-bad": "ئامۆژگاری بۆ فرۆشیاران", "ku-sor": "ئامۆژگاری بۆ فرۆشیاران", "ar": "نصائح للبائعين", "en": "Tips for Sellers" },
+        sellerTip1: { "ku-bad": "بهایەکێ گونجای بۆ مولکێ خۆ بدانە.", "ku-sor": "نرخێکی گونجاو بۆ موڵکەکەت دابنێ.", "ar": "حدد سعراً واقعياً لعقارك.", "en": "Set a realistic price for your property." },
+        sellerTip2: { "ku-bad": "مولکێ خۆ پاقژ و ئامادە بکە.", "ku-sor": "موڵکەکەت پاک و ئامادە بکە.", "ar": "نظّف وحضّر عقارك جيداً.", "en": "Clean and prepare your property." },
+        sellerTip3: { "ku-bad": "وێنەیێن کوالێتی بلند بگرە.", "ku-sor": "وێنەی کوالێتی بەرز بگرە.", "ar": "التقط صوراً عالية الجودة.", "en": "Take high-quality photos." },
+        sellerTip4: { "ku-bad": "د زانیاریان دا شەفاف و ڕاستگۆ بە.", "ku-sor": "لە زانیارییەکاندا شەفاف و ڕاستگۆ بە.", "ar": "كن شفافاً وصادقاً في المعلومات.", "en": "Be transparent and honest in the details." },
+        sellerTip5: { "ku-bad": "هەموو بەلگەنامەیێن پێدڤی ئامادە بکە.", "ku-sor": "هەموو بەڵگەنامە پێویستەکان ئامادە بکە.", "ar": "اجمع كل المستندات اللازمة.", "en": "Gather all necessary documents." },
+        priceTypeNumeric: { "ku-bad": "بها بنڤیسە", "ku-sor": "نرخ بنووسە", "ar": "إدخال السعر", "en": "Enter Price" },
+        priceTypeSpecial: { "ku-bad": "بهایێ تایبەت", "ku-sor": "نرخی تایبەت", "ar": "سعر خاص", "en": "Special Price" },
+        isZero: { "ku-bad": "ئەڤ مولکە سفرە؟", "ku-sor": "ئەم موڵکە تازەیە؟", "ar": "هل العقار جديد؟", "en": "Is this property new?" },
+        zero: { "ku-bad": "صفر", "ku-sor": "تازە", "ar": "جديد", "en": "New" },
+        pending: { "ku-bad": "یێ چاڤەرێ", "ku-sor": "چاوەڕوان", "ar": "قيد الانتظar", "en": "Pending" },
+        approveBtn: { "ku-bad": "پەسەندکرن", "ku-sor": "پەسەندکردن", "ar": "موافقة", "en": "Approve" },
+        postSubmittedSuccess: { "ku-bad": "پۆستێ تە بۆ پێداچوونێ هاتە هنارتن", "ku-sor": "پۆستەکەت بۆ پێداچوون نێردرا", "ar": "تم إرسال إعلانك للمراجعة", "en": "Your post was submitted for review" },
+    };
+    let currentLang = localStorage.getItem('appLanguage') || 'ku-bad';
+    const elements = { body: document.body };
+    let allPosts = JSON.parse(localStorage.getItem('aqaratPosts')) || [];
+    let userProfile = JSON.parse(localStorage.getItem('userProfile')) || { name: 'نەناس', pic: 'https://via.placeholder.com/100' };
+    let favoritePostIds = JSON.parse(localStorage.getItem('favoritePosts')) || [];
+    let editingPostId = null, mainMap, pickerMap, pickerMarker, singlePostMap;
+    let userLocationMarker = null;
+    let defaultCoords = { lat: 36.8665, lng: 42.9906 };
+    let selectedCoords = { ...defaultCoords };
+    let uploadedImages = [];
+    const propertyTypeIcons = { house: 'fa-house-chimney', apartment: 'fa-building', villa: 'fa-house-chimney-window', farm: 'fa-tractor', land: 'fa-mountain-sun', commercial: 'fa-store', default: 'fa-building-shield' };
+    let visiblePostsCount = 6;
+    const postsPerPage = 6;
+    const baseLayers = {
+        'Satelite': L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: 'Tiles &copy; Esri' }),
+        'Sade': L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; CARTO' }),
+        'Klasîk': L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap' })
+    };
+    function applyTranslations(lang) {
+        document.documentElement.lang = lang.split('-')[0];
+        document.documentElement.dir = (lang === 'ar' || lang.startsWith('ku')) ? 'rtl' : 'ltr';
+        document.querySelectorAll('[data-translate]').forEach(el => {
+            const key = el.dataset.translate;
+            if (translations[key] && translations[key][lang]) el.textContent = translations[key][lang];
+        });
+        if (elements.searchMyPosts) elements.searchMyPosts.placeholder = translations.searchPlaceholder[lang];
+        const loadMoreBtn = document.getElementById('load-more-btn');
+        if(loadMoreBtn) loadMoreBtn.textContent = "بارکرنا پتر";
+    }
+    function saveData(key, data) { localStorage.setItem(key, JSON.stringify(data)); }
+    function switchPage(pageId) {
+        let isMapPage = pageId === 'map-page';
+        let isDetailPage = pageId === 'post-detail-page';
+        elements.body.className = isMapPage ? 'map-is-active' : '';
+        const currentTheme = localStorage.getItem('theme');
+        if (currentTheme === 'dark') document.body.classList.add('dark-mode');
+        document.querySelector('header').style.display = isDetailPage || isMapPage ? 'none' : 'flex';
+        document.querySelector('.bottom-nav').style.display = isDetailPage ? 'none' : 'flex'; 
+        document.querySelectorAll('.page-content').forEach(p => p.classList.toggle('active', p.id === pageId));
+        document.querySelectorAll('.bottom-nav a').forEach(l => l.classList.remove('active'));
+        const activeLink = document.querySelector(`.bottom-nav a[data-page="${pageId}"]`);
+        if(activeLink) activeLink.classList.add('active');
+        
+        if (pageId === 'add-page' && !editingPostId) renderAddForm();
+        if (pageId !== 'add-page') editingPostId = null;
+        if (pageId === 'home-page') renderHomePage();
+        if (pageId === 'apartments-page') renderApartmentsPage();
+        
+        setTimeout(() => {
+            if (isMapPage && mainMap) { mainMap.invalidateSize(); renderMapMarkers(); }
+            if (pageId === 'add-page' && pickerMap) pickerMap.invalidateSize();
+            if (isDetailPage && singlePostMap) singlePostMap.invalidateSize();
+        }, 50);
+    }
+    function populateStaticHTML() {
+        document.getElementById('profile-page').innerHTML = `<div class="profile-header"><div id="profile-pic-container"><img src="https://via.placeholder.com/100" alt="Wêneyê Profaylê" id="profile-pic"><input type="file" id="profile-pic-input" accept="image/*"><i class="fa-solid fa-pencil" id="profile-pic-edit-icon"></i></div><h2 id="username-display"></h2><button id="edit-profile-btn" data-translate="editProfileName"></button></div><div class="stats-container"><div class="stat-card"><i class="fa-solid fa-list-check"></i><span class="stat-number" id="total-posts-stat">0</span><span class="stat-label" data-translate="allPosts"></span></div><div class="stat-card"><i class="fa-solid fa-tags"></i><span class="stat-number" id="for-sale-stat">0</span><span class="stat-label" data-translate="forSale"></span></div><div class="stat-card"><i class="fa-solid fa-key"></i><span class="stat-number" id="for-rent-stat">0</span><span class="stat-label" data-translate="forRent"></span></div></div><div class="my-posts-controls"><input type="search" id="search-my-posts"><button class="filter-btn active" data-filter="all" data-translate="all"></button><button class="filter-btn" data-filter="sale" data-translate="forSale"></button><button class="filter-btn" data-filter="rent" data-translate="forRent"></button><button class="filter-btn" data-filter="pending" data-translate="pending"></button><button class="filter-btn" data-filter="sold" data-translate="sold"></button><button class="filter-btn" data-filter="rented" data-translate="rented"></button></div><div id="my-posts-container"></div><button id="logout-btn"><i class="fa-solid fa-right-from-bracket"></i> <span data-translate="logout"></span></button>`;
+        document.getElementById('settings-page').innerHTML = `<div class="form-container"><h2 data-translate="settingsTitle"></h2><div class="form-group"><label for="language-select" data-translate="language"></label><select id="language-select"><option value="ku-bad">کوردی (بادینی)</option><option value="ku-sor">کوردی (سۆرانی)</option><option value="ar">عربي</option><option value="en">English</option></select></div><div class="form-group"><label data-translate="colorMode"></label><div style="display: flex; align-items: center; justify-content: space-between; padding: 5px 0;"><span data-translate="lightMode"><i class="fa-solid fa-sun"></i> </span><label class="switch"><input type="checkbox" id="dark-mode-toggle"><span class="slider round"></span></label><span data-translate="darkMode"><i class="fa-solid fa-moon"></i> </span></div></div><hr style="margin: 25px 0; border: none; border-top: 1px solid var(--border-color);"><details class="info-section"><summary data-translate="buyerTipsTitle"></summary><div class="info-content"><ul><li data-translate="buyerTip1"></li><li data-translate="buyerTip2"></li><li data-translate="buyerTip3"></li><li data-translate="buyerTip4"></li><li data-translate="buyerTip5"></li></ul></div></details><details class="info-section"><summary data-translate="sellerTipsTitle"></summary><div class="info-content"><ul><li data-translate="sellerTip1"></li><li data-translate="sellerTip2"></li><li data-translate="sellerTip3"></li><li data-translate="sellerTip4"></li><li data-translate="sellerTip5"></li></ul></div></details><hr style="margin: 25px 0; border: none; border-top: 1px solid var(--border-color);"><h3 data-translate="contactUs"></h3><ul class="contact-list"><li><i class="fa-solid fa-phone-volume"></i> <a href="tel:07507100238">0750 710 0238</a></li><li><i class="fa-solid fa-phone-volume"></i> <a href="tel:07504528000">0750 452 8000</a></li><li><i class="fa-solid fa-phone-volume"></i> <a href="tel:07504176611">0750 417 6611</a></li></ul><div class="developer-info"><p class="dev-title">گەشەپێدان</p><p class="dev-name">Omed Abdulwahid</p><div class="dev-contact"><a href="tel:07507100238"><i class="fa-solid fa-phone"></i> 07507100238</a></div></div></div>`;
+        document.getElementById('add-page').innerHTML = `<form id="add-property-form" class="form-container"></form>`;
+        document.getElementById('favorites-page').innerHTML = `<h2><span data-translate="navFavorites"></span></h2><div id="favorites-container" class="posts-grid"></div>`;
+    }
+    function formatPrice(post) {
+        if (post.status === 'pending') return `<span data-translate="pending"></span>`;
+        if (post.status === 'sold') return `<span data-translate="wasSold"></span>`;
+        if (post.status === 'rented') return `<span data-translate="wasRented"></span>`;
+        switch(post.priceType) {
+            case 'numeric': return post.priceValue ? `$${new Intl.NumberFormat().format(post.priceValue)}` : translations.priceTypeNumeric[currentLang];
+            case 'special': return translations.priceTypeSpecial[currentLang];
+            default: return '';
+        }
+    }
+    function getOverlay(post) {
+        if (post.status === 'sold' || post.status === 'rented') {
+            return `<div class="overlay">${formatPrice(post)}</div>`;
+        }
+        if (post.status === 'pending') {
+            return `<div class="overlay pending">${formatPrice(post)}</div>`;
+        }
+        return '';
+    }
+    function createCardHTML(post, cardType = 'grid') {
+        const isFavorite = favoritePostIds.includes(post.id);
+        const priceDisplay = formatPrice(post);
+        const zeroBadge = post.isZero === 'yes' ? `<span class="zero-badge" data-translate="zero"></span>` : '';
+        const cardClass = cardType === 'story' ? 'story-card' : (cardType === 'list' ? 'list-card' : 'grid-card');
+        const infoClass = cardType === 'story' ? 'story-card-info' : 'grid-card-info';
+        const overlay = getOverlay(post);
+        const firstImage = (post.imageUrls && post.imageUrls.length > 0) ? post.imageUrls[0] : 'https://via.placeholder.com/400x400.png?text=Wêne+Nîne';
+        
+        let detailsHtml = `<div class="story-card-extra-details">
+            <span><i class="fa-solid ${propertyTypeIcons[post.propertyType] || propertyTypeIcons.default}"></i> <span data-translate="${post.propertyType}"></span></span>
+            ${post.bedrooms ? `<span><i class="fa-solid fa-bed"></i> ${post.bedrooms}</span>` : ''}
+            ${post.bathrooms ? `<span><i class="fa-solid fa-bath"></i> ${post.bathrooms}</span>` : ''}
+            ${post.area ? `<span><i class="fa-solid fa-ruler-combined"></i> ${post.area}м²</span>` : ''}
+            ${post.phone ? `<span><i class="fa-solid fa-phone"></i> ${post.phone}</span>` : ''}
+        </div>`;
+        
+        if (cardType === 'list') {
+            return `<div class="property-card ${cardClass}" data-post-id="${post.id}">
+                        <div class="property-image-container">
+                            ${overlay}
+                            ${zeroBadge}
+                            <img src="${firstImage}" alt="${post.location}">
+                        </div>
+                        <div class="list-card-info">
+                            <h3>${post.location || ''}</h3>
+                            <div class="price">${priceDisplay}</div>
+                            <div class="property-card-details">
+                                ${detailsHtml}
+                            </div>
+                        </div>
+                         <i class="favorite-toggle ${isFavorite ? 'fa-solid fa-star is-favorite' : 'fa-regular fa-star'}" style="color: black;" data-post-id="${post.id}"></i>
+                    </div>`;
+        }
+
+        return `<div data-post-id="${post.id}" class="property-card ${cardClass}">
+                    <div class="property-image-container">
+                        ${overlay}
+                        ${zeroBadge}
+                        <i class="favorite-toggle ${isFavorite ? 'fa-solid fa-star is-favorite' : 'fa-regular fa-star'}" data-post-id="${post.id}"></i>
+                        <img src="${firstImage}" alt="${post.location}">
+                        <div class="${infoClass}">
+                            <div class="location-price">
+                                <h3>${post.location || ''}</h3>
+                                <div class="price">${priceDisplay}</div>
+                            </div>
+                            ${detailsHtml}
+                        </div>
+                    </div>
+                </div>`;
+    }
+    function getPublicPosts() {
+        return allPosts.filter(p => p.status !== 'pending');
+    }
+    function renderAll() { renderHomePage(); renderApartmentsPage(); renderProfilePage(); renderFavoritesPage(); renderMapMarkers(); }
+    
+    function renderHomePage() {
+        const publicPosts = getPublicPosts();
+        const postsForHome = publicPosts.filter(p => p.propertyType !== 'apartment');
+        renderPosts(elements.postsGridContainer, postsForHome, 'grid');
+    }
+    
+    function renderApartmentsPage() {
+        const publicPosts = getPublicPosts();
+        const apartmentPosts = publicPosts.filter(p => p.propertyType === 'apartment');
+        if (elements.apartmentsGridContainer) {
+            elements.apartmentsGridContainer.classList.add('story-view');
+        }
+        renderPosts(elements.apartmentsGridContainer, apartmentPosts, 'story');
+    }
+
+    function renderPosts(container, posts, cardType) {
+        if(!container) return;
+        container.innerHTML = '';
+        const postsToRender = (container.id === 'posts-grid-container') ? posts.slice(0, visiblePostsCount) : posts;
+        if (posts.length === 0 || postsToRender.length === 0) {
+             container.innerHTML = `<p class="empty-page-message">هیچ پۆستەک نینە.</p>`;
+             return;
+        }
+        postsToRender.forEach(post => {
+            const cardWrapper = document.createElement('div');
+            cardWrapper.innerHTML = createCardHTML(post, cardType);
+            cardWrapper.firstChild.addEventListener('click', (e) => {
+                if(e.target.classList.contains('favorite-toggle')) {
+                    e.stopPropagation();
+                    toggleFavorite(post.id);
+                }
+                else { renderPostDetailPage(post.id); switchPage('post-detail-page'); }
+            });
+            container.append(cardWrapper);
+        });
+        const loadMoreContainer = document.getElementById('load-more-container');
+        if (container.id === 'posts-grid-container' && loadMoreContainer) {
+            if (visiblePostsCount >= getPublicPosts().filter(p => p.propertyType !== 'apartment').length) {
+                 loadMoreContainer.style.display = 'none';
+            } else {
+                 loadMoreContainer.style.display = 'block';
+            }
+        }
+        applyTranslations(currentLang);
+    }
+    function renderPostDetailPage(postId) {
+        const post = allPosts.find(p => p.id === postId);
+        const container = document.getElementById('post-detail-page');
+        if (!post || post.status === 'pending') {
+            container.innerHTML = `<p class="empty-page-message" data-translate="postNotFound"></p>`;
+            applyTranslations(currentLang); return;
+        }
+        const isFavorite = favoritePostIds.includes(post.id);
+        const priceDisplay = formatPrice(post);
+        let galleryHtml = '';
+        if (post.imageUrls && post.imageUrls.length > 0) {
+            galleryHtml = post.imageUrls.map(url => `<img src="${url}" alt="${post.location}">`).join('');
+        } else {
+            galleryHtml = `<img src="https://via.placeholder.com/400x400.png?text=Wêne+Nîne" alt="${post.location}">`;
+        }
+        
+        const specItems = [
+            { icon: propertyTypeIcons[post.propertyType] || propertyTypeIcons.default, labelKey: "propertyType", value: translations[post.propertyType] ? translations[post.propertyType][currentLang] : post.propertyType },
+            { icon: 'fa-ruler-combined', labelKey: "area", value: post.area ? `${post.area} م²` : 'N/A' },
+            { icon: 'fa-bed', labelKey: "bedrooms", value: post.bedrooms || 'N/A' },
+            { icon: 'fa-bath', labelKey: "bathrooms", value: post.bathrooms || 'N/A' },
+            { icon: 'fa-layer-group', labelKey: "floors", value: post.floors || 'N/A' },
+            { icon: 'fa-compass', labelKey: "direction", value: post.direction || 'N/A' },
+            { icon: 'fa-leaf', labelKey: "garden", value: post.garden === 'yes' ? translations.yes[currentLang] : translations.no[currentLang] }
+        ].filter(item => item.value && item.value !== 'N/A');
+        
+        container.innerHTML = `<div class="detail-header"><button class="back-btn"><i class="fa-solid fa-arrow-left"></i></button><h3 class="detail-title">${post.location}</h3><button class="detail-fav-btn ${isFavorite ? 'is-favorite fa-solid' : 'fa-regular'} fa-star" data-post-id="${post.id}"></button></div><div class="detail-gallery">${galleryHtml}</div><div class="detail-main-info"><h2>${post.location}</h2><div class="price">${priceDisplay}</div></div><div class="detail-specs">${specItems.map(item => `<div class="spec-item"><i class="fa-solid ${item.icon}"></i><span class="value">${item.value}</span><span class="label" data-translate="${item.labelKey}"></span></div>`).join('')}</div><h3 class="section-title" style="padding: 0 20px;" data-translate="mapLocation"></h3><div id="single-post-map"></div><div style="padding: 0 20px 20px;"><a href="tel:${post.phone}" style="text-decoration: none;"><button class="submit-btn"><i class="fa-solid fa-phone"></i> <span data-translate="phone"></span>: ${post.phone}</button></a></div>`;
+        container.querySelector('.back-btn').addEventListener('click', () => { visiblePostsCount = 6; renderHomePage(); switchPage('home-page'); });
+        container.querySelector('.detail-fav-btn').addEventListener('click', (e) => { toggleFavorite(post.id); e.target.classList.toggle('is-favorite'); e.target.classList.toggle('fa-solid'); e.target.classList.toggle('fa-regular'); });
+        if (post.coords && post.coords.lat) initializeSinglePostMap(post.coords);
+        applyTranslations(currentLang);
+    }
+    function renderProfilePage() {
+        if(!elements.myPostsContainer) return;
+        elements.myPostsContainer.innerHTML = '';
+        const filter = elements.profilePage.querySelector('.filter-btn.active')?.dataset.filter || 'all';
+        const searchTerm = elements.searchMyPosts.value.toLowerCase();
+        
+        let postsToRender = allPosts.filter(post => {
+            const searchMatch = !searchTerm || (post.location && post.location.toLowerCase().includes(searchTerm));
+            if (!searchMatch) return false;
+
+            switch(filter) {
+                case 'all': return post.status !== 'pending';
+                case 'sale': return post.listingType === 'sale' && !post.status;
+                case 'rent': return post.listingType === 'rent' && !post.status;
+                case 'pending': return post.status === 'pending';
+                case 'sold': return post.status === 'sold';
+                case 'rented': return post.status === 'rented';
+                default: return true;
+            }
+        });
+
+        if(postsToRender.length === 0){
+            elements.myPostsContainer.innerHTML = `<p class="empty-page-message">هیچ پۆستەک نینە.</p>`;
+        } else {
+            postsToRender.forEach(post => {
+                const cardWrapper = document.createElement('div');
+                let actionButtons = '';
+                if(post.status === 'pending') {
+                    actionButtons = `<button class="action-btn approve-btn" data-post-id="${post.id}"><i class="fa-solid fa-check"></i> <span data-translate="approveBtn"></span></button>`;
+                } else {
+                    actionButtons = `<button class="action-btn sold-btn" data-post-id="${post.id}"><i class="fa-solid fa-tag"></i></button>`;
+                }
+
+                cardWrapper.innerHTML = createCardHTML(post, 'list') + `<div class="card-actions">
+                    <button class="action-btn edit-btn"><i class="fa-solid fa-pencil"></i></button>
+                    ${actionButtons}
+                    <button class="action-btn delete-btn"><i class="fa-solid fa-trash"></i></button></div>`;
+                
+                cardWrapper.querySelector('.edit-btn').addEventListener('click', () => editPost(post.id));
+                cardWrapper.querySelector('.delete-btn').addEventListener('click', () => deletePost(post.id));
+                
+                if(post.status === 'pending') {
+                    cardWrapper.querySelector('.approve-btn').addEventListener('click', (e) => approvePost(e.currentTarget.dataset.postId));
+                } else {
+                    cardWrapper.querySelector('.sold-btn').addEventListener('click', (e) => togglePostStatus(e.currentTarget.dataset.postId));
+                }
+                
+                cardWrapper.querySelector('.favorite-toggle').addEventListener('click', e => { e.stopPropagation(); toggleFavorite(post.id); });
+                elements.myPostsContainer.prepend(cardWrapper);
+            });
+        }
+        updateStats();
+        applyTranslations(currentLang);
+    }
+    function renderFavoritesPage() {
+        if(!elements.favoritesContainer) return;
+        elements.favoritesContainer.innerHTML = '';
+        const publicPosts = getPublicPosts();
+        const favoritePosts = publicPosts.filter(post => favoritePostIds.includes(post.id));
+        if (favoritePosts.length === 0) {
+            elements.favoritesContainer.innerHTML = `<p class="empty-page-message" data-translate="favEmpty"></p>`;
+            applyTranslations(currentLang); return;
+        }
+        favoritePosts.forEach(post => {
+            const cardWrapper = document.createElement('div');
+            cardWrapper.innerHTML = createCardHTML(post, 'grid');
+            cardWrapper.querySelector('.property-card').addEventListener('click', (e) => {
+                if(e.target.classList.contains('favorite-toggle')) {
+                     e.stopPropagation();
+                     toggleFavorite(post.id);
+                }
+                else { renderPostDetailPage(post.id); switchPage('post-detail-page'); }
+            });
+            elements.favoritesContainer.prepend(cardWrapper);
+        });
+        applyTranslations(currentLang);
+    }
+    
+    function setupNumberSelector(controlId, inputId, max, defaultValue) {
+        const control = document.getElementById(controlId);
+        const input = document.getElementById(inputId);
+        if (!control || !input) return;
+
+        control.innerHTML = '';
+        let currentValue = defaultValue || '';
+        input.value = currentValue;
+
+        for (let i = 1; i <= max; i++) {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.dataset.value = i;
+            button.textContent = i;
+            if (i.toString() === currentValue) {
+                button.classList.add('active');
+            }
+            button.addEventListener('click', () => {
+                const allButtons = control.querySelectorAll('button');
+                const clickedValue = button.dataset.value;
+                if (button.classList.contains('active')) {
+                    button.classList.remove('active');
+                    input.value = '';
+                } else {
+                    allButtons.forEach(b => b.classList.remove('active'));
+                    button.classList.add('active');
+                    input.value = clickedValue;
+                }
+            });
+            control.appendChild(button);
+        }
+    }
+    
+    function setupMultiSelectSegmentedControl(controlId, inputId, defaultValue = '') {
+        const control = document.getElementById(controlId);
+        const input = document.getElementById(inputId);
+        const buttons = control.querySelectorAll('button');
+        
+        const updateInputValue = () => {
+            const activeValues = Array.from(control.querySelectorAll('button.active'))
+                                      .map(b => b.dataset.value);
+            input.value = activeValues.join(', ');
+        };
+
+        const defaultValues = defaultValue.split(',').map(item => item.trim());
+        buttons.forEach(button => {
+            if (defaultValues.includes(button.dataset.value)) {
+                button.classList.add('active');
+            }
+            button.addEventListener('click', () => {
+                button.classList.toggle('active');
+                updateInputValue();
+            });
+        });
+        updateInputValue();
+    }
+
+    function renderAddForm(post = {}) {
+        const isEditing = Object.keys(post).length > 0;
+        uploadedImages = isEditing ? [...(post.imageUrls || [])] : [];
+        
+        elements.addPropertyForm.innerHTML = `<h2 id="form-title"></h2><div class="form-group"><label data-translate="propertyImage"></label><label for="image-upload-input" class="image-upload-box"><div class="upload-icon"><i class="fa-solid fa-camera" style="font-size:40px;"></i><p data-translate="chooseImage"></p></div></label><input type="file" id="image-upload-input" accept="image/*" multiple><div id="image-previews-container"></div></div><h3 class="form-section-title" data-translate="mainInfo"></h3><div class="form-group"><label data-translate="listingType"></label><div class="segmented-control" id="listingType-control"><button type="button" data-value="sale"><i class="fa-solid fa-tag"></i><span data-translate="forSale"></span></button><button type="button" data-value="rent"><i class="fa-solid fa-key"></i><span data-translate="forRent"></span></button></div><input type="hidden" name="listingType" id="listingType-input"></div><div class="form-group"><label data-translate="propertyType"></label><div class="property-type-selector" id="propertyType-control"></div><input type="hidden" name="propertyType" id="propertyType-input"></div><div class="form-group"><label data-translate="location"></label><input type="text" name="location" required placeholder="دهۆک، تاخێ ئاشتی" value="${post.location || ''}"></div><div class="form-group"><label data-translate="price"></label><div class="segmented-control" id="priceType-control"><button type="button" data-value="numeric" data-translate="priceTypeNumeric"></button><button type="button" data-value="special" data-translate="priceTypeSpecial"></button></div><input type="hidden" name="priceType" id="priceType-input"><div class="input-with-icon" id="price-value-container" style="margin-top:10px;"><i class="fa-solid fa-dollar-sign"></i><input type="number" name="priceValue" placeholder="150000" value="${post.priceValue || ''}"></div></div><div class="form-group"><label data-translate="phone"></label><div class="input-with-icon"><i class="fa-solid fa-phone"></i><input type="tel" name="phone" required placeholder="07XX XXX XXXX" value="${post.phone || ''}"></div></div><h3 class="form-section-title" data-translate="propertySpecs"></h3><div class="form-grid"><div class="form-group"><label data-translate="area"></label><input type="number" name="area" placeholder="150" required value="${post.area || ''}"></div><div class="form-group"><label data-translate="direction"></label><div class="direction-selector" id="direction-control"><button type="button" data-value="روژهەلات">روژهەلات</button><button type="button" data-value="روژئاڤا">روژئاڤا</button><button type="button" data-value="باکور">باکور</button><button type="button" data-value="باشوور">باشوور</button></div><input type="hidden" name="direction" id="direction-input"></div></div><div class="form-group"><label data-translate="bedrooms"></label><div class="number-selector" id="bedrooms-control"></div><input type="hidden" name="bedrooms" id="bedrooms-input"></div><div class="form-group"><label data-translate="bathrooms"></label><div class="number-selector" id="bathrooms-control"></div><input type="hidden" name="bathrooms" id="bathrooms-input"></div><div class="form-group"><label data-translate="floors"></label><div class="number-selector" id="floors-control"></div><input type="hidden" name="floors" id="floors-input"></div><div class="form-group"><label data-translate="garden"></label><div class="segmented-control" id="garden-control"><button type="button" data-value="no" data-translate="no"></button><button type="button" data-value="yes" data-translate="yes"></button></div><input type="hidden" name="garden" id="garden-input"></div><div class="form-group"><label data-translate="isZero"></label><div class="segmented-control" id="isZero-control"><button type="button" data-value="no" data-translate="no"></button><button type="button" data-value="yes" data-translate="yes"></button></div><input type="hidden" name="isZero" id="isZero-input"></div><h3 class="form-section-title" data-translate="mapLocation"></h3><div id="location-picker-map"></div><div class="form-notice"><i class="fa-solid fa-circle-info"></i><p><strong>تێبینی:</strong> پشتی کو تۆ پۆستێ خۆ بەلاڤ دکەی، ئێک سەر ناهێتە خار. دێ پەیوەندی ب تە هێتە کرن بۆ وێنەگرتنەکا پرۆفێشنال، و پاشی دێ پۆستێ تە هێتە بەلاڤکرن.</p></div><button type="submit" class="submit-btn"></button>`;
+        
+        renderImagePreviews();
+        document.getElementById('image-upload-input').addEventListener('change', handleImageUpload);
+        
+        document.getElementById('form-title').setAttribute('data-translate', isEditing ? 'editFormTitle' : 'addFormTitle');
+        document.querySelector('button[type="submit"]').setAttribute('data-translate', isEditing ? 'updateButton' : 'postButton');
+        
+        function setupSegmentedControl(controlId, inputId, defaultValue, onchangeCallback) {
+            const control = document.getElementById(controlId);
+            const input = document.getElementById(inputId);
+            const buttons = control.querySelectorAll('button');
+            let currentValue = defaultValue || buttons[0]?.dataset.value;
+            input.value = currentValue;
+            buttons.forEach(b => b.classList.toggle('active', b.dataset.value === currentValue));
+            buttons.forEach(button => {
+                button.addEventListener('click', () => {
+                    buttons.forEach(b => b.classList.remove('active'));
+                    button.classList.add('active');
+                    input.value = button.dataset.value;
+                    if (onchangeCallback) onchangeCallback(button.dataset.value);
+                });
+            });
+            if (onchangeCallback) onchangeCallback(currentValue);
+        }
+
+        const priceValueContainer = document.getElementById('price-value-container');
+        const togglePriceInputVisibility = (type) => {
+            priceValueContainer.style.display = type === 'numeric' ? 'block' : 'none';
+        };
+
+        setupSegmentedControl('priceType-control', 'priceType-input', post.priceType || 'numeric', togglePriceInputVisibility);
+        setupSegmentedControl('listingType-control', 'listingType-input', post.listingType);
+        setupSegmentedControl('garden-control', 'garden-input', post.garden);
+        setupSegmentedControl('isZero-control', 'isZero-input', post.isZero);
+        
+        setupMultiSelectSegmentedControl('direction-control', 'direction-input', post.direction);
+        setupNumberSelector('bedrooms-control', 'bedrooms-input', 10, post.bedrooms);
+        setupNumberSelector('bathrooms-control', 'bathrooms-input', 5, post.bathrooms);
+        setupNumberSelector('floors-control', 'floors-input', 5, post.floors);
+        
+        function setupPropertyTypeSelector(defaultValue) {
+            const control = document.getElementById('propertyType-control');
+            const input = document.getElementById('propertyType-input');
+            control.innerHTML = '';
+            const types = ['house', 'apartment', 'villa', 'farm', 'land', 'commercial'];
+            types.forEach(type => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.dataset.value = type;
+                button.innerHTML = `<i class="fa-solid ${propertyTypeIcons[type]}"></i><span data-translate="${type}"></span>`;
+                control.appendChild(button);
+            });
+            const buttons = control.querySelectorAll('button');
+            let currentValue = defaultValue || 'house';
+            input.value = currentValue;
+            buttons.forEach(b => b.classList.toggle('active', b.dataset.value === currentValue));
+            buttons.forEach(button => {
+                button.addEventListener('click', () => {
+                    buttons.forEach(b => b.classList.remove('active'));
+                    button.classList.add('active');
+                    input.value = button.dataset.value;
+                });
+            });
+        }
+        setupPropertyTypeSelector(post.propertyType);
+
+        applyTranslations(currentLang);
+        initializePickerMap(post.coords || defaultCoords);
+    }
+    function enableDarkMode() { document.body.classList.add('dark-mode'); localStorage.setItem('theme', 'dark'); }
+    function disableDarkMode() { document.body.classList.remove('dark-mode'); localStorage.setItem('theme', 'light'); }
+    function handleFormSubmit(e) {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const formValues = Object.fromEntries(formData.entries());
+        formValues.imageUrls = uploadedImages;
+        formValues.coords = selectedCoords;
+        
+        const isEditing = !!editingPostId;
+        const postData = { 
+            ...formValues, 
+            id: editingPostId || Date.now().toString(), 
+            status: isEditing ? allPosts.find(p=>p.id===editingPostId).status : 'pending' 
+        };
+        
+        if (isEditing) {
+            const index = allPosts.findIndex(p => p.id === editingPostId);
+            if (index > -1) allPosts[index] = postData;
+        } else {
+            allPosts.unshift(postData);
+        }
+        
+        saveData('aqaratPosts', allPosts);
+        editingPostId = null; 
+        uploadedImages = [];
+        showToast(translations.postSubmittedSuccess[currentLang]);
+        
+        renderAll();
+        switchPage('profile-page');
+    }
+    function toggleFavorite(postId) {
+        const index = favoritePostIds.indexOf(postId);
+        if (index > -1) favoritePostIds.splice(index, 1);
+        else favoritePostIds.push(postId);
+        saveData('favoritePosts', favoritePostIds);
+        
+        renderHomePage();
+        renderApartmentsPage();
+        renderFavoritesPage();
+        const detailFavBtn = document.querySelector(`#post-detail-page .detail-fav-btn[data-post-id="${postId}"]`);
+        if (detailFavBtn) {
+            detailFavBtn.classList.toggle('is-favorite');
+            detailFavBtn.classList.toggle('fa-solid');
+            detailFavBtn.classList.toggle('fa-regular');
+        }
+    }
+    function approvePost(postId) {
+        const post = allPosts.find(p => p.id === postId);
+        if(post && post.status === 'pending') {
+            post.status = null; // Set status to active/published
+            saveData('aqaratPosts', allPosts);
+            renderProfilePage();
+        }
+    }
+    function togglePostStatus(postId) {
+        const post = allPosts.find(p => p.id === postId);
+        if(!post) return;
+        
+        const newStatus = post.status ? null : (post.listingType === 'sale' ? 'sold' : 'rented');
+        post.status = newStatus;
+        saveData('aqaratPosts', allPosts);
+        renderProfilePage();
+    }
+    function updateStats() {
+        if(!elements.totalPostsStat) return;
+        const publicPosts = getPublicPosts();
+        elements.totalPostsStat.textContent = publicPosts.length;
+        elements.forSaleStat.textContent = publicPosts.filter(p => p.listingType === 'sale' && !p.status).length;
+        elements.forRentStat.textContent = publicPosts.filter(p => p.listingType === 'rent' && !p.status).length;
+    }
+    function editPost(postId) {
+        const post = allPosts.find(p => p.id === postId);
+        if (!post) return;
+        editingPostId = postId;
+        switchPage('add-page');
+        renderAddForm(post);
+    }
+    function deletePost(postId) {
+        if (!confirm(translations.confirmDelete[currentLang])) return;
+        allPosts = allPosts.filter(p => p.id !== postId);
+        favoritePostIds = favoritePostIds.filter(id => id !== postId);
+        saveData('aqaratPosts', allPosts); saveData('favoritePosts', favoritePostIds);
+        visiblePostsCount = 6; 
+        renderAll();
+        switchPage('profile-page');
+    }
+    function loadProfile() {
+        if(!elements.usernameDisplay) return;
+        elements.usernameDisplay.textContent = userProfile.name;
+        elements.profilePic.src = userProfile.pic;
+    }
+    function handleImageUpload(e) {
+        if (e.target.files) {
+            Array.from(e.target.files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    uploadedImages.push(event.target.result);
+                    renderImagePreviews();
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+    }
+    function renderImagePreviews() {
+        const container = document.getElementById('image-previews-container');
+        if (!container) return;
+        container.innerHTML = '';
+        uploadedImages.forEach((imgData, index) => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'img-preview-wrapper';
+            wrapper.innerHTML = `<img src="${imgData}"><div class="delete-img-btn" data-index="${index}"><i class="fa-solid fa-times"></i></div>`;
+            container.appendChild(wrapper);
+        });
+        document.querySelectorAll('.delete-img-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const indexToRemove = parseInt(e.currentTarget.dataset.index, 10);
+                uploadedImages.splice(indexToRemove, 1);
+                renderImagePreviews();
+            });
+        });
+    }
+    function initializePickerMap(coords) {
+        if (pickerMap) pickerMap.remove();
+        pickerMap = L.map('location-picker-map').setView(coords, 13);
+        L.control.layers(baseLayers).addTo(pickerMap);
+        baseLayers['Sade'].addTo(pickerMap);
+        const pickerIcon = L.divIcon({ className: 'picker-map-marker', iconSize: [20, 20] });
+        pickerMarker = L.marker(coords, { draggable: true, icon: pickerIcon }).addTo(pickerMap);
+        pickerMap.on('click', e => { selectedCoords = e.latlng; pickerMarker.setLatLng(selectedCoords); });
+        pickerMarker.on('dragend', e => { selectedCoords = e.target.getLatLng(); });
+    }
+    function initializeMainMap() {
+        if(mainMap) mainMap.remove();
+        mainMap = L.map('main-map-container', { zoomControl: false }).setView(defaultCoords, 13);
+        L.control.layers(baseLayers).addTo(mainMap);
+        baseLayers['Sade'].addTo(mainMap);
+    }
+    function renderMapMarkers() {
+        if (!mainMap) return;
+        mainMap.eachLayer(layer => { if (layer instanceof L.Marker) mainMap.removeLayer(layer); });
+        userLocationMarker = null;
+        getPublicPosts().forEach(post => {
+            if (post.coords && post.coords.lat && post.coords.lng) {
+                const iconClass = propertyTypeIcons[post.propertyType] || propertyTypeIcons.default;
+                let markerColorClass = '';
+                if(post.status === 'sold' || post.status === 'rented') {
+                    markerColorClass = ' sold';
+                } else if (post.listingType === 'rent') {
+                    markerColorClass = ' rent';
+                }
+                const customIcon = L.divIcon({
+                    className: `custom-map-marker${markerColorClass}`,
+                    html: `<i class="fa-solid ${iconClass}"></i>`,
+                    iconSize: [30, 30],
+                    iconAnchor: [15, 15]
+                });
+                const firstImage = (post.imageUrls && post.imageUrls.length > 0) ? post.imageUrls[0] : 'https://via.placeholder.com/400x400.png?text=Wêne+Nîne';
+                const priceDisplay = formatPrice(post);
+                const popupContent = `<div class="map-popup"><img src="${firstImage}" alt="${post.location}"><h4>${post.location}</h4><div class="price">${priceDisplay}</div><button class="view-details-btn" data-post-id="${post.id}" data-translate="viewDetails"></button></div>`;
+                const marker = L.marker([post.coords.lat, post.coords.lng], { icon: customIcon }).addTo(mainMap).bindPopup(popupContent);
+                marker.on('popupopen', () => applyTranslations(currentLang));
+            }
+        });
+    }
+    function initializeSinglePostMap(coords) {
+        if (singlePostMap) singlePostMap.remove();
+        singlePostMap = L.map('single-post-map').setView(coords, 15);
+        L.control.layers(baseLayers).addTo(singlePostMap);
+        baseLayers['Satelite'].addTo(singlePostMap);
+        const mainIcon = L.divIcon({ className: 'custom-map-marker', html: `<i class="fa-solid fa-location-dot"></i>`, iconSize: [30, 30] });
+        L.marker(coords, { icon: mainIcon }).addTo(singlePostMap);
+    }
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.id = 'toast-notification';
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        setTimeout(() => {
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 500);
+            }, 2000);
+        }, 100);
+    }
+    function locateUser() {
+        if (!navigator.geolocation) {
+            showToast("Geolocation is not supported by your browser");
+            return;
+        }
+        navigator.geolocation.getCurrentPosition(position => {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            mainMap.setView([lat, lng], 15);
+            if (userLocationMarker) { mainMap.removeLayer(userLocationMarker); }
+            const userIcon = L.divIcon({ className: 'user-location-marker', iconSize: [20, 20] });
+            userLocationMarker = L.marker([lat, lng], { icon: userIcon }).addTo(mainMap);
+            showToast(translations.locationFound[currentLang]);
+        }, () => {
+            showToast(translations.locationNotFound[currentLang]);
+        });
+    }
+    function setupEventListeners() {
+        document.querySelectorAll('.bottom-nav a').forEach(l => {
+            l.addEventListener('click', e => {
+                e.preventDefault();
+                const targetLink = e.currentTarget;
+                if(!targetLink.classList.contains('active') || targetLink.id === 'fab-add-btn') {
+                    visiblePostsCount = 6;
+                    switchPage(targetLink.dataset.page);
+                }
+            });
+        });
+        document.getElementById('profile-header-btn').addEventListener('click', e => { e.preventDefault(); switchPage('profile-page'); });
+        document.getElementById('settings-header-btn').addEventListener('click', e => { e.preventDefault(); switchPage('settings-page'); });
+        
+        const mapPage = document.querySelector('.page-content#map-page');
+        if (mapPage) {
+            mapPage.addEventListener('click', function(e) {
+                if (e.target.closest('#locate-me-btn')) {
+                    locateUser();
+                }
+                if (e.target.closest('#refresh-map-btn')) {
+                    renderMapMarkers();
+                }
+            });
+        }
+        
+        elements.body.addEventListener('submit', function(e) { if (e.target.id === 'add-property-form') handleFormSubmit(e); });
+        elements.body.addEventListener('click', function(e) {
+            if (e.target.id === 'edit-profile-btn') {
+                const newName = prompt(translations.promptNewName[currentLang], userProfile.name);
+                if (newName) { userProfile.name = newName; saveData('userProfile', userProfile); loadProfile(); }
+            }
+            if (e.target.closest('#profile-pic-container')) document.getElementById('profile-pic-input').click();
+            if (e.target.classList.contains('filter-btn')) {
+                document.querySelectorAll('#profile-page .filter-btn').forEach(btn => btn.classList.remove('active'));
+                e.target.classList.add('active');
+                renderProfilePage();
+            }
+            if (e.target.classList.contains('view-details-btn')) {
+                const postId = e.target.dataset.postId;
+                if(postId) { renderPostDetailPage(postId); switchPage('post-detail-page'); }
+            }
+            if (e.target.id === 'load-more-btn') {
+                 visiblePostsCount += postsPerPage;
+                 renderHomePage();
+            }
+        });
+        elements.body.addEventListener('change', function(e){
+            if(e.target.id === 'profile-pic-input'){
+                if (e.target.files && e.target.files[0]) { 
+                    const reader = new FileReader(); 
+                    reader.onload = e => { userProfile.pic = e.target.result; saveData('userProfile', userProfile); loadProfile(); }; 
+                    reader.readAsDataURL(e.target.files[0]); 
+                }
+            }
+            if(e.target.id === 'dark-mode-toggle'){
+                if (e.target.checked) enableDarkMode(); else disableDarkMode();
+            }
+            if(e.target.id === 'language-select'){
+                localStorage.setItem('appLanguage', e.target.value);
+                location.reload(); 
+            }
+        });
+        elements.body.addEventListener('input', e => { if (e.target.id === 'search-my-posts') renderProfilePage(); });
+    }
+    function init() {
+        populateStaticHTML();
+        Object.assign(elements, {
+            homePage: document.getElementById('home-page'), postsGridContainer: document.getElementById('posts-grid-container'),
+            apartmentsPage: document.getElementById('apartments-page'), apartmentsGridContainer: document.getElementById('apartments-grid-container'),
+            profilePage: document.getElementById('profile-page'), myPostsContainer: document.getElementById('my-posts-container'),
+            favoritesContainer: document.getElementById('favorites-page'), addPropertyForm: document.getElementById('add-property-form'),
+            usernameDisplay: document.getElementById('username-display'), profilePic: document.getElementById('profile-pic'),
+            totalPostsStat: document.getElementById('total-posts-stat'), forSaleStat: document.getElementById('for-sale-stat'),
+            forRentStat: document.getElementById('for-rent-stat'), searchMyPosts: document.getElementById('search-my-posts'),
+        });
+        const darkModeToggle = document.getElementById('dark-mode-toggle');
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        if (savedTheme === 'dark') {
+            if(darkModeToggle) darkModeToggle.checked = true;
+            enableDarkMode();
+        } else {
+            disableDarkMode();
+        }
+        document.getElementById('language-select').value = currentLang;
+        applyTranslations(currentLang);
+        loadProfile();
+        initializeMainMap();
+        renderAll();
+        setupEventListeners();
+    }
+    init();
+});
+</script>
+</body>
+</html>
