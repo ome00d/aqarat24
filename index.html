@@ -330,14 +330,14 @@
         body.map-is-active #main-map-container { height: 100vh; }
         
         #main-map-container, #location-picker-map { width: 100%; z-index: 1; }
-        #main-map-container { height: 100%; }
+        #main-map-container { height: 100%; position: relative; }
         #location-picker-map { height: 300px; }
         
         .map-controls {
             position: absolute;
             bottom: 30px;
             right: 15px;
-            z-index: 1000;
+            z-index: 401;
             display: flex;
             flex-direction: column;
             gap: 10px;
@@ -374,50 +374,24 @@
             100% { box-shadow: 0 0 0 0 rgba(74, 144, 226, 0); }
         }
 
-        .leaflet-control-layers {
-            background: var(--card-background);
-            border-radius: 12px !important;
-            box-shadow: var(--shadow);
-            border: none;
-        }
-        .leaflet-control-layers-toggle {
-            background-image: none !important;
-            width: 44px !important;
-            height: 44px !important;
-        }
-        .leaflet-control-layers-toggle::after {
-            font-family: 'Font Awesome 6 Free';
-            font-weight: 900;
-            content: '\\f279';
-            font-size: 1.3em;
-            color: var(--text-color);
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-        body.dark-mode .leaflet-control-layers-toggle::after {
-            color: var(--text-light);
-        }
-        .leaflet-control-layers-expanded { padding: 10px; }
-        .leaflet-control-layers-base label {
-            display: block; padding: 8px 15px; margin-bottom: 5px;
-            border-radius: 8px; cursor: pointer; transition: background-color 0.2s ease;
-            font-weight: 600;
-        }
-        .leaflet-control-layers-base label:hover {
-            background-color: var(--background-color);
-        }
-        .leaflet-control-layers-base input { display: none; }
-        .leaflet-control-layers-base input:checked + span { color: var(--primary-color); }
-
         .property-card { position: relative; overflow: hidden; cursor: pointer; }
         .favorite-toggle { position: absolute; top: 10px; right: 10px; font-size: 1.5em; color: #fff; cursor: pointer;
             text-shadow: 0 0 5px rgba(0,0,0,0.7); z-index: 10; transition: color 0.2s; }
         .favorite-toggle.is-favorite { color: var(--favorite-color); }
-        .zero-badge { position: absolute; top: 10px; left: 10px; background-color: rgba(2, 62, 138, 0.8); color: white; padding: 4px 10px; border-radius: 8px; font-size: 0.8em; font-weight: 700; z-index: 10; backdrop-filter: blur(4px); }
+        .zero-badge { position: absolute; top: 10px; right: 10px; background-color: rgba(2, 62, 138, 0.8); color: white; padding: 4px 10px; border-radius: 8px; font-size: 0.8em; font-weight: 700; z-index: 10; backdrop-filter: blur(4px); }
+        .post-code-badge { position: absolute; top: 10px; left: 10px; background-color: rgba(52, 58, 64, 0.8); color: white; padding: 4px 8px; border-radius: 8px; font-size: 0.8em; font-weight: 700; z-index: 10; backdrop-filter: blur(4px); display: flex; align-items: center; gap: 4px; }
+        .list-card .post-code-badge { top: auto; bottom: 10px; }
         .property-image-container { width: 100%; height:100%; }
-        .property-image-container img { width: 100%; height: 100%; object-fit: cover; }
+        .property-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.3s ease-in-out;
+            opacity: 0;
+        }
+        .property-image-container img.loaded {
+            opacity: 1;
+        }
         .price { font-size: 1.5em; color: var(--sold-color); margin-bottom: 10px; font-weight: 700; }
         .card-actions { display: flex; gap: 10px; padding: 15px; background-color: var(--background-color); border-top: 1px solid var(--border-color); }
         .action-btn { flex-grow: 1; padding: 10px; border: none; color: white; cursor: pointer; font-weight: 600; }
@@ -464,7 +438,7 @@
             aspect-ratio: 9 / 16;
         }
 
-        .grid-card-info { position: absolute; bottom: 0; left: 0; right: 0; padding: 8px; color: white; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 120%); }
+        .grid-card-info { position: absolute; bottom: 0; left: 0; right: 0; padding: 12px; color: white; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 120%); }
         .location-price { display: flex; justify-content: space-between; align-items: center; width: 100%; }
         .grid-card-info h3, .story-card-info h3 { font-size: 0.9em; margin: 0; color: #fff; text-shadow: 1px 1px 2px rgba(0,0,0,0.7); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .grid-card-info .price, .story-card-info .price { font-size: 1em; color: #fff; font-weight: bold; margin: 0; flex-shrink: 0; margin-right: 5px; }
@@ -496,7 +470,7 @@
         
         .list-card { background: var(--card-background); box-shadow: var(--shadow); border: 1px solid var(--border-color); margin-bottom: 20px; display: flex; flex-direction: column; }
         .list-card .property-image-container { aspect-ratio: 16/10; }
-        .list-card .property-card-info { padding: 15px; }
+        .list-card .list-card-info { padding: 15px; }
         .list-card .property-card-details { display: flex; flex-wrap: wrap; gap: 15px; font-size: 0.9em; padding-top: 10px; margin-top: 10px; border-top: 1px solid var(--border-color); }
         
         .overlay {
@@ -511,7 +485,9 @@
         #post-detail-page { padding: 0; background-color: var(--card-background); }
         .detail-header { padding: 10px 15px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); }
         .back-btn { background: none; border: none; font-size: 1.5em; cursor: pointer; color: var(--text-color); }
-        .detail-title { font-size: 1.2em; font-weight: 700; margin: 0; flex-grow: 1; text-align: center; }
+        .detail-title-wrapper {flex-grow: 1; text-align: center;}
+        .detail-title { font-size: 1.2em; font-weight: 700; margin: 0; }
+        .detail-code {font-size: 0.7em; color: var(--text-light); margin-top: 2px; display: block;}
         .detail-fav-btn { font-size: 1.5em; background: none; border: none; cursor: pointer; color: #ccc; }
         .detail-fav-btn.is-favorite { color: var(--favorite-color); }
         
@@ -542,7 +518,6 @@
         .spec-item .label { font-size: 0.8em; color: var(--text-light); display: block; }
         .spec-item .value { font-size: 1.1em; font-weight: 600; display: block; }
         #single-post-map { height: 250px; margin: 20px; z-index: 1; }
-        .leaflet-popup-content-wrapper { border-radius: 8px; }
         .map-popup { text-align: right; }
         .map-popup img { width: 100%; height: 80px; object-fit: cover; border-radius: 4px; }
         .map-popup h4 { margin: 5px 0; font-size: 1em; }
@@ -565,9 +540,6 @@
         .picker-map-marker {
             background-color: var(--rent-color); width: 20px; height: 20px; border-radius: 50%;
             border: 3px solid #fff; box-shadow: 0 0 10px rgba(0,0,0,0.5); cursor: move;
-        }
-        .leaflet-control-layers-toggle {
-            background-image: none;
         }
         #toast-notification {
             position: fixed;
@@ -605,6 +577,7 @@
             color: var(--text-color);
             font-weight: 700;
             margin: 0;
+            cursor: pointer;
         }
         .developer-info .dev-contact {
             margin-top: 5px;
@@ -619,6 +592,178 @@
         .developer-info .dev-contact i {
             margin-right: 8px;
         }
+        
+        .grid-card-bottom-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 5px;
+            font-size: 0.9em;
+        }
+        .grid-card-bottom-details > span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .grid-card-bottom-details .price {
+            font-size: 1.1em !important;
+            color: #fff !important;
+            font-weight: bold !important;
+            margin: 0 !important;
+        }
+
+        /* --- START: NEW ADMIN & MAP CSS --- */
+        .admin-view { display: none; }
+        .custom-map-layer-switcher {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 401;
+            background: var(--card-background);
+            border-radius: 25px;
+            box-shadow: var(--shadow);
+            padding: 5px;
+            display: flex;
+            gap: 5px;
+        }
+        .custom-map-layer-switcher button {
+            background-color: transparent;
+            border: none;
+            color: var(--text-light);
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .custom-map-layer-switcher button:hover {
+            background-color: var(--background-color);
+        }
+        .custom-map-layer-switcher button.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .admin-header h2 {
+            margin: 0;
+            color: var(--text-color);
+        }
+        .admin-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .admin-stat-card {
+            background-color: var(--card-background);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+        .admin-stat-card .stat-number {
+            font-size: 2.2em;
+            font-weight: 700;
+            color: var(--primary-color);
+            display: block;
+        }
+        .admin-stat-card .stat-label {
+            font-size: 0.9em;
+            color: var(--text-light);
+            margin-top: 5px;
+            display: block;
+        }
+        .admin-dashboard-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .admin-dashboard-nav button {
+            font-size: 1.1em;
+            padding: 18px;
+            border-radius: 15px;
+            gap: 10px;
+            justify-content: center;
+        }
+        .admin-columns {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        .admin-column h3 {
+            background-color: var(--background-color);
+            padding: 12px;
+            border-radius: 15px;
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--primary-color);
+        }
+        #private-data-table-container, #admin-data-table-container {
+            overflow-x: auto;
+        }
+        #private-data-table, #admin-data-table {
+            width: 100%;
+            border-collapse: collapse;
+            white-space: nowrap;
+        }
+        #private-data-table th, #private-data-table td, #admin-data-table th, #admin-data-table td {
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            text-align: right;
+        }
+        #private-data-table thead, #admin-data-table thead {
+            background-color: var(--background-color);
+        }
+        #private-data-table tr:nth-child(even), #admin-data-table tr:nth-child(even) {
+            background-color: var(--background-color);
+        }
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 2000; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            background-color: var(--card-background);
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            width: 90%;
+            max-width: 500px;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .close-btn {
+            color: var(--text-light);
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close-btn:hover, .close-btn:focus {
+            color: var(--text-color);
+        }
+        /* --- END: NEW ADMIN & MAP CSS --- */
     </style>
 </head>
 <body>
@@ -641,16 +786,16 @@
         </div>
         <div id="add-page" class="page-content"></div>
         <div id="map-page" class="page-content">
-            <div id="main-map-container"></div>
-            <div class="map-controls">
-                <button id="refresh-map-btn"><i class="fa-solid fa-arrows-rotate"></i></button>
-                <button id="locate-me-btn"><i class="fa-solid fa-location-crosshairs"></i></button>
+            <div id="main-map-container">
+                 <div id="custom-layer-control-container"></div>
             </div>
+            <div class="map-controls"></div>
         </div>
         <div id="profile-page" class="page-content"></div>
         <div id="favorites-page" class="page-content"></div>
         <div id="settings-page" class="page-content"></div>
         <div id="post-detail-page" class="page-content"></div>
+        <div id="admin-page" class="page-content"></div>
     </main>
     
     <nav class="bottom-nav">
@@ -665,9 +810,49 @@
         </div>
     </nav>
 
+    <!-- Modal for Private Data -->
+    <div id="private-data-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="private-data-modal-title">Tomarekê Nû</h2>
+                <span class="close-btn">&times;</span>
+            </div>
+            <form id="private-data-form">
+                <input type="hidden" id="private-record-id">
+                <div class="form-group">
+                    <label>Nav û Nîşan</label>
+                    <input type="text" id="private-location" required>
+                </div>
+                 <div class="form-grid">
+                    <div class="form-group">
+                        <label>Buhay</label>
+                        <input type="text" id="private-price">
+                    </div>
+                    <div class="form-group">
+                        <label>Rûber (m²)</label>
+                        <input type="number" id="private-area">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Jimara Têlefonê</label>
+                    <input type="tel" id="private-phone">
+                </div>
+                <div class="form-group">
+                    <label>Têbînî</label>
+                    <textarea id="private-notes" rows="3"></textarea>
+                </div>
+                <button type="submit" class="submit-btn">Paşkeft bike</button>
+            </form>
+        </div>
+    </div>
+
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const translations = {
+        adminPanelTitle: { "ku-bad": "پانەلا ئادمنی", "ku-sor": "پەناڵی ئەدمین", "ar": "لوحة التحكم", "en": "Admin Panel" },
+        showPendingOnly: { "ku-bad": "بتنێ یێن چاڤەرێ", "ku-sor": "تەنها چاوەڕوانکراو", "ar": "عرض قيد الانتظار فقط", "en": "Show Pending Only" },
+        backToAdmin: { "ku-bad": "زڤڕین بۆ پانەلێ", "ku-sor": "گەڕانەوە بۆ پەناڵ", "ar": "العودة للوحة التحكم", "en": "Back to Panel" },
         navHome: { "ku-bad": "مال", "ku-sor": "سەرەکی", "ar": "الرئيسية", "en": "Home" },
         navFavorites: { "ku-bad": "هەلبژارتی", "ku-sor": "دڵخوازەکان", "ar": "المفضلة", "en": "Favorites" },
         navAdd: { "ku-bad": "زیدە کرن", "ku-sor": "زیادکردن", "ar": "إضافة", "en": "Add" },
@@ -743,15 +928,50 @@ document.addEventListener('DOMContentLoaded', function() {
         priceTypeSpecial: { "ku-bad": "بهایێ تایبەت", "ku-sor": "نرخی تایبەت", "ar": "سعر خاص", "en": "Special Price" },
         isZero: { "ku-bad": "ئەڤ مولکە سفرە؟", "ku-sor": "ئەم موڵکە تازەیە؟", "ar": "هل العقار جديد؟", "en": "Is this property new?" },
         zero: { "ku-bad": "صفر", "ku-sor": "تازە", "ar": "جديد", "en": "New" },
-        pending: { "ku-bad": "یێ چاڤەرێ", "ku-sor": "چاوەڕوان", "ar": "قيد الانتظar", "en": "Pending" },
+        pending: { "ku-bad": "یێ چاڤەرێ", "ku-sor": "چاوەڕوان", "ar": "قيد الانتظار", "en": "Pending" },
         approveBtn: { "ku-bad": "پەسەندکرن", "ku-sor": "پەسەندکردن", "ar": "موافقة", "en": "Approve" },
         postSubmittedSuccess: { "ku-bad": "پۆستێ تە بۆ پێداچوونێ هاتە هنارتن", "ku-sor": "پۆستەکەت بۆ پێداچوون نێردرا", "ar": "تم إرسال إعلانك للمراجعة", "en": "Your post was submitted for review" },
+        postApprovedSuccess: { "ku-bad": "پۆست ب سەرکەفتی هاتە پەسەندکرن", "ku-sor": "پۆستەکە بە سەرکەوتوویی پەسەندکرا", "ar": "تمت الموافقة على الإعلان بنجاح", "en": "Post approved successfully" },
+        postUpdatedSuccess: { "ku-bad": "پۆست ب سەرکەفتی هاتە نووکرن", "ku-sor": "پۆستەکە بە سەرکەوتوویی نوێکرایەوە", "ar": "تم تحديث الإعلان بنجاح", "en": "Post updated successfully" },
     };
     let currentLang = localStorage.getItem('appLanguage') || 'ku-bad';
     const elements = { body: document.body };
-    let allPosts = JSON.parse(localStorage.getItem('aqaratPosts')) || [];
-    let userProfile = JSON.parse(localStorage.getItem('userProfile')) || { name: 'نەناس', pic: 'https://via.placeholder.com/100' };
-    let favoritePostIds = JSON.parse(localStorage.getItem('favoritePosts')) || [];
+    let allPosts, userProfile, favoritePostIds, privateProperties;
+    let lastActivePageBeforeDetail = 'home-page';
+    
+    function saveData(key, data) { localStorage.setItem(key, JSON.stringify(data)); }
+
+    const samplePosts = [
+        { id: "1726200000001", postCode: "101A", userId: "admin_user_id", listingType: "sale", propertyType: "house", location: "دهۆک, گرێ باسێ", priceType: "numeric", priceValue: "120000", phone: "07501112233", area: "200", direction: "روژهەلات", bedrooms: "4", bathrooms: "3", floors: "2", garden: "yes", isZero: "no", coords: { lat: 36.861, lng: 42.989 }, imageUrls: ["https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"], status: null },
+        { id: "1726200000002", postCode: "25B", userId: "admin_user_id", listingType: "rent", propertyType: "apartment", location: "شوقێن گولان, هەولێر", priceType: "numeric", priceValue: "500", phone: "07502223344", area: "150", direction: "باکور", bedrooms: "3", bathrooms: "2", floors: "1", garden: "no", isZero: "yes", coords: { lat: 36.191, lng: 44.009 }, imageUrls: ["https://images.pexels.com/photos/276724/pexels-photo-276724.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"], status: null },
+        { id: "1726200000003", postCode: "V03", userId: "admin_user_id", listingType: "sale", propertyType: "villa", location: "ماسیک, دهۆک", priceType: "special", priceValue: "", phone: "07503334455", area: "600", direction: "روژئاڤا", bedrooms: "6", bathrooms: "5", floors: "3", garden: "yes", isZero: "yes", coords: { lat: 36.883, lng: 42.946 }, imageUrls: ["https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"], status: "pending" },
+        { id: "1726200000004", postCode: "L77", userId: "admin_user_id", listingType: "sale", propertyType: "land", location: "زاويتە, رێکا سەرەکی", priceType: "numeric", priceValue: "80000", phone: "07504445566", area: "1000", direction: "", bedrooms: "", bathrooms: "", floors: "", garden: "no", isZero: "no", coords: { lat: 37.142, lng: 43.136 }, imageUrls: ["https://images.pexels.com/photos/164558/pexels-photo-164558.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"], status: null },
+        { id: "1726200000005", postCode: "C40", userId: "admin_user_id", listingType: "rent", propertyType: "commercial", location: "ناڤ بازاری, سلێمانی", priceType: "numeric", priceValue: "1200", phone: "07705556677", area: "80", direction: "باشوور", bedrooms: "", bathrooms: "1", floors: "1", garden: "no", isZero: "no", coords: { lat: 35.564, lng: 45.437 }, imageUrls: ["https://images.pexels.com/photos/262333/pexels-photo-262333.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"], status: null },
+        { id: "1726200000006", postCode: "A91", userId: "admin_user_id", listingType: "sale", propertyType: "apartment", location: "شوقێن ئاشتی, دهۆک", priceType: "numeric", priceValue: "75000", phone: "07506667788", area: "175", direction: "روژهەلات, باکور", bedrooms: "3", bathrooms: "2", floors: "1", garden: "no", isZero: "no", coords: { lat: 36.851, lng: 42.997 }, imageUrls: ["https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"], status: "pending" }
+    ];
+    
+    const isFirstLoad = !localStorage.getItem('aqaratPosts');
+    if (isFirstLoad) {
+        localStorage.clear();
+        allPosts = samplePosts;
+        userProfile = { id: 'user_' + Date.now(), name: 'نەناس', pic: 'https://via.placeholder.com/100' };
+        favoritePostIds = [];
+        privateProperties = [];
+        saveData('aqaratPosts', allPosts);
+        saveData('userProfile', userProfile);
+        saveData('favoritePosts', favoritePostIds);
+        saveData('privateProperties', privateProperties);
+    } else {
+        allPosts = JSON.parse(localStorage.getItem('aqaratPosts'));
+        userProfile = JSON.parse(localStorage.getItem('userProfile')) || { id: 'user_' + Date.now(), name: 'نەناس', pic: 'https://via.placeholder.com/100' };
+        if (!userProfile.id) {
+            userProfile.id = 'user_' + Date.now();
+            saveData('userProfile', userProfile);
+        }
+        favoritePostIds = JSON.parse(localStorage.getItem('favoritePosts')) || [];
+        privateProperties = JSON.parse(localStorage.getItem('privateProperties')) || [];
+    }
+    
     let editingPostId = null, mainMap, pickerMap, pickerMarker, singlePostMap;
     let userLocationMarker = null;
     let defaultCoords = { lat: 36.8665, lng: 42.9906 };
@@ -760,11 +980,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const propertyTypeIcons = { house: 'fa-house-chimney', apartment: 'fa-building', villa: 'fa-house-chimney-window', farm: 'fa-tractor', land: 'fa-mountain-sun', commercial: 'fa-store', default: 'fa-building-shield' };
     let visiblePostsCount = 6;
     const postsPerPage = 6;
+    const imagePlaceholder = "data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==";
     const baseLayers = {
         'Satelite': L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: 'Tiles &copy; Esri' }),
         'Sade': L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; CARTO' }),
         'Klasîk': L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap' })
     };
+    let currentTileLayer = baseLayers['Sade'];
+
     function applyTranslations(lang) {
         document.documentElement.lang = lang.split('-')[0];
         document.documentElement.dir = (lang === 'ar' || lang.startsWith('ku')) ? 'rtl' : 'ltr';
@@ -776,15 +999,28 @@ document.addEventListener('DOMContentLoaded', function() {
         const loadMoreBtn = document.getElementById('load-more-btn');
         if(loadMoreBtn) loadMoreBtn.textContent = "بارکرنا پتر";
     }
-    function saveData(key, data) { localStorage.setItem(key, JSON.stringify(data)); }
+
     function switchPage(pageId) {
+        const currentPage = document.querySelector('.page-content.active');
+        if (currentPage && pageId === 'post-detail-page' && currentPage.id !== 'post-detail-page') {
+            lastActivePageBeforeDetail = currentPage.id;
+        }
+
         let isMapPage = pageId === 'map-page';
         let isDetailPage = pageId === 'post-detail-page';
-        elements.body.className = isMapPage ? 'map-is-active' : '';
-        const currentTheme = localStorage.getItem('theme');
-        if (currentTheme === 'dark') document.body.classList.add('dark-mode');
-        document.querySelector('header').style.display = isDetailPage || isMapPage ? 'none' : 'flex';
-        document.querySelector('.bottom-nav').style.display = isDetailPage ? 'none' : 'flex'; 
+        let isAdminPage = pageId === 'admin-page';
+        
+        const currentClassName = document.body.className;
+        let newClassName = '';
+        if (isMapPage) newClassName = 'map-is-active';
+        if (localStorage.getItem('theme') === 'dark') {
+            newClassName += (newClassName ? ' ' : '') + 'dark-mode';
+        }
+        document.body.className = newClassName;
+
+
+        document.querySelector('header').style.display = isDetailPage || isMapPage || isAdminPage ? 'none' : 'flex';
+        document.querySelector('.bottom-nav').style.display = isDetailPage || isAdminPage ? 'none' : 'flex'; 
         document.querySelectorAll('.page-content').forEach(p => p.classList.toggle('active', p.id === pageId));
         document.querySelectorAll('.bottom-nav a').forEach(l => l.classList.remove('active'));
         const activeLink = document.querySelector(`.bottom-nav a[data-page="${pageId}"]`);
@@ -794,6 +1030,10 @@ document.addEventListener('DOMContentLoaded', function() {
         if (pageId !== 'add-page') editingPostId = null;
         if (pageId === 'home-page') renderHomePage();
         if (pageId === 'apartments-page') renderApartmentsPage();
+        if (pageId === 'admin-page') renderAdminPage();
+        if (pageId === 'profile-page') renderProfilePage();
+        
+        if (pageId === 'map-page') updateMapControls();
         
         setTimeout(() => {
             if (isMapPage && mainMap) { mainMap.invalidateSize(); renderMapMarkers(); }
@@ -802,10 +1042,70 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 50);
     }
     function populateStaticHTML() {
-        document.getElementById('profile-page').innerHTML = `<div class="profile-header"><div id="profile-pic-container"><img src="https://via.placeholder.com/100" alt="Wêneyê Profaylê" id="profile-pic"><input type="file" id="profile-pic-input" accept="image/*"><i class="fa-solid fa-pencil" id="profile-pic-edit-icon"></i></div><h2 id="username-display"></h2><button id="edit-profile-btn" data-translate="editProfileName"></button></div><div class="stats-container"><div class="stat-card"><i class="fa-solid fa-list-check"></i><span class="stat-number" id="total-posts-stat">0</span><span class="stat-label" data-translate="allPosts"></span></div><div class="stat-card"><i class="fa-solid fa-tags"></i><span class="stat-number" id="for-sale-stat">0</span><span class="stat-label" data-translate="forSale"></span></div><div class="stat-card"><i class="fa-solid fa-key"></i><span class="stat-number" id="for-rent-stat">0</span><span class="stat-label" data-translate="forRent"></span></div></div><div class="my-posts-controls"><input type="search" id="search-my-posts"><button class="filter-btn active" data-filter="all" data-translate="all"></button><button class="filter-btn" data-filter="sale" data-translate="forSale"></button><button class="filter-btn" data-filter="rent" data-translate="forRent"></button><button class="filter-btn" data-filter="pending" data-translate="pending"></button><button class="filter-btn" data-filter="sold" data-translate="sold"></button><button class="filter-btn" data-filter="rented" data-translate="rented"></button></div><div id="my-posts-container"></div><button id="logout-btn"><i class="fa-solid fa-right-from-bracket"></i> <span data-translate="logout"></span></button>`;
+        document.getElementById('profile-page').innerHTML = `<div class="profile-header"><div id="profile-pic-container"><img src="https://via.placeholder.com/100" alt="Wêneyê Profaylê" id="profile-pic"><input type="file" id="profile-pic-input" accept="image/*"><i class="fa-solid fa-pencil" id="profile-pic-edit-icon"></i></div><h2 id="username-display"></h2><button id="edit-profile-btn" data-translate="editProfileName"></button></div><div id="my-posts-container"></div><button id="logout-btn"><i class="fa-solid fa-right-from-bracket"></i> <span data-translate="logout"></span></button>`;
         document.getElementById('settings-page').innerHTML = `<div class="form-container"><h2 data-translate="settingsTitle"></h2><div class="form-group"><label for="language-select" data-translate="language"></label><select id="language-select"><option value="ku-bad">کوردی (بادینی)</option><option value="ku-sor">کوردی (سۆرانی)</option><option value="ar">عربي</option><option value="en">English</option></select></div><div class="form-group"><label data-translate="colorMode"></label><div style="display: flex; align-items: center; justify-content: space-between; padding: 5px 0;"><span data-translate="lightMode"><i class="fa-solid fa-sun"></i> </span><label class="switch"><input type="checkbox" id="dark-mode-toggle"><span class="slider round"></span></label><span data-translate="darkMode"><i class="fa-solid fa-moon"></i> </span></div></div><hr style="margin: 25px 0; border: none; border-top: 1px solid var(--border-color);"><details class="info-section"><summary data-translate="buyerTipsTitle"></summary><div class="info-content"><ul><li data-translate="buyerTip1"></li><li data-translate="buyerTip2"></li><li data-translate="buyerTip3"></li><li data-translate="buyerTip4"></li><li data-translate="buyerTip5"></li></ul></div></details><details class="info-section"><summary data-translate="sellerTipsTitle"></summary><div class="info-content"><ul><li data-translate="sellerTip1"></li><li data-translate="sellerTip2"></li><li data-translate="sellerTip3"></li><li data-translate="sellerTip4"></li><li data-translate="sellerTip5"></li></ul></div></details><hr style="margin: 25px 0; border: none; border-top: 1px solid var(--border-color);"><h3 data-translate="contactUs"></h3><ul class="contact-list"><li><i class="fa-solid fa-phone-volume"></i> <a href="tel:07507100238">0750 710 0238</a></li><li><i class="fa-solid fa-phone-volume"></i> <a href="tel:07504528000">0750 452 8000</a></li><li><i class="fa-solid fa-phone-volume"></i> <a href="tel:07504176611">0750 417 6611</a></li></ul><div class="developer-info"><p class="dev-title">گەشەپێدان</p><p class="dev-name">Omed Abdulwahid</p><div class="dev-contact"><a href="tel:07507100238"><i class="fa-solid fa-phone"></i> 07507100238</a></div></div></div>`;
         document.getElementById('add-page').innerHTML = `<form id="add-property-form" class="form-container"></form>`;
         document.getElementById('favorites-page').innerHTML = `<h2><span data-translate="navFavorites"></span></h2><div id="favorites-container" class="posts-grid"></div>`;
+        document.getElementById('admin-page').innerHTML = `
+            <div id="admin-dashboard" class="admin-view">
+                 <div class="form-container">
+                    <div class="admin-header">
+                        <h2 data-translate="adminPanelTitle"></h2>
+                        <button id="admin-home-btn" class="filter-btn" style="flex-grow:0;"><i class="fa-solid fa-house"></i></button>
+                    </div>
+                    <div class="admin-stats">
+                        <div class="admin-stat-card">
+                            <span class="stat-number" id="pending-posts-count">0</span>
+                            <span class="stat-label">پۆستێن چاڤەرێ</span>
+                        </div>
+                        <div class="admin-stat-card">
+                            <span class="stat-number" id="approved-posts-count">0</span>
+                            <span class="stat-label">پۆستێن پەسەندکری</span>
+                        </div>
+                    </div>
+                    <div class="admin-dashboard-nav">
+                        <button id="btn-show-posts" class="submit-btn"><i class="fa-solid fa-list-check"></i> Pêşandana Postan</button>
+                        <button id="btn-show-private-data" class="submit-btn" style="background-color: #6c757d;"><i class="fa-solid fa-lock"></i> Datayên Taybet</button>
+                    </div>
+                </div>
+            </div>
+            <div id="admin-posts-view" class="admin-view">
+                 <div class="form-container">
+                    <div class="admin-header">
+                        <h2>Pêşandana Postan</h2>
+                        <button id="btn-back-to-dashboard-1" class="filter-btn" style="flex-grow:0;"><i class="fa-solid fa-arrow-left"></i></button>
+                    </div>
+                    <div class="admin-columns">
+                        <div class="admin-column">
+                            <h3>پۆستێن چاڤەرێ</h3>
+                            <div id="admin-pending-posts"></div>
+                        </div>
+                        <div class="admin-column">
+                            <h3>پۆستێن پەسەندکری</h3>
+                            <div id="admin-approved-posts"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+             <div id="admin-private-data-view" class="admin-view">
+                <div class="form-container">
+                    <div class="admin-header">
+                        <h2>Datayên Taybet</h2>
+                         <button id="btn-back-to-dashboard-3" class="filter-btn" style="flex-grow:0;"><i class="fa-solid fa-arrow-left"></i></button>
+                    </div>
+                    <button id="btn-add-private-record" class="submit-btn" style="margin-bottom: 20px;"><i class="fa-solid fa-plus"></i> Tomarekê Nû Zêdeke</button>
+                    <div class="form-group">
+                        <input type="search" id="private-data-search" placeholder="ل داتayên taybet بگەڕه...">
+                    </div>
+                    <div id="private-data-table-container">
+                        <table id="private-data-table">
+                           <thead></thead>
+                           <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        `;
     }
     function formatPrice(post) {
         if (post.status === 'pending') return `<span data-translate="pending"></span>`;
@@ -826,16 +1126,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         return '';
     }
+    
     function createCardHTML(post, cardType = 'grid') {
         const isFavorite = favoritePostIds.includes(post.id);
         const priceDisplay = formatPrice(post);
         const zeroBadge = post.isZero === 'yes' ? `<span class="zero-badge" data-translate="zero"></span>` : '';
-        const cardClass = cardType === 'story' ? 'story-card' : (cardType === 'list' ? 'list-card' : 'grid-card');
-        const infoClass = cardType === 'story' ? 'story-card-info' : 'grid-card-info';
+        const postCodeBadge = post.postCode ? `<span class="post-code-badge"><i class="fa-solid fa-hashtag" style="font-size: 0.8em; opacity: 0.8;"></i>${post.postCode}</span>` : '';
         const overlay = getOverlay(post);
-        const firstImage = (post.imageUrls && post.imageUrls.length > 0) ? post.imageUrls[0] : 'https://via.placeholder.com/400x400.png?text=Wêne+Nîne';
+        const firstImage = (post.imageUrls && post.imageUrls.length > 0) ? post.imageUrls[0] : imagePlaceholder;
         
-        let detailsHtml = `<div class="story-card-extra-details">
+        const fullDetailsHtml = `<div class="story-card-extra-details">
             <span><i class="fa-solid ${propertyTypeIcons[post.propertyType] || propertyTypeIcons.default}"></i> <span data-translate="${post.propertyType}"></span></span>
             ${post.bedrooms ? `<span><i class="fa-solid fa-bed"></i> ${post.bedrooms}</span>` : ''}
             ${post.bathrooms ? `<span><i class="fa-solid fa-bath"></i> ${post.bathrooms}</span>` : ''}
@@ -844,39 +1144,72 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>`;
         
         if (cardType === 'list') {
-            return `<div class="property-card ${cardClass}" data-post-id="${post.id}">
+            return `<div class="property-card list-card" data-post-id="${post.id}">
                         <div class="property-image-container">
                             ${overlay}
-                            ${zeroBadge}
-                            <img src="${firstImage}" alt="${post.location}">
+                            ${postCodeBadge}
+                            <img src="${imagePlaceholder}" data-src="${firstImage}" alt="${post.location}" class="lazy-load">
                         </div>
                         <div class="list-card-info">
                             <h3>${post.location || ''}</h3>
                             <div class="price">${priceDisplay}</div>
                             <div class="property-card-details">
-                                ${detailsHtml}
+                                ${fullDetailsHtml}
                             </div>
                         </div>
                          <i class="favorite-toggle ${isFavorite ? 'fa-solid fa-star is-favorite' : 'fa-regular fa-star'}" style="color: black;" data-post-id="${post.id}"></i>
                     </div>`;
         }
 
+        const cardClass = cardType === 'story' ? 'story-card' : 'grid-card';
+        let infoHtmlBlock = '';
+
+        if (cardType === 'grid') { // Home page card (Simplified)
+            infoHtmlBlock = `
+                <div class="grid-card-info">
+                    <h3>${post.location || ''}</h3>
+                    <div class="grid-card-bottom-details">
+                        ${post.area ? `<span><i class="fa-solid fa-ruler-combined"></i> ${post.area} м²</span>` : '<span></span>'}
+                        <span class="price">${priceDisplay}</span>
+                    </div>
+                </div>
+            `;
+        } else { // Story card (apartments page with more details)
+            infoHtmlBlock = `
+                <div class="story-card-info">
+                    <div class="location-price">
+                        <h3>${post.location || ''}</h3>
+                        <div class="price">${priceDisplay}</div>
+                    </div>
+                    ${fullDetailsHtml}
+                </div>
+            `;
+        }
+
         return `<div data-post-id="${post.id}" class="property-card ${cardClass}">
                     <div class="property-image-container">
                         ${overlay}
                         ${zeroBadge}
+                        ${postCodeBadge}
                         <i class="favorite-toggle ${isFavorite ? 'fa-solid fa-star is-favorite' : 'fa-regular fa-star'}" data-post-id="${post.id}"></i>
-                        <img src="${firstImage}" alt="${post.location}">
-                        <div class="${infoClass}">
-                            <div class="location-price">
-                                <h3>${post.location || ''}</h3>
-                                <div class="price">${priceDisplay}</div>
-                            </div>
-                            ${detailsHtml}
-                        </div>
+                        <img src="${imagePlaceholder}" data-src="${firstImage}" alt="${post.location}" class="lazy-load">
+                        ${infoHtmlBlock}
                     </div>
                 </div>`;
     }
+
+    
+    const lazyLoadObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const img = entry.target;
+                img.src = img.dataset.src;
+                img.classList.add('loaded');
+                observer.unobserve(img);
+            }
+        });
+    }, { rootMargin: "0px 0px 200px 0px" });
+
     function getPublicPosts() {
         return allPosts.filter(p => p.status !== 'pending');
     }
@@ -913,10 +1246,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     e.stopPropagation();
                     toggleFavorite(post.id);
                 }
-                else { renderPostDetailPage(post.id); switchPage('post-detail-page'); }
+                else { switchPage('post-detail-page'); renderPostDetailPage(post.id); }
             });
             container.append(cardWrapper);
         });
+
+        document.querySelectorAll('.lazy-load').forEach(img => lazyLoadObserver.observe(img));
+
         const loadMoreContainer = document.getElementById('load-more-container');
         if (container.id === 'posts-grid-container' && loadMoreContainer) {
             if (visiblePostsCount >= getPublicPosts().filter(p => p.propertyType !== 'apartment').length) {
@@ -930,7 +1266,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function renderPostDetailPage(postId) {
         const post = allPosts.find(p => p.id === postId);
         const container = document.getElementById('post-detail-page');
-        if (!post || post.status === 'pending') {
+        if (!post || (post.status === 'pending' && !sessionStorage.getItem('isAdmin') && post.userId !== userProfile.id)) {
             container.innerHTML = `<p class="empty-page-message" data-translate="postNotFound"></p>`;
             applyTranslations(currentLang); return;
         }
@@ -942,6 +1278,8 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             galleryHtml = `<img src="https://via.placeholder.com/400x400.png?text=Wêne+Nîne" alt="${post.location}">`;
         }
+        const codeDisplay = post.postCode ? `<span class="detail-code">#${post.postCode}</span>` : '';
+
         
         const specItems = [
             { icon: propertyTypeIcons[post.propertyType] || propertyTypeIcons.default, labelKey: "propertyType", value: translations[post.propertyType] ? translations[post.propertyType][currentLang] : post.propertyType },
@@ -953,66 +1291,169 @@ document.addEventListener('DOMContentLoaded', function() {
             { icon: 'fa-leaf', labelKey: "garden", value: post.garden === 'yes' ? translations.yes[currentLang] : translations.no[currentLang] }
         ].filter(item => item.value && item.value !== 'N/A');
         
-        container.innerHTML = `<div class="detail-header"><button class="back-btn"><i class="fa-solid fa-arrow-left"></i></button><h3 class="detail-title">${post.location}</h3><button class="detail-fav-btn ${isFavorite ? 'is-favorite fa-solid' : 'fa-regular'} fa-star" data-post-id="${post.id}"></button></div><div class="detail-gallery">${galleryHtml}</div><div class="detail-main-info"><h2>${post.location}</h2><div class="price">${priceDisplay}</div></div><div class="detail-specs">${specItems.map(item => `<div class="spec-item"><i class="fa-solid ${item.icon}"></i><span class="value">${item.value}</span><span class="label" data-translate="${item.labelKey}"></span></div>`).join('')}</div><h3 class="section-title" style="padding: 0 20px;" data-translate="mapLocation"></h3><div id="single-post-map"></div><div style="padding: 0 20px 20px;"><a href="tel:${post.phone}" style="text-decoration: none;"><button class="submit-btn"><i class="fa-solid fa-phone"></i> <span data-translate="phone"></span>: ${post.phone}</button></a></div>`;
-        container.querySelector('.back-btn').addEventListener('click', () => { visiblePostsCount = 6; renderHomePage(); switchPage('home-page'); });
+        container.innerHTML = `<div class="detail-header"><button class="back-btn"><i class="fa-solid fa-arrow-left"></i></button><div class="detail-title-wrapper"><h3 class="detail-title">${post.location}</h3>${codeDisplay}</div><button class="detail-fav-btn ${isFavorite ? 'is-favorite fa-solid' : 'fa-regular'} fa-star" data-post-id="${post.id}"></button></div><div class="detail-gallery">${galleryHtml}</div><div class="detail-main-info"><h2>${post.location}</h2><div class="price">${priceDisplay}</div></div><div class="detail-specs">${specItems.map(item => `<div class="spec-item"><i class="fa-solid ${item.icon}"></i><span class="value">${item.value}</span><span class="label" data-translate="${item.labelKey}"></span></div>`).join('')}</div><h3 class="section-title" style="padding: 0 20px;" data-translate="mapLocation"></h3><div id="single-post-map"></div><div style="padding: 0 20px 20px;"><a href="tel:${post.phone}" style="text-decoration: none;"><button class="submit-btn"><i class="fa-solid fa-phone"></i> <span data-translate="phone"></span>: ${post.phone}</button></a></div>`;
+        container.querySelector('.back-btn').addEventListener('click', () => { 
+            switchPage(lastActivePageBeforeDetail || 'home-page');
+        });
         container.querySelector('.detail-fav-btn').addEventListener('click', (e) => { toggleFavorite(post.id); e.target.classList.toggle('is-favorite'); e.target.classList.toggle('fa-solid'); e.target.classList.toggle('fa-regular'); });
         if (post.coords && post.coords.lat) initializeSinglePostMap(post.coords);
         applyTranslations(currentLang);
     }
+    
     function renderProfilePage() {
         if(!elements.myPostsContainer) return;
-        elements.myPostsContainer.innerHTML = '';
-        const filter = elements.profilePage.querySelector('.filter-btn.active')?.dataset.filter || 'all';
-        const searchTerm = elements.searchMyPosts.value.toLowerCase();
-        
-        let postsToRender = allPosts.filter(post => {
-            const searchMatch = !searchTerm || (post.location && post.location.toLowerCase().includes(searchTerm));
-            if (!searchMatch) return false;
 
-            switch(filter) {
-                case 'all': return post.status !== 'pending';
-                case 'sale': return post.listingType === 'sale' && !post.status;
-                case 'rent': return post.listingType === 'rent' && !post.status;
-                case 'pending': return post.status === 'pending';
-                case 'sold': return post.status === 'sold';
-                case 'rented': return post.status === 'rented';
-                default: return true;
+        elements.myPostsContainer.innerHTML = `
+            <h3 class="section-title" style="margin-top:20px;">پۆستێن من یێن چاڤەرێ</h3>
+            <div id="profile-pending-posts"></div>
+        `;
+
+        const pendingContainer = document.getElementById('profile-pending-posts');
+        const myPendingPosts = allPosts.filter(post => post.status === 'pending' && post.userId === userProfile.id);
+
+        const renderCards = (container, posts) => {
+            container.innerHTML = '';
+            if(posts.length === 0){
+                container.innerHTML = `<p class="empty-page-message">هیچ پۆستەکێ چاڤەرێ نینە.</p>`;
+            } else {
+                posts.forEach(post => {
+                    const cardWrapper = document.createElement('div');
+                    cardWrapper.innerHTML = createCardHTML(post, 'list') + `<div class="card-actions">
+                        <button class="action-btn edit-btn"><i class="fa-solid fa-pencil"></i></button>
+                        <button class="action-btn delete-btn"><i class="fa-solid fa-trash"></i></button></div>`;
+
+                    cardWrapper.querySelector('.edit-btn').addEventListener('click', () => editPost(post.id));
+                    cardWrapper.querySelector('.delete-btn').addEventListener('click', () => deletePost(post.id));
+                    
+                    cardWrapper.querySelector('.property-card').addEventListener('click', (e) => {
+                        if(!e.target.closest('.card-actions')) {
+                             switchPage('post-detail-page'); 
+                             renderPostDetailPage(post.id);
+                        }
+                    });
+
+                    cardWrapper.querySelector('.favorite-toggle').addEventListener('click', e => { e.stopPropagation(); toggleFavorite(post.id); });
+                    container.prepend(cardWrapper);
+                });
             }
-        });
+        };
 
-        if(postsToRender.length === 0){
-            elements.myPostsContainer.innerHTML = `<p class="empty-page-message">هیچ پۆستەک نینە.</p>`;
-        } else {
-            postsToRender.forEach(post => {
-                const cardWrapper = document.createElement('div');
-                let actionButtons = '';
-                if(post.status === 'pending') {
-                    actionButtons = `<button class="action-btn approve-btn" data-post-id="${post.id}"><i class="fa-solid fa-check"></i> <span data-translate="approveBtn"></span></button>`;
-                } else {
-                    actionButtons = `<button class="action-btn sold-btn" data-post-id="${post.id}"><i class="fa-solid fa-tag"></i></button>`;
-                }
+        renderCards(pendingContainer, myPendingPosts);
 
-                cardWrapper.innerHTML = createCardHTML(post, 'list') + `<div class="card-actions">
-                    <button class="action-btn edit-btn"><i class="fa-solid fa-pencil"></i></button>
-                    ${actionButtons}
-                    <button class="action-btn delete-btn"><i class="fa-solid fa-trash"></i></button></div>`;
-                
-                cardWrapper.querySelector('.edit-btn').addEventListener('click', () => editPost(post.id));
-                cardWrapper.querySelector('.delete-btn').addEventListener('click', () => deletePost(post.id));
-                
-                if(post.status === 'pending') {
-                    cardWrapper.querySelector('.approve-btn').addEventListener('click', (e) => approvePost(e.currentTarget.dataset.postId));
-                } else {
-                    cardWrapper.querySelector('.sold-btn').addEventListener('click', (e) => togglePostStatus(e.currentTarget.dataset.postId));
-                }
-                
-                cardWrapper.querySelector('.favorite-toggle').addEventListener('click', e => { e.stopPropagation(); toggleFavorite(post.id); });
-                elements.myPostsContainer.prepend(cardWrapper);
-            });
-        }
-        updateStats();
+        document.querySelectorAll('.lazy-load').forEach(img => lazyLoadObserver.observe(img));
         applyTranslations(currentLang);
     }
+    
+    function showAdminView(viewId) {
+        document.querySelectorAll('.admin-view').forEach(v => v.style.display = 'none');
+        document.getElementById(viewId).style.display = 'block';
+    }
+
+    function renderAdminPage() {
+        showAdminView('admin-dashboard');
+        renderAdminDashboard();
+        renderAdminPostsView();
+        renderAdminPrivateDataView();
+    }
+    
+    function renderAdminDashboard() {
+        const pendingPosts = allPosts.filter(p => p.status === 'pending');
+        const approvedPosts = allPosts.filter(p => p.status !== 'pending');
+        
+        document.getElementById('pending-posts-count').textContent = pendingPosts.length;
+        document.getElementById('approved-posts-count').textContent = approvedPosts.length;
+    }
+
+    function renderAdminPostsView() {
+        const pendingContainer = document.getElementById('admin-pending-posts');
+        const approvedContainer = document.getElementById('admin-approved-posts');
+        pendingContainer.innerHTML = '';
+        approvedContainer.innerHTML = '';
+        
+        const pendingPosts = allPosts.filter(p => p.status === 'pending');
+        const approvedPosts = allPosts.filter(p => p.status !== 'pending');
+
+        const renderAdminCard = (post, container) => {
+            const cardWrapper = document.createElement('div');
+            let actionButtons = '';
+            if(post.status === 'pending') {
+                actionButtons = `<button class="action-btn approve-btn" data-post-id="${post.id}"><i class="fa-solid fa-check"></i> <span data-translate="approveBtn"></span></button>`;
+            } else {
+                actionButtons = `<button class="action-btn sold-btn" data-post-id="${post.id}"><i class="fa-solid fa-tag"></i></button>`;
+            }
+
+            cardWrapper.innerHTML = createCardHTML(post, 'list') + `<div class="card-actions">
+                <button class="action-btn edit-btn"><i class="fa-solid fa-pencil"></i></button>
+                ${actionButtons}
+                <button class="action-btn delete-btn"><i class="fa-solid fa-trash"></i></button></div>`;
+            
+            cardWrapper.querySelector('.property-card').addEventListener('click', (e) => {
+                if(!e.target.closest('.card-actions')) {
+                     switchPage('post-detail-page');
+                     renderPostDetailPage(post.id); 
+                }
+            });
+
+            cardWrapper.querySelector('.edit-btn').addEventListener('click', () => editPost(post.id));
+            cardWrapper.querySelector('.delete-btn').addEventListener('click', () => deletePost(post.id));
+            
+            if(post.status === 'pending') {
+                cardWrapper.querySelector('.approve-btn').addEventListener('click', (e) => approvePost(e.currentTarget.dataset.postId));
+            } else {
+                cardWrapper.querySelector('.sold-btn').addEventListener('click', (e) => togglePostStatus(e.currentTarget.dataset.postId));
+            }
+            container.appendChild(cardWrapper);
+        };
+
+        if(pendingPosts.length === 0) pendingContainer.innerHTML = `<p class="empty-page-message">پۆستێن چاڤەرێ نینن.</p>`;
+        else pendingPosts.forEach(post => renderAdminCard(post, pendingContainer));
+
+        if(approvedPosts.length === 0) approvedContainer.innerHTML = `<p class="empty-page-message">پۆستێن پەسەندکری نینن.</p>`;
+        else approvedPosts.forEach(post => renderAdminCard(post, approvedContainer));
+        
+        document.querySelectorAll('.lazy-load').forEach(img => lazyLoadObserver.observe(img));
+        applyTranslations(currentLang);
+    }
+    
+    function renderAdminPrivateDataView() {
+        const tableHead = document.querySelector('#private-data-table thead');
+        const tableBody = document.querySelector('#private-data-table tbody');
+        const searchTerm = document.getElementById('private-data-search').value.toLowerCase();
+        
+        tableHead.innerHTML = `<tr><th>Cih</th><th>Buhay</th><th>Rûber</th><th>Telefon</th><th>Têbînî</th><th>Çalakî</th></tr>`;
+        tableBody.innerHTML = '';
+        
+        const filteredData = privateProperties.filter(p =>
+            (p.location && p.location.toLowerCase().includes(searchTerm)) ||
+            (p.price && p.price.toLowerCase().includes(searchTerm)) ||
+            (p.phone && p.phone.includes(searchTerm))
+        );
+
+        if (filteredData.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="6" class="empty-page-message">هیچ داتایەکێ تایبەت نینە.</td></tr>`;
+            return;
+        }
+
+        filteredData.forEach(p => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${p.location || ''}</td>
+                <td>${p.price || ''}</td>
+                <td>${p.area || ''}</td>
+                <td>${p.phone || ''}</td>
+                <td>${p.notes || ''}</td>
+                <td>
+                    <button class="action-btn edit-btn" data-id="${p.id}" style="min-width: 40px;"><i class="fa-solid fa-pencil"></i></button>
+                    <button class="action-btn delete-btn" data-id="${p.id}" style="min-width: 40px;"><i class="fa-solid fa-trash"></i></button>
+                </td>
+            `;
+            row.querySelector('.edit-btn').addEventListener('click', () => openPrivateDataModal(p.id));
+            row.querySelector('.delete-btn').addEventListener('click', () => deletePrivateRecord(p.id));
+            tableBody.appendChild(row);
+        });
+    }
+
+
     function renderFavoritesPage() {
         if(!elements.favoritesContainer) return;
         elements.favoritesContainer.innerHTML = '';
@@ -1030,10 +1471,11 @@ document.addEventListener('DOMContentLoaded', function() {
                      e.stopPropagation();
                      toggleFavorite(post.id);
                 }
-                else { renderPostDetailPage(post.id); switchPage('post-detail-page'); }
+                else { switchPage('post-detail-page'); renderPostDetailPage(post.id); }
             });
             elements.favoritesContainer.prepend(cardWrapper);
         });
+        document.querySelectorAll('.lazy-load').forEach(img => lazyLoadObserver.observe(img));
         applyTranslations(currentLang);
     }
     
@@ -1098,7 +1540,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const isEditing = Object.keys(post).length > 0;
         uploadedImages = isEditing ? [...(post.imageUrls || [])] : [];
         
-        elements.addPropertyForm.innerHTML = `<h2 id="form-title"></h2><div class="form-group"><label data-translate="propertyImage"></label><label for="image-upload-input" class="image-upload-box"><div class="upload-icon"><i class="fa-solid fa-camera" style="font-size:40px;"></i><p data-translate="chooseImage"></p></div></label><input type="file" id="image-upload-input" accept="image/*" multiple><div id="image-previews-container"></div></div><h3 class="form-section-title" data-translate="mainInfo"></h3><div class="form-group"><label data-translate="listingType"></label><div class="segmented-control" id="listingType-control"><button type="button" data-value="sale"><i class="fa-solid fa-tag"></i><span data-translate="forSale"></span></button><button type="button" data-value="rent"><i class="fa-solid fa-key"></i><span data-translate="forRent"></span></button></div><input type="hidden" name="listingType" id="listingType-input"></div><div class="form-group"><label data-translate="propertyType"></label><div class="property-type-selector" id="propertyType-control"></div><input type="hidden" name="propertyType" id="propertyType-input"></div><div class="form-group"><label data-translate="location"></label><input type="text" name="location" required placeholder="دهۆک، تاخێ ئاشتی" value="${post.location || ''}"></div><div class="form-group"><label data-translate="price"></label><div class="segmented-control" id="priceType-control"><button type="button" data-value="numeric" data-translate="priceTypeNumeric"></button><button type="button" data-value="special" data-translate="priceTypeSpecial"></button></div><input type="hidden" name="priceType" id="priceType-input"><div class="input-with-icon" id="price-value-container" style="margin-top:10px;"><i class="fa-solid fa-dollar-sign"></i><input type="number" name="priceValue" placeholder="150000" value="${post.priceValue || ''}"></div></div><div class="form-group"><label data-translate="phone"></label><div class="input-with-icon"><i class="fa-solid fa-phone"></i><input type="tel" name="phone" required placeholder="07XX XXX XXXX" value="${post.phone || ''}"></div></div><h3 class="form-section-title" data-translate="propertySpecs"></h3><div class="form-grid"><div class="form-group"><label data-translate="area"></label><input type="number" name="area" placeholder="150" required value="${post.area || ''}"></div><div class="form-group"><label data-translate="direction"></label><div class="direction-selector" id="direction-control"><button type="button" data-value="روژهەلات">روژهەلات</button><button type="button" data-value="روژئاڤا">روژئاڤا</button><button type="button" data-value="باکور">باکور</button><button type="button" data-value="باشوور">باشوور</button></div><input type="hidden" name="direction" id="direction-input"></div></div><div class="form-group"><label data-translate="bedrooms"></label><div class="number-selector" id="bedrooms-control"></div><input type="hidden" name="bedrooms" id="bedrooms-input"></div><div class="form-group"><label data-translate="bathrooms"></label><div class="number-selector" id="bathrooms-control"></div><input type="hidden" name="bathrooms" id="bathrooms-input"></div><div class="form-group"><label data-translate="floors"></label><div class="number-selector" id="floors-control"></div><input type="hidden" name="floors" id="floors-input"></div><div class="form-group"><label data-translate="garden"></label><div class="segmented-control" id="garden-control"><button type="button" data-value="no" data-translate="no"></button><button type="button" data-value="yes" data-translate="yes"></button></div><input type="hidden" name="garden" id="garden-input"></div><div class="form-group"><label data-translate="isZero"></label><div class="segmented-control" id="isZero-control"><button type="button" data-value="no" data-translate="no"></button><button type="button" data-value="yes" data-translate="yes"></button></div><input type="hidden" name="isZero" id="isZero-input"></div><h3 class="form-section-title" data-translate="mapLocation"></h3><div id="location-picker-map"></div><div class="form-notice"><i class="fa-solid fa-circle-info"></i><p><strong>تێبینی:</strong> پشتی کو تۆ پۆستێ خۆ بەلاڤ دکەی، ئێک سەر ناهێتە خار. دێ پەیوەندی ب تە هێتە کرن بۆ وێنەگرتنەکا پرۆفێشنال، و پاشی دێ پۆستێ تە هێتە بەلاڤکرن.</p></div><button type="submit" class="submit-btn"></button>`;
+        elements.addPropertyForm.innerHTML = `<h2 id="form-title"></h2><div class="form-group"><label data-translate="propertyImage"></label><label for="image-upload-input" class="image-upload-box"><div class="upload-icon"><i class="fa-solid fa-camera" style="font-size:40px;"></i><p data-translate="chooseImage"></p></div></label><input type="file" id="image-upload-input" accept="image/*" multiple><div id="image-previews-container"></div></div><h3 class="form-section-title" data-translate="mainInfo"></h3><div class="form-group"><label>Koda Mulkî (ID)</label><input type="text" name="postCode" placeholder="mînak: 101A" value="${post.postCode || ''}"></div><div class="form-group"><label data-translate="listingType"></label><div class="segmented-control" id="listingType-control"><button type="button" data-value="sale"><i class="fa-solid fa-tag"></i><span data-translate="forSale"></span></button><button type="button" data-value="rent"><i class="fa-solid fa-key"></i><span data-translate="forRent"></span></button></div><input type="hidden" name="listingType" id="listingType-input"></div><div class="form-group"><label data-translate="propertyType"></label><div class="property-type-selector" id="propertyType-control"></div><input type="hidden" name="propertyType" id="propertyType-input"></div><div class="form-group"><label data-translate="location"></label><input type="text" name="location" required placeholder="دهۆک، تاخێ ئاشتی" value="${post.location || ''}"></div><div class="form-group"><label data-translate="price"></label><div class="segmented-control" id="priceType-control"><button type="button" data-value="numeric" data-translate="priceTypeNumeric"></button><button type="button" data-value="special" data-translate="priceTypeSpecial"></button></div><input type="hidden" name="priceType" id="priceType-input"><div class="input-with-icon" id="price-value-container" style="margin-top:10px;"><i class="fa-solid fa-dollar-sign"></i><input type="number" name="priceValue" placeholder="150000" value="${post.priceValue || ''}"></div></div><div class="form-group"><label data-translate="phone"></label><div class="input-with-icon"><i class="fa-solid fa-phone"></i><input type="tel" name="phone" required placeholder="07XX XXX XXXX" value="${post.phone || ''}"></div></div><h3 class="form-section-title" data-translate="propertySpecs"></h3><div class="form-grid"><div class="form-group"><label data-translate="area"></label><input type="number" name="area" placeholder="150" required value="${post.area || ''}"></div><div class="form-group"><label data-translate="direction"></label><div class="direction-selector" id="direction-control"><button type="button" data-value="روژهەلات">روژهەلات</button><button type="button" data-value="روژئاڤا">روژئاڤا</button><button type="button" data-value="باکور">باکور</button><button type="button" data-value="باشوور">باشوور</button></div><input type="hidden" name="direction" id="direction-input"></div></div><div class="form-group"><label data-translate="bedrooms"></label><div class="number-selector" id="bedrooms-control"></div><input type="hidden" name="bedrooms" id="bedrooms-input"></div><div class="form-group"><label data-translate="bathrooms"></label><div class="number-selector" id="bathrooms-control"></div><input type="hidden" name="bathrooms" id="bathrooms-input"></div><div class="form-group"><label data-translate="floors"></label><div class="number-selector" id="floors-control"></div><input type="hidden" name="floors" id="floors-input"></div><div class="form-group"><label data-translate="garden"></label><div class="segmented-control" id="garden-control"><button type="button" data-value="no" data-translate="no"></button><button type="button" data-value="yes" data-translate="yes"></button></div><input type="hidden" name="garden" id="garden-input"></div><div class="form-group"><label data-translate="isZero"></label><div class="segmented-control" id="isZero-control"><button type="button" data-value="no" data-translate="no"></button><button type="button" data-value="yes" data-translate="yes"></button></div><input type="hidden" name="isZero" id="isZero-input"></div><h3 class="form-section-title" data-translate="mapLocation"></h3><div id="location-picker-map"></div><div class="form-notice"><i class="fa-solid fa-circle-info"></i><p><strong>تێبینی:</strong> پشتی کو پۆستێ تە دهێتە هنارتن، ئەو دچیتە د لیستا چاڤەرێیێ دا. پێدڤیە تو بچیە پەرێ پرۆفایلێ خۆ و ژ وێرێ پەسەند بکەی دا بۆ هەمیان دیار بیت.</p></div><button type="submit" class="submit-btn"></button>`;
         
         renderImagePreviews();
         document.getElementById('image-upload-input').addEventListener('change', handleImageUpload);
@@ -1181,12 +1623,17 @@ document.addEventListener('DOMContentLoaded', function() {
         const postData = { 
             ...formValues, 
             id: editingPostId || Date.now().toString(), 
-            status: isEditing ? allPosts.find(p=>p.id===editingPostId).status : 'pending' 
+            status: 'pending',
+            userId: userProfile.id
         };
         
         if (isEditing) {
             const index = allPosts.findIndex(p => p.id === editingPostId);
-            if (index > -1) allPosts[index] = postData;
+            if (index > -1) {
+                postData.status = allPosts[index].status;
+                postData.userId = allPosts[index].userId;
+                allPosts[index] = postData;
+            }
         } else {
             allPosts.unshift(postData);
         }
@@ -1194,10 +1641,19 @@ document.addEventListener('DOMContentLoaded', function() {
         saveData('aqaratPosts', allPosts);
         editingPostId = null; 
         uploadedImages = [];
-        showToast(translations.postSubmittedSuccess[currentLang]);
+        
+        if (isEditing) {
+            showToast(translations.postUpdatedSuccess[currentLang]);
+        } else {
+            showToast(translations.postSubmittedSuccess[currentLang]);
+        }
         
         renderAll();
-        switchPage('profile-page');
+        if (sessionStorage.getItem('isAdmin')) {
+            switchPage('admin-page');
+        } else {
+            switchPage('profile-page');
+        }
     }
     function toggleFavorite(postId) {
         const index = favoritePostIds.indexOf(postId);
@@ -1218,9 +1674,14 @@ document.addEventListener('DOMContentLoaded', function() {
     function approvePost(postId) {
         const post = allPosts.find(p => p.id === postId);
         if(post && post.status === 'pending') {
-            post.status = null; // Set status to active/published
+            post.status = null;
             saveData('aqaratPosts', allPosts);
-            renderProfilePage();
+            showToast(translations.postApprovedSuccess[currentLang]);
+            if (sessionStorage.getItem('isAdmin')) {
+                renderAdminPage();
+            } else {
+                renderProfilePage();
+            }
         }
     }
     function togglePostStatus(postId) {
@@ -1230,14 +1691,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const newStatus = post.status ? null : (post.listingType === 'sale' ? 'sold' : 'rented');
         post.status = newStatus;
         saveData('aqaratPosts', allPosts);
-        renderProfilePage();
-    }
-    function updateStats() {
-        if(!elements.totalPostsStat) return;
-        const publicPosts = getPublicPosts();
-        elements.totalPostsStat.textContent = publicPosts.length;
-        elements.forSaleStat.textContent = publicPosts.filter(p => p.listingType === 'sale' && !p.status).length;
-        elements.forRentStat.textContent = publicPosts.filter(p => p.listingType === 'rent' && !p.status).length;
+        if (sessionStorage.getItem('isAdmin')) {
+            renderAdminPage();
+        } else {
+            renderProfilePage();
+        }
     }
     function editPost(postId) {
         const post = allPosts.find(p => p.id === postId);
@@ -1253,7 +1711,11 @@ document.addEventListener('DOMContentLoaded', function() {
         saveData('aqaratPosts', allPosts); saveData('favoritePosts', favoritePostIds);
         visiblePostsCount = 6; 
         renderAll();
-        switchPage('profile-page');
+        if (sessionStorage.getItem('isAdmin')) {
+            renderAdminPage();
+        } else {
+            switchPage('profile-page');
+        }
     }
     function loadProfile() {
         if(!elements.usernameDisplay) return;
@@ -1303,8 +1765,32 @@ document.addEventListener('DOMContentLoaded', function() {
     function initializeMainMap() {
         if(mainMap) mainMap.remove();
         mainMap = L.map('main-map-container', { zoomControl: false }).setView(defaultCoords, 13);
-        L.control.layers(baseLayers).addTo(mainMap);
-        baseLayers['Sade'].addTo(mainMap);
+        currentTileLayer.addTo(mainMap);
+    }
+    function initializeCustomLayerControl() {
+        const container = document.getElementById('custom-layer-control-container');
+        container.innerHTML = `<div class="custom-map-layer-switcher"></div>`;
+        const switcher = container.querySelector('.custom-map-layer-switcher');
+        
+        Object.keys(baseLayers).forEach(name => {
+            const button = document.createElement('button');
+            button.textContent = name;
+            button.dataset.layer = name;
+            if (baseLayers[name] === currentTileLayer) {
+                button.classList.add('active');
+            }
+            button.addEventListener('click', () => {
+                if(mainMap.hasLayer(currentTileLayer)) {
+                    mainMap.removeLayer(currentTileLayer);
+                }
+                currentTileLayer = baseLayers[name];
+                mainMap.addLayer(currentTileLayer);
+                
+                switcher.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+            });
+            switcher.appendChild(button);
+        });
     }
     function renderMapMarkers() {
         if (!mainMap) return;
@@ -1336,7 +1822,6 @@ document.addEventListener('DOMContentLoaded', function() {
     function initializeSinglePostMap(coords) {
         if (singlePostMap) singlePostMap.remove();
         singlePostMap = L.map('single-post-map').setView(coords, 15);
-        L.control.layers(baseLayers).addTo(singlePostMap);
         baseLayers['Satelite'].addTo(singlePostMap);
         const mainIcon = L.divIcon({ className: 'custom-map-marker', html: `<i class="fa-solid fa-location-dot"></i>`, iconSize: [30, 30] });
         L.marker(coords, { icon: mainIcon }).addTo(singlePostMap);
@@ -1354,23 +1839,81 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 2000);
         }, 100);
     }
-    function locateUser() {
-        if (!navigator.geolocation) {
-            showToast("Geolocation is not supported by your browser");
-            return;
+    
+    function updateMapControls() {
+        const mapControls = document.querySelector('.map-controls');
+        if (!mapControls) return;
+
+        let buttonsHTML = `<button id="refresh-map-btn"><i class="fa-solid fa-arrows-rotate"></i></button>`;
+        if (sessionStorage.getItem('isAdmin')) {
+            buttonsHTML += `<button id="admin-back-to-panel-btn"><i class="fa-solid fa-shield-halved"></i></button>`;
+        } else {
+            buttonsHTML += `<button id="locate-me-btn"><i class="fa-solid fa-location-crosshairs"></i></button>`;
         }
-        navigator.geolocation.getCurrentPosition(position => {
-            const lat = position.coords.latitude;
-            const lng = position.coords.longitude;
-            mainMap.setView([lat, lng], 15);
-            if (userLocationMarker) { mainMap.removeLayer(userLocationMarker); }
-            const userIcon = L.divIcon({ className: 'user-location-marker', iconSize: [20, 20] });
-            userLocationMarker = L.marker([lat, lng], { icon: userIcon }).addTo(mainMap);
-            showToast(translations.locationFound[currentLang]);
-        }, () => {
-            showToast(translations.locationNotFound[currentLang]);
-        });
+        mapControls.innerHTML = buttonsHTML;
+        applyTranslations(currentLang);
     }
+
+    function openPrivateDataModal(recordId = null) {
+        const modal = document.getElementById('private-data-modal');
+        const form = document.getElementById('private-data-form');
+        const modalTitle = document.getElementById('private-data-modal-title');
+        form.reset();
+        document.getElementById('private-record-id').value = '';
+
+        if (recordId) {
+            const record = privateProperties.find(p => p.id === recordId);
+            modalTitle.textContent = 'Destkarîkirina Tomarê';
+            document.getElementById('private-record-id').value = record.id;
+            document.getElementById('private-location').value = record.location;
+            document.getElementById('private-price').value = record.price;
+            document.getElementById('private-area').value = record.area;
+            document.getElementById('private-phone').value = record.phone;
+            document.getElementById('private-notes').value = record.notes;
+        } else {
+            modalTitle.textContent = 'Tomarekê Nû Zêdeke';
+        }
+        modal.style.display = 'block';
+    }
+
+    function closePrivateDataModal() {
+        document.getElementById('private-data-modal').style.display = 'none';
+    }
+    
+    function savePrivateRecord(e) {
+        e.preventDefault();
+        const recordId = document.getElementById('private-record-id').value;
+        const record = {
+            id: recordId || Date.now().toString(),
+            location: document.getElementById('private-location').value,
+            price: document.getElementById('private-price').value,
+            area: document.getElementById('private-area').value,
+            phone: document.getElementById('private-phone').value,
+            notes: document.getElementById('private-notes').value,
+        };
+
+        if (recordId) {
+            const index = privateProperties.findIndex(p => p.id === recordId);
+            privateProperties[index] = record;
+        } else {
+            privateProperties.unshift(record);
+        }
+        saveData('privateProperties', privateProperties);
+        closePrivateDataModal();
+        renderAdminPrivateDataView();
+    }
+    
+    function deletePrivateRecord(recordId) {
+        if(confirm('Tu piştrastî dixwazî vî tomarî jêbibî?')) {
+            privateProperties = privateProperties.filter(p => p.id !== recordId);
+            saveData('privateProperties', privateProperties);
+            renderAdminPrivateDataView();
+        }
+    }
+
+    let adminClickCount = 0;
+    let adminClickTimer = null;
+
     function setupEventListeners() {
         document.querySelectorAll('.bottom-nav a').forEach(l => {
             l.addEventListener('click', e => {
@@ -1385,39 +1928,59 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('profile-header-btn').addEventListener('click', e => { e.preventDefault(); switchPage('profile-page'); });
         document.getElementById('settings-header-btn').addEventListener('click', e => { e.preventDefault(); switchPage('settings-page'); });
         
-        const mapPage = document.querySelector('.page-content#map-page');
-        if (mapPage) {
-            mapPage.addEventListener('click', function(e) {
-                if (e.target.closest('#locate-me-btn')) {
-                    locateUser();
-                }
-                if (e.target.closest('#refresh-map-btn')) {
-                    renderMapMarkers();
-                }
-            });
-        }
-        
-        elements.body.addEventListener('submit', function(e) { if (e.target.id === 'add-property-form') handleFormSubmit(e); });
         elements.body.addEventListener('click', function(e) {
+            if (e.target.closest('#locate-me-btn')) locateUser();
+            if (e.target.closest('#refresh-map-btn')) renderMapMarkers();
+            if (e.target.closest('#admin-back-to-panel-btn')) switchPage('admin-page');
+            
             if (e.target.id === 'edit-profile-btn') {
                 const newName = prompt(translations.promptNewName[currentLang], userProfile.name);
                 if (newName) { userProfile.name = newName; saveData('userProfile', userProfile); loadProfile(); }
             }
             if (e.target.closest('#profile-pic-container')) document.getElementById('profile-pic-input').click();
-            if (e.target.classList.contains('filter-btn')) {
-                document.querySelectorAll('#profile-page .filter-btn').forEach(btn => btn.classList.remove('active'));
-                e.target.classList.add('active');
-                renderProfilePage();
-            }
+
             if (e.target.classList.contains('view-details-btn')) {
                 const postId = e.target.dataset.postId;
-                if(postId) { renderPostDetailPage(postId); switchPage('post-detail-page'); }
+                if(postId) { switchPage('post-detail-page'); renderPostDetailPage(postId); }
             }
             if (e.target.id === 'load-more-btn') {
                  visiblePostsCount += postsPerPage;
                  renderHomePage();
             }
+             if(e.target.closest('.dev-name')) {
+                adminClickCount++;
+                clearTimeout(adminClickTimer);
+                adminClickTimer = setTimeout(() => { adminClickCount = 0; }, 2000);
+                if (adminClickCount >= 7) {
+                    clearTimeout(adminClickTimer);
+                    adminClickCount = 0;
+                    const password = prompt("Peyva nihênî ya Adminî binvîse:");
+                    if (password === "Omed@1985") {
+                        sessionStorage.setItem('isAdmin', 'true');
+                        switchPage('admin-page');
+                    } else if (password) {
+                        alert("Peyva nihênî xelet e!");
+                    }
+                }
+            }
+            if (e.target.id === 'admin-home-btn') {
+                switchPage('home-page');
+            }
+            if(e.target.id === 'btn-show-posts') showAdminView('admin-posts-view');
+            if(e.target.id === 'btn-show-private-data') showAdminView('admin-private-data-view');
+            if(e.target.id === 'btn-back-to-dashboard-1' || e.target.id === 'btn-back-to-dashboard-3') showAdminView('admin-dashboard');
+            
+            if(e.target.id === 'btn-add-private-record') openPrivateDataModal();
+            if(e.target.classList.contains('close-btn')) closePrivateDataModal();
+            if (e.target.closest('.modal') && e.target.classList.contains('modal')) closePrivateDataModal();
         });
+        
+        document.getElementById('private-data-form').addEventListener('submit', savePrivateRecord);
+        document.getElementById('private-data-search')?.addEventListener('input', renderAdminPrivateDataView);
+        document.getElementById('admin-data-search')?.addEventListener('input', renderAdminDataView);
+
+        elements.body.addEventListener('submit', function(e) { if (e.target.id === 'add-property-form') handleFormSubmit(e); });
+
         elements.body.addEventListener('change', function(e){
             if(e.target.id === 'profile-pic-input'){
                 if (e.target.files && e.target.files[0]) { 
@@ -1434,7 +1997,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 location.reload(); 
             }
         });
-        elements.body.addEventListener('input', e => { if (e.target.id === 'search-my-posts') renderProfilePage(); });
     }
     function init() {
         populateStaticHTML();
@@ -1444,21 +2006,20 @@ document.addEventListener('DOMContentLoaded', function() {
             profilePage: document.getElementById('profile-page'), myPostsContainer: document.getElementById('my-posts-container'),
             favoritesContainer: document.getElementById('favorites-page'), addPropertyForm: document.getElementById('add-property-form'),
             usernameDisplay: document.getElementById('username-display'), profilePic: document.getElementById('profile-pic'),
-            totalPostsStat: document.getElementById('total-posts-stat'), forSaleStat: document.getElementById('for-sale-stat'),
-            forRentStat: document.getElementById('for-rent-stat'), searchMyPosts: document.getElementById('search-my-posts'),
         });
         const darkModeToggle = document.getElementById('dark-mode-toggle');
         const savedTheme = localStorage.getItem('theme') || 'light';
         if (savedTheme === 'dark') {
             if(darkModeToggle) darkModeToggle.checked = true;
-            enableDarkMode();
+            document.body.classList.add('dark-mode');
         } else {
-            disableDarkMode();
+            document.body.classList.remove('dark-mode');
         }
         document.getElementById('language-select').value = currentLang;
         applyTranslations(currentLang);
         loadProfile();
         initializeMainMap();
+        initializeCustomLayerControl();
         renderAll();
         setupEventListeners();
     }
