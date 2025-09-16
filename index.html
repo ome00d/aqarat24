@@ -1049,7 +1049,7 @@ document.addEventListener('DOMContentLoaded', function() {
         verifyBtn: { "ku-bad": "پشتراست بکە", "ku-sor": "پشتڕاستی بکەوە", "ar": "تحقق", "en": "Verify" },
         enterAllFields: { "ku-bad": "تکایە هەمی خانەیان پڕ بکە.", "ku-sor": "تکایە هەموو خانەکان پڕبکەوە.", "ar": "يرجى ملء جميع الحقول.", "en": "Please fill all fields." },
         emailInUse: { "ku-bad": "بکارهێنەرەک ب ڤی ئیمەیلی یێ هەی.", "ku-sor": "بەکارهێنەرێک بەم ئیمەیڵە هەیە.", "ar": "هذا البريد الإلكتروني مستخدم بالفعل.", "en": "This email is already in use." },
-        verificationCodeSent: { "ku-bad": "کۆدێ پشتراستکرنێ هاتە هنارتن.", "ku-sor": "کۆدی پشتڕاستکردنەوە نێردرا.", "ar": "تم إرسال رمز التحقق.", "en": "Verification code sent." },
+        verificationCodeSent: { "ku-bad": "کۆدێ پشتراستکرنێ بۆ ئیمەیلێ تە هاتە هنارتن.", "ku-sor": "کۆدی پشتڕاستکردنەوە بۆ ئیمەیڵەکەت نێردرا.", "ar": "تم إرسال رمز التحقق إلى بريدك الإلكتروني.", "en": "Verification code sent to your email." },
         invalidCode: { "ku-bad": "کۆد خەلەتە.", "ku-sor": "کۆد هەڵەیە.", "ar": "الرمز غير صحيح.", "en": "Invalid code." },
         registrationSuccess: { "ku-bad": "هەژمارا تە ب سەرکەفتی هاتە دروستکرن.", "ku-sor": "هەژمارەکەت بە سەرکەوتوویی دروستکرا.", "ar": "تم إنشاء حسابك بنجاح.", "en": "Your account has been created successfully." },
         loginError: { "ku-bad": "ئیمەیل یان پەیڤا نهێنی خەلەتە.", "ku-sor": "ئیمەیڵ یان وشەی نهێنی هەڵەیە.", "ar": "البريد الإلكتروني أو كلمة المرور غير صحيحة.", "en": "Incorrect email or password." },
@@ -1150,7 +1150,7 @@ document.addEventListener('DOMContentLoaded', function() {
         buyerTip2: { "ku-bad": "پشکنینەکا تەمام بۆ مولکی بکە.", "ku-sor": "پشکنینێکی تەواو بۆ موڵکەکە بکە.", "ar": "قم بفحص العقار بشكل كامل.", "en": "Thoroughly inspect the property." },
         buyerTip3: { "ku-bad": "پشتراست بە ژ بەلگەنامەیێن یاسایی.", "ku-sor": "دڵنیابە لە بەڵگەنامە یاساییەکان.", "ar": "تأكد من المستندات القانونية.", "en": "Verify the legal documents." },
         buyerTip4: { "ku-bad": "لسەر بهای دانوستاندنێ بکە.", "ku-sor": "لەسەر نرخەکەی دانوستان بکە.", "ar": "تفاوض على السعر.", "en": "Negotiate the price." },
-        buyerTip5: { "ku-bad": "جهـ و خزمەتگوزارییان ل بەرچاڤ بگرە.", "ku-sor": "شوێن و خزمەتگوزارییەکان لەبەرچاو بگرە.", "ar": "فكر في الموقع والخدمات.", "en": "Consider the location and amenities." },
+        buyerTip5: { "ku-bad ": "جهـ و خزمەتگوزارییان ل بەرچاڤ بگرە.", "ku-sor": "شوێن و خزمەتگوزارییەکان لەبەرچاو بگرە.", "ar": "فكر في الموقع والخدمات.", "en": "Consider the location and amenities." },
         sellerTipsTitle: { "ku-bad": "ئامۆژگاری بۆ فرۆشیاران", "ku-sor": "ئامۆژگاری بۆ فرۆشیاران", "ar": "نصائح للبائعين", "en": "Tips for Sellers" },
         sellerTip1: { "ku-bad": "بهایەکێ گونجای بۆ مولکێ خۆ بدانە.", "ku-sor": "نرخێکی گونجاو بۆ موڵکەکەت دابنێ.", "ar": "حدد سعراً واقعياً لعقارك.", "en": "Set a realistic price for your property." },
         sellerTip2: { "ku-bad": "مولکێ خۆ پاقژ و ئامادە بکە.", "ku-sor": "موڵکەکەت پاک و ئامادە بکە.", "ar": "نظّف وحضّر عقارك جيداً.", "en": "Clean and prepare your property." },
@@ -1228,7 +1228,11 @@ document.addEventListener('DOMContentLoaded', function() {
             if (translations[key] && translations[key][lang]) el.textContent = translations[key][lang];
         });
         document.getElementById('home-search-input').placeholder = translations.homeSearchPlaceholder[lang];
-        document.getElementById('users-data-search').placeholder = translations.usersSearchPlaceholder[lang];
+        // Check if the element exists before setting the placeholder
+        const usersSearchInput = document.getElementById('users-data-search');
+        if (usersSearchInput) {
+            usersSearchInput.placeholder = translations.usersSearchPlaceholder[lang];
+        }
     }
 
     function switchPage(pageId) {
@@ -2468,7 +2472,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const code = Math.floor(100000 + Math.random() * 900000);
         registrationState = { name, email, password, code };
         
-        showToast(`${translations.verificationCodeSent[currentLang]} Your code is: ${code}`);
+        // --- گوهۆڕینا ژمارە ١ ---
+        // ل ڤێرێ کۆد دهاتە نیشاندان. نوکە مە ئەو ڕاکر و بتنێ دێ پەیامەکێ نیشاندەین.
+        showToast(translations.verificationCodeSent[currentLang]);
+        
+        // بۆ مەبەستێن تێستکرنێ، کۆد دێ ل کونسۆلێ (Console) برەوزەری هێتە نیشاندان.
+        console.log(`کۆدێ پشتراستکرنێ بۆ (${email}): ${code}`);
+        
         showAuthView('verify-email-container');
     }
 
@@ -2531,7 +2541,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         const code = Math.floor(100000 + Math.random() * 900000);
         passwordResetState = { email, code };
-        showToast(`کۆدێ نووکرنێ: ${code}`);
+        
+        // --- گوهۆڕینا ژمارە ٢ ---
+        // ل ڤێرێ ژی کۆد دهاتە نیشاندان. نوکە مە ئەو ژی ڕاکر.
+        showToast(translations.verificationCodeSent[currentLang]);
+        
+        // بۆ مەبەستێن تێستکرنێ، کۆد دێ ل کونسۆلێ هێتە نیشاندان.
+        console.log(`کۆدێ ژبیرکرنا پاسوۆردی بۆ (${email}): ${code}`);
+        
         showAuthView('reset-password-container');
     }
 
@@ -2571,6 +2588,7 @@ document.addEventListener('DOMContentLoaded', function() {
         };
         currentUser = defaultUser;
         saveData('currentUser', currentUser);
+        sessionStorage.removeItem('isAdmin'); // Remove admin session on logout
         renderProfilePage();
     }
     function handleSendNotification(e) {
