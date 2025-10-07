@@ -35,9 +35,23 @@
             border-radius: 20px !important; 
         }
         
+        #profile-pic { border-radius: 20px !important; }
+
         .info-section { margin-top: 20px; border: 1px solid var(--border-color); border-radius: 20px; overflow: hidden; }
-        .info-section summary { padding: 15px; font-weight: 600; cursor: pointer; display: flex; justify-content: space-between; align-items: center; background-color: var(--card-background); }
+        .info-section summary { position: relative; padding: 15px; font-weight: 600; cursor: pointer; display: flex; justify-content: space-between; align-items: center; background-color: var(--card-background); }
         .info-section summary:hover { background-color: var(--background-color); }
+        .info-section summary.has-notification::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0px;
+            transform: translateY(-50%);
+            width: 10px;
+            height: 10px;
+            background-color: #e74c3c;
+            border-radius: 50%;
+        }
+        html[dir="ltr"] .info-section summary.has-notification::before { left: auto; right: 0px; }
         .info-section summary::after { content: '\\f078'; font-family: 'Font Awesome 6 Free'; font-weight: 900; transition: transform 0.3s ease; }
         .info-section[open] > summary::after { transform: rotate(-180deg); }
         .info-section .info-content { padding: 0 15px 15px 15px; background-color: var(--card-background); }
@@ -48,7 +62,6 @@
         .info-section .info-content li::before { content: '•'; color: var(--primary-color); font-weight: bold; display: inline-block; width: 1em; margin-right: -1em; margin-left: 0.5em;}
         html[dir="ltr"] .info-section .info-content li::before { margin-left: -1em; margin-right: 0.5em;}
         
-        /* New Info Card Style for Tips */
         .info-card { background: var(--card-background); padding: 20px; box-shadow: var(--shadow); margin-top: 20px;}
         .info-card-header { font-size: 1.2em; font-weight: 700; color: var(--primary-color); margin: 0 0 15px 0; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 10px;}
         .info-card-header i { font-size: 0.9em; }
@@ -84,6 +97,7 @@
         }
 
         .header-icon {
+            position: relative;
             font-size: 1.3em;
             color: var(--text-light);
             text-decoration: none;
@@ -95,12 +109,21 @@
             justify-content: center;
             transition: all 0.2s ease;
         }
-
         .header-icon:hover {
             background-color: var(--background-color);
             color: var(--primary-color);
         }
-
+        .has-notification::after {
+            content: '';
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 10px;
+            height: 10px;
+            background-color: #e74c3c;
+            border-radius: 50%;
+            border: 2px solid var(--card-background);
+        }
         main { padding: 20px 20px 100px 20px; }
         .page-content { display: none; }
         .page-content.active { display: block; }
@@ -209,14 +232,30 @@
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
         .submit-btn { background-color: var(--primary-color); color: white; cursor: pointer; margin-top: 20px; border: none; font-weight: 600; padding: 14px; width: 100%; font-size: 1.1em; transition: background-color 0.2s; }
         .submit-btn:hover { background-color: var(--primary-hover); }
-        .image-upload-box { width: 100%; height: 180px; border: 2px dashed var(--border-color); display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; background-size: cover; background-position: center; transition: border-color 0.3s; }
-        .image-upload-box:hover { border-color: var(--primary-color); }
+        .image-upload-box { 
+            width: 100%; 
+            min-height: 180px; 
+            border: 2px solid var(--border-color);
+            background-color: var(--background-color);
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            cursor: pointer; 
+            background-size: cover; 
+            background-position: center; 
+            transition: all 0.3s; 
+            padding: 20px; 
+            box-sizing: border-box;
+            border-radius: 20px;
+        }
+        .image-upload-box:hover { border-color: var(--primary-color); box-shadow: 0 0 10px rgba(2,62,138, 0.1); }
         .image-upload-box .upload-icon { text-align: center; color: var(--text-light); }
         #image-upload-input { display: none; }
         
         #image-previews-container { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px; }
-        .img-preview-wrapper { position: relative; width: 80px; height: 80px; }
-        .img-preview-wrapper img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
+        .img-preview-wrapper { position: relative; width: 80px; height: 80px; border: 2px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .img-preview-wrapper img { width: 100%; height: 100%; object-fit: cover; }
         .delete-img-btn {
             position: absolute; top: -5px; right: -5px;
             width: 20px; height: 20px; background-color: #dc3545; color: white;
@@ -435,7 +474,7 @@
         
         .profile-header { display: flex; flex-direction: column; align-items: center; padding: 20px; background-color: var(--card-background); margin-bottom: 20px; box-shadow: var(--shadow); }
         #profile-pic-container { position: relative; cursor: pointer; }
-        #profile-pic { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 4px solid var(--primary-color); }
+        #profile-pic { width: 100px; height: 100px; object-fit: cover; border: 4px solid var(--primary-color); }
         #profile-pic-edit-icon { position: absolute; bottom: 5px; right: 5px; background-color: white; border-radius: 50%; padding: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
         #username-display { font-size: 1.5em; font-weight: 700; margin-top: 10px; color: var(--text-color); }
         #edit-profile-btn { background: none; border: none; color: var(--primary-color); cursor: pointer; font-weight: 600; }
@@ -551,7 +590,7 @@
         .spec-item i { font-size: 1.8em; color: var(--primary-color); margin-bottom: 8px; }
         .spec-item .label { font-size: 0.8em; color: var(--text-light); display: block; }
         .spec-item .value { font-size: 1.1em; font-weight: 600; display: block; }
-        #single-post-map { height: 250px; margin: 20px; z-index: 1; }
+        #single-post-map { height: 250px; z-index: 1; }
         .map-popup { text-align: right; }
         .map-popup img { width: 100%; height: 80px; object-fit: cover; border-radius: 4px; }
         .map-popup h4 { margin: 5px 0; font-size: 1em; }
@@ -788,6 +827,8 @@
             height: 100%; 
             overflow: auto; 
             background-color: rgba(0,0,0,0.5);
+            -webkit-backdrop-filter: blur(4px);
+            backdrop-filter: blur(4px);
         }
         .modal-content {
             background-color: var(--card-background);
@@ -798,6 +839,11 @@
             max-width: 500px;
             border-radius: 20px;
             box-shadow: var(--shadow);
+            animation: modal-fade-in 0.3s ease;
+        }
+        @keyframes modal-fade-in {
+            from { transform: translateY(-30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
         .modal-header {
             display: flex;
@@ -979,6 +1025,7 @@
         <div id="settings-page" class="page-content"></div>
         <div id="post-detail-page" class="page-content"></div>
         <div id="admin-page" class="page-content"></div>
+        <div id="edit-profile-page" class="page-content"></div>
     </main>
     
     <nav class="bottom-nav">
@@ -1025,9 +1072,32 @@
         </div>
     </div>
 
+    <!-- Admin Login Modal -->
+    <div id="admin-login-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Têketina Admin</h2>
+                <span class="close-btn">&times;</span>
+            </div>
+            <form id="admin-login-form">
+                <div class="form-group">
+                    <label>Navê Bikarhêner</label>
+                    <input type="text" id="admin-username" required>
+                </div>
+                <div class="form-group">
+                    <label>Peyva Nihênî</label>
+                    <input type="password" id="admin-password" required>
+                </div>
+                <button type="submit" class="submit-btn">Têkeve</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Edit Profile Modal (Now replaced by a page, but keeping the div just in case) -->
+    <div id="edit-profile-modal" class="modal"></div>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Moved Translations up for global access before init
     const translations = {
         loginTitle: { "ku-bad": "چوونەژوور", "ku-sor": "چوونەژوورەوە", "ar": "تسجيل الدخول", "en": "Login" },
         registerTitle: { "ku-bad": "خۆ تۆمارکرن", "ku-sor": "خۆتۆمارکردن", "ar": "إنشاء حساب", "en": "Register" },
@@ -1059,6 +1129,7 @@ document.addEventListener('DOMContentLoaded', function() {
         mustLoginToAdd: { "ku-bad": "تکایە سەرەتا خۆ تۆمار بکە یان بچۆ ژوور.", "ku-sor": "تکایە سەرەتا خۆت تۆمار بکە یان بچۆ ژوورەوە.", "ar": "يرجى تسجيل الدخول أو إنشاء حساب أولاً.", "en": "Please log in or register first." },
         adminLoginError: { "ku-bad": "ناڤ یان پەیڤا نهێنی خەلەتە!", "ku-sor": "ناو یان وشەی نهێنی هەڵەیە!", "ar": "اسم المستخدم أو كلمة المرور غير صحيحة!", "en": "Incorrect username or password!" },
         notificationSent: { "ku-bad": "ئاگەهداری ب سەرکەفتی هاتە هنارتن.", "ku-sor": "ئاگادارییەکە بە سەرکەوتوویی نێردرا.", "ar": "تم إرسال الإشعار بنجاح.", "en": "Notification sent successfully." },
+        reportSentSuccess: { "ku-bad": "پەیاما تە ب سەرکەفتی هاتە هنارتن.", "ku-sor": "پەیامەکەت بە سەرکەوتوویی نێردرا.", "ar": "تم إرسال رسالتك بنجاح.", "en": "Your message was sent successfully." },
         filter: { "ku-bad": "فلتەرکرن", "ku-sor": "فیلتەرکردن", "ar": "فلترة", "en": "Filter" },
         minPriceLabel: { "ku-bad": "کێمترین نرخ", "ku-sor": "کەمترین نرخ", "ar": "أقل سعر", "en": "Min Price" },
         maxPriceLabel: { "ku-bad": "زێدەترین نرخ", "ku-sor": "بەرزترین نرخ", "ar": "أعلى سعر", "en": "Max Price" },
@@ -1114,8 +1185,8 @@ document.addEventListener('DOMContentLoaded', function() {
         editFormTitle: { "ku-bad": "دەستکاریا پۆستی بکە", "ku-sor": "دەستکاری پۆست بکە", "ar": "تعديل الإعلان", "en": "Edit Post" },
         mainInfo: { "ku-bad": "پێزانینێن سەرەکی", "ku-sor": "زانیاری سەرەکی", "ar": "المعلومات الأساسية", "en": "Basic Info" },
         propertySpecs: { "ku-bad": "تایبەتمەندیێن مولکی", "ku-sor": "تایبەتمەندی موڵک", "ar": "مواصفات العقار", "en": "Property Specs" },
-        propertyImage: { "ku-bad": "وێنێ مولکی", "ku-sor": "وێنەی موڵک", "ar": "صورة العقار", "en": "Property Image" },
-        chooseImage: { "ku-bad": "وێنەیەکێ هەلبژێرە", "ku-sor": "وێنەیەک هەڵبژێرە", "ar": "اختر صورة", "en": "Choose Image" },
+        propertyImage: { "ku-bad": "وێنێ مولکی", "ku-sor": "وێنەی موڵک", "ar": "صور العقار", "en": "Property Images" },
+        chooseImage: { "ku-bad": "وێنەیان هەلبژێرە", "ku-sor": "وێنەکان هەڵبژێرە", "ar": "اختر صور", "en": "Choose Images" },
         listingType: { "ku-bad": "جورێ داخازیێ", "ku-sor": "جۆری داواکاری", "ar": "نوع الطلب", "en": "Listing Type" },
         propertyType: { "ku-bad": "جورێ مولکی", "ku-sor": "جۆری موڵک", "ar": "نوع العقار", "en": "Property Type" },
         price: { "ku-bad": "بها", "ku-sor": "نرخ", "ar": "السعر", "en": "Price" },
@@ -1166,19 +1237,26 @@ document.addEventListener('DOMContentLoaded', function() {
         postSubmittedSuccess: { "ku-bad": "پۆستێ تە بۆ پێداچوونێ هاتە هنارتن", "ku-sor": "پۆستەکەت بۆ پێداچوون نێردرا", "ar": "تم إرسال إعلانك للمراجعة", "en": "Your post was submitted for review" },
         postApprovedSuccess: { "ku-bad": "پۆست ب سەرکەفتی هاتە پەسەندکرن", "ku-sor": "پۆستەکە بە سەرکەوتوویی پەسەندکرا", "ar": "تمت الموافقة على الإعلان بنجاح", "en": "Post approved successfully" },
         postUpdatedSuccess: { "ku-bad": "پۆست ب سەرکەفتی هاتە نووکرن", "ku-sor": "پۆستەکە بە سەرکەوتوویی نوێکرایەوە", "ar": "تم تحديث الإعلان بنجاح", "en": "Post updated successfully" },
+        reportsTitle: { "ku-bad": "پێشبینی و ئاریشە", "ku-sor": "پێشنیار و کێشەکان", "ar": "الاقتراحات والشكاوى", "en": "Suggestions & Issues" },
+        noReports: { "ku-bad": "چ پێشبینی یان ئاریشە نینن.", "ku-sor": "هیچ پێشنیارێک یان کێشەیەک نییە.", "ar": "لا توجد اقتراحات أو شكاوى.", "en": "No suggestions or issues." },
+        sendReportTitle: { "ku-bad": "پێشبینییەک یان ئاریشەیەک بهنێرە", "ku-sor": "پێشنیارێک یان کێشەیەک بنێرە", "ar": "إرسال اقتراح أو شكوى", "en": "Send a Suggestion or Issue" },
+        reportLabel: { "ku-bad": "پێشبینی یان ئاریشەیا خۆ ل ڤێرێ بنڤیسە", "ku-sor": "پێشنیار یان کێشەکەت لێرە بنووسە", "ar": "اكتب اقتراحك أو شكواك هنا", "en": "Write your suggestion or issue here" },
+        sendReportBtn: { "ku-bad": "هنارتن", "ku-sor": "ناردن", "ar": "إرسال", "en": "Send" },
+        editProfilePageTitle: { "ku-bad": "گوهۆڕینا پروفایلێ", "ku-sor": "گۆڕینی پرۆفایل", "ar": "تعديل الملف الشخصي", "en": "Edit Profile" },
+        profileUpdated: { "ku-bad": "پروفایلێ تە هاتە نویكرن.", "ku-sor": "پڕۆفایلەکەت نوێکرایەوە.", "ar": "تم تحديث ملفك الشخصي.", "en": "Your profile has been updated." },
     };
     let currentLang = localStorage.getItem('appLanguage') || 'ku-bad';
     const elements = { body: document.body };
-    let allPosts, currentUser, allUsers, favoritePostIds, privateProperties, passwordResetState, registrationState;
+    let allPosts, currentUser, allUsers, favoritePostIds, privateProperties, allReports, passwordResetState, registrationState;
     let lastActivePageBeforeDetail = 'home-page';
 
     function saveData(key, data) { localStorage.setItem(key, JSON.stringify(data)); }
     function loadData(key) { return JSON.parse(localStorage.getItem(key)); }
 
     const samplePosts = [
-        { id: "1726200000001", postCode: "101A", userId: "admin_user_id", listingType: "sale", propertyType: "house", location: "دهۆک, گرێ باسێ", priceType: "numeric", priceValue: "120000", phone: "07501112233", area: "200", direction: "روژهەلات", bedrooms: "4", bathrooms: "3", floors: "2", garden: "yes", isZero: "no", coords: { lat: 36.861, lng: 42.989 }, imageUrls: ["https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg"], status: null },
+        { id: "1726200000001", postCode: "101A", userId: "admin_user_id", listingType: "sale", propertyType: "house", location: "دهۆک, گرێ باسێ", priceType: "numeric", priceValue: "120000", phone: "07501112233", area: "200", direction: "روژهەلات", bedrooms: "4", bathrooms: "3", floors: "2", garden: "yes", isZero: "no", coords: { lat: 36.861, lng: 42.989 }, imageUrls: ["https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg", "https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg"], status: null },
         { id: "1726200000002", postCode: "25B", userId: "admin_user_id", listingType: "rent", propertyType: "apartment", location: "شوقێن گولان, هەولێر", priceType: "numeric", priceValue: "500", phone: "07502223344", area: "150", direction: "باکور", bedrooms: "3", bathrooms: "2", floors: "1", garden: "no", isZero: "yes", coords: { lat: 36.191, lng: 44.009 }, imageUrls: ["https://images.pexels.com/photos/276724/pexels-photo-276724.jpeg"], status: null },
-        { id: "1726200000003", postCode: "V03", userId: "anonymous_user", listingType: "sale", propertyType: "villa", location: "ماسیک, دهۆک", priceType: "special", priceValue: "", phone: "07503334455", area: "600", direction: "روژئاڤا", bedrooms: "6", bathrooms: "5", floors: "3", garden: "yes", isZero: "yes", coords: { lat: 36.883, lng: 42.946 }, imageUrls: ["https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg"], status: "pending" },
+        { id: "1726200000003", postCode: "V03", userId: "anonymous_user", listingType: "sale", propertyType: "villa", location: "ماسیک, دهۆک", priceType: "special", priceValue: "", phone: "07503334455", area: "600", direction: "روژئاڤا", bedrooms: "6", bathrooms: "5", floors: "3", garden: "yes", isZero: "yes", coords: { lat: 36.883, lng: 42.946 }, imageUrls: [], status: "pending" },
     ];
     
     function initializeData() {
@@ -1191,17 +1269,28 @@ document.addEventListener('DOMContentLoaded', function() {
             isAnonymous: true 
         };
         
+        const adminUser = {
+            id: 'admin_user_id',
+            name: 'Admin',
+            email: 'admin',
+            password: 'admin',
+            pic: 'https://via.placeholder.com/100',
+            isAnonymous: false
+        };
+        
         if (!loadData('currentUser')) saveData('currentUser', defaultUser);
         if (!loadData('favoritePosts')) saveData('favoritePosts', []);
         if (!loadData('privateProperties')) saveData('privateProperties', []);
-        if (!loadData('users')) saveData('users', []);
+        if (!loadData('users')) saveData('users', [adminUser]);
         if (!loadData('notifications')) saveData('notifications', []);
+        if (!loadData('aqaratReports')) saveData('aqaratReports', []);
 
         allPosts = loadData('aqaratPosts');
         currentUser = loadData('currentUser');
         allUsers = loadData('users');
         favoritePostIds = loadData('favoritePosts');
         privateProperties = loadData('privateProperties');
+        allReports = loadData('aqaratReports');
     }
 
     let editingPostId = null, mainMap, pickerMap, pickerMarker, singlePostMap, markerClusterGroup;
@@ -1228,7 +1317,6 @@ document.addEventListener('DOMContentLoaded', function() {
             if (translations[key] && translations[key][lang]) el.textContent = translations[key][lang];
         });
         document.getElementById('home-search-input').placeholder = translations.homeSearchPlaceholder[lang];
-        // Check if the element exists before setting the placeholder
         const usersSearchInput = document.getElementById('users-data-search');
         if (usersSearchInput) {
             usersSearchInput.placeholder = translations.usersSearchPlaceholder[lang];
@@ -1244,6 +1332,7 @@ document.addEventListener('DOMContentLoaded', function() {
         let isMapPage = pageId === 'map-page';
         let isDetailPage = pageId === 'post-detail-page';
         let isAdminPage = pageId === 'admin-page';
+        let isEditProfilePage = pageId === 'edit-profile-page';
         
         let newClassName = '';
         if (isMapPage) newClassName = 'map-is-active';
@@ -1252,19 +1341,24 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         document.body.className = newClassName;
 
-        document.querySelector('header').style.display = isDetailPage || isMapPage || isAdminPage ? 'none' : 'flex';
-        document.querySelector('.bottom-nav').style.display = isDetailPage || isAdminPage ? 'none' : 'flex'; 
+        document.querySelector('header').style.display = isDetailPage || isMapPage || isAdminPage || isEditProfilePage ? 'none' : 'flex';
+        document.querySelector('.bottom-nav').style.display = isDetailPage || isAdminPage || isEditProfilePage ? 'none' : 'flex';
         document.querySelectorAll('.page-content').forEach(p => p.classList.toggle('active', p.id === pageId));
         document.querySelectorAll('.bottom-nav a').forEach(l => l.classList.remove('active'));
         const activeLink = document.querySelector(`.bottom-nav a[data-page="${pageId}"]`);
         if(activeLink) activeLink.classList.add('active');
         
-        if (pageId === 'add-page' && !editingPostId) renderAddForm();
+        if (pageId === 'add-page') {
+            const postToEdit = editingPostId ? allPosts.find(p => p.id === editingPostId) : {};
+            renderAddForm(postToEdit);
+        }
+
         if (pageId !== 'add-page') editingPostId = null;
         if (pageId === 'home-page') renderHomePage();
         if (pageId === 'apartments-page') renderApartmentsPage();
         if (pageId === 'admin-page') renderAdminPage();
         if (pageId === 'profile-page') renderProfilePage();
+        if (pageId === 'edit-profile-page') renderEditProfilePage();
         
         if (pageId === 'map-page') updateMapControls();
         
@@ -1274,6 +1368,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (isDetailPage && singlePostMap) singlePostMap.invalidateSize();
         }, 50);
     }
+
     function populateStaticHTML() {
         document.getElementById('profile-page').innerHTML = `
             <div id="logged-out-view" style="display: none;">
@@ -1329,10 +1424,10 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
             <div id="logged-in-view" style="display: none;">
                 <div class="profile-header">
-                    <div id="profile-pic-container"><img src="https://via.placeholder.com/100" alt="Wêneyê Profaylê" id="profile-pic"><input type="file" id="profile-pic-input" accept="image/*"><i class="fa-solid fa-pencil" id="profile-pic-edit-icon"></i></div>
+                    <div id="profile-pic-container"><img src="https://via.placeholder.com/100" alt="Wêneyê Profaylê" id="profile-pic"><input type="file" id="profile-pic-input" accept="image/*" style="display:none;"><i class="fa-solid fa-camera" id="profile-pic-edit-icon"></i></div>
                     <h2 id="username-display"></h2>
-                    <button id="edit-profile-btn" data-translate="editProfileName"></button>
                 </div>
+                <button id="go-to-edit-profile-btn" class="submit-btn" style="margin-top:0; margin-bottom: 20px;"><i class="fa-solid fa-user-pen"></i> <span data-translate="editProfilePageTitle"></span></button>
                 <div id="notifications-section"></div>
                 <div id="my-posts-container"></div>
                 <button id="logout-btn" class="submit-btn" style="background-color: #dc3545;"><i class="fa-solid fa-arrow-right-from-bracket"></i> <span data-translate="logout"></span></button>
@@ -1344,6 +1439,17 @@ document.addEventListener('DOMContentLoaded', function() {
                  <div class="info-card" style="padding-top:10px;">
                      <div class="form-group"><label for="language-select" data-translate="language"></label><select id="language-select"><option value="ku-bad">کوردی (بادینی)</option><option value="ku-sor">کوردی (سۆرانی)</option><option value="ar">عربي</option><option value="en">English</option></select></div>
                      <div class="form-group"><label data-translate="colorMode"></label><div style="display: flex; align-items: center; justify-content: space-between; padding: 5px 0;"><span data-translate="lightMode"><i class="fa-solid fa-sun"></i> </span><label class="switch"><input type="checkbox" id="dark-mode-toggle"><span class="slider round"></span></label><span data-translate="darkMode"><i class="fa-solid fa-moon"></i> </span></div></div>
+                 </div>
+
+                 <div class="info-card" id="report-card">
+                    <h3 class="info-card-header"><i class="fa-solid fa-flag"></i> <span data-translate="sendReportTitle"></span></h3>
+                    <form id="report-form">
+                        <div class="form-group">
+                            <label data-translate="reportLabel"></label>
+                            <textarea id="report-text" rows="4" placeholder="..." required></textarea>
+                        </div>
+                        <button type="submit" class="submit-btn" data-translate="sendReportBtn"></button>
+                    </form>
                  </div>
 
                  <div class="info-card">
@@ -1369,9 +1475,9 @@ document.addEventListener('DOMContentLoaded', function() {
                   <div class="info-card">
                      <h3 class="info-card-header" data-translate="contactUs"></h3>
                      <ul class="contact-list" style="padding:0;">
-                        <li><i class="fa-solid fa-phone-volume"></i> <a href="tel:07507100238">0750 710 0238</a></li>
                         <li><i class="fa-solid fa-phone-volume"></i> <a href="tel:07504542800">0750 454 2800</a></li>
                         <li><i class="fa-solid fa-phone-volume"></i> <a href="tel:07504176611">0750 417 6611</a></li>
+                        <li><i class="fa-solid fa-phone-volume"></i> <a href="tel:07507100238">0750 710 0238</a></li>
                      </ul>
                  </div>
                  <div class="developer-info"><p class="dev-title">گەشەپێدان</p><p class="dev-name">Omed Abdulwahid</p><div class="dev-contact"><a href="tel:07507100238"><i class="fa-solid fa-phone"></i> 07507100238</a></div></div>
@@ -1400,6 +1506,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <button id="btn-show-users" class="submit-btn" style="background-color: #5bc0de;"><i class="fa-solid fa-users"></i> <span data-translate="adminShowUsers"></span></button>
                         <button id="btn-show-notifications" class="submit-btn" style="background-color: #f39c12;"><i class="fa-solid fa-bell"></i> <span data-translate="adminSendNotifications"></span></button>
                         <button id="btn-show-private-data" class="submit-btn" style="background-color: #6c757d;"><i class="fa-solid fa-lock"></i> <span data-translate="adminPrivateData"></span></button>
+                        <button id="btn-show-reports" class="submit-btn" style="background-color: #c0392b;"><i class="fa-solid fa-flag"></i> <span data-translate="reportsTitle"></span></button>
                     </div>
                 </div>
             </div>
@@ -1477,6 +1584,15 @@ document.addEventListener('DOMContentLoaded', function() {
                         <h3 data-translate="adminAllNotifications"></h3>
                         <div id="admin-notifications-list"></div>
                     </div>
+                </div>
+            </div>
+            <div id="admin-reports-view" class="admin-view">
+                 <div class="form-container">
+                    <div class="admin-header">
+                        <h2 data-translate="reportsTitle"></h2>
+                        <button id="btn-back-to-dashboard-5" class="filter-btn" style="flex-grow:0;"><i class="fa-solid fa-arrow-left"></i></button>
+                    </div>
+                    <div id="admin-reports-list"></div>
                 </div>
             </div>
         `;
@@ -1583,7 +1699,8 @@ document.addEventListener('DOMContentLoaded', function() {
         renderApartmentsPage(); 
         renderProfilePage(); 
         renderFavoritesPage(); 
-        renderMapMarkers(); 
+        renderMapMarkers();
+        checkForUnreadNotifications();
     }
     
     function renderHomePage() {
@@ -1660,7 +1777,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         const codeDisplay = post.postCode ? `<span class="detail-code">#${post.postCode}</span>` : '';
 
-        
         const specItems = [
             { icon: propertyTypeIcons[post.propertyType] || propertyTypeIcons.default, labelKey: "propertyType", value: translations[post.propertyType] ? translations[post.propertyType][currentLang] : post.propertyType },
             { icon: 'fa-ruler-combined', labelKey: "area", value: post.area ? `${post.area} م²` : 'N/A' },
@@ -1671,12 +1787,21 @@ document.addEventListener('DOMContentLoaded', function() {
             { icon: 'fa-leaf', labelKey: "garden", value: post.garden === 'yes' ? translations.yes[currentLang] : translations.no[currentLang] }
         ].filter(item => item.value && item.value !== 'N/A');
         
-        container.innerHTML = `<div class="detail-header"><button class="back-btn"><i class="fa-solid fa-arrow-left"></i></button><div class="detail-title-wrapper"><h3 class="detail-title">${post.location}</h3>${codeDisplay}</div><button class="detail-fav-btn ${isFavorite ? 'is-favorite fa-solid' : 'fa-regular'} fa-star" data-post-id="${post.id}"></button></div><div class="detail-gallery">${galleryHtml}</div><div class="detail-main-info"><h2>${post.location}</h2><div class="price">${priceDisplay}</div></div><div class="detail-specs">${specItems.map(item => `<div class="spec-item"><i class="fa-solid ${item.icon}"></i><span class="value">${item.value}</span><span class="label" data-translate="${item.labelKey}"></span></div>`).join('')}</div><h3 class="section-title" style="padding: 0 20px;" data-translate="mapLocation"></h3><div id="single-post-map"></div><div style="padding: 0 20px 20px;"><a href="tel:${post.phone}" style="text-decoration: none;"><button class="submit-btn"><i class="fa-solid fa-phone"></i> <span data-translate="phone"></span>: ${post.phone}</button></a></div>`;
+        const officeNumbersHTML = `
+            <div style="padding: 0 20px; margin-top: -10px; margin-bottom: 20px;">
+                <a href="tel:07504542800" style="text-decoration: none;"><button class="submit-btn" style="background-color: #2c3e50; margin-top: 10px;"><i class="fa-solid fa-phone-volume"></i> Ofîs: 0750 454 2800</button></a>
+                <a href="tel:07504176611" style="text-decoration: none;"><button class="submit-btn" style="background-color: #2c3e50; margin-top: 10px;"><i class="fa-solid fa-phone-volume"></i> Ofîs: 0750 417 6611</button></a>
+                <a href="tel:07507100238" style="text-decoration: none;"><button class="submit-btn" style="background-color: #2c3e50; margin-top: 10px;"><i class="fa-solid fa-phone-volume"></i> Ofîs: 0750 710 0238</button></a>
+            </div>
+        `;
+        
+        container.innerHTML = `<div class="detail-header"><button class="back-btn"><i class="fa-solid fa-arrow-left"></i></button><div class="detail-title-wrapper"><h3 class="detail-title">${post.location}</h3>${codeDisplay}</div><button class="detail-fav-btn ${isFavorite ? 'is-favorite fa-solid' : 'fa-regular'} fa-star" data-post-id="${post.id}"></button></div><div class="detail-gallery">${galleryHtml}</div><div class="detail-main-info"><h2>${post.location}</h2><div class="price">${priceDisplay}</div></div><div class="detail-specs">${specItems.map(item => `<div class="spec-item"><i class="fa-solid ${item.icon}"></i><span class="value">${item.value}</span><span class="label" data-translate="${item.labelKey}"></span></div>`).join('')}</div><div id="single-post-map-container" style="padding: 20px;"><h3 class="section-title" data-translate="mapLocation"></h3><div id="single-post-map"></div></div><div style="padding: 0 20px 20px;"><a href="tel:${post.phone}" style="text-decoration: none;"><button class="submit-btn"><i class="fa-solid fa-phone"></i> <span data-translate="phone"></span>: ${post.phone}</button></a></div>${officeNumbersHTML}`;
+        
         container.querySelector('.back-btn').addEventListener('click', () => { 
             switchPage(lastActivePageBeforeDetail || 'home-page');
         });
         container.querySelector('.detail-fav-btn').addEventListener('click', (e) => { toggleFavorite(post.id); e.target.classList.toggle('is-favorite'); e.target.classList.toggle('fa-solid'); e.target.classList.toggle('fa-regular'); });
-        if (post.coords && post.coords.lat) initializeSinglePostMap(post.coords);
+        if (post.coords && post.coords.lat) initializeSinglePostMap(post.coords); else document.getElementById('single-post-map-container').style.display = 'none';
         applyTranslations(currentLang);
     }
     
@@ -1708,15 +1833,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function renderNotificationsOnProfile(){
         const container = document.getElementById('notifications-section');
-        const notifications = (loadData('notifications') || []).reverse();
+        const allNotifications = loadData('notifications') || [];
+        const userNotifications = allNotifications.filter(n => n.userId === currentUser.id || n.userId === 'all');
         
         let notificationsHtml = `
-            <details class="info-section">
+            <details class="info-section" id="notifications-details">
                 <summary data-translate="notifications"></summary>
                 <div class="info-content">`;
 
-        if(notifications.length > 0){
-             notifications.forEach(n => {
+        if(userNotifications.length > 0){
+             userNotifications.slice().reverse().forEach(n => {
                 notificationsHtml += `
                     <div class="notification-card">
                         <h4 class="notification-title">${n.title}</h4>
@@ -1731,6 +1857,21 @@ document.addEventListener('DOMContentLoaded', function() {
         
         notificationsHtml += '</div></details>';
         container.innerHTML = notificationsHtml;
+        
+        const detailsElement = document.getElementById('notifications-details');
+        detailsElement.addEventListener('toggle', () => {
+            if (detailsElement.open) {
+                const notifications = loadData('notifications') || [];
+                notifications.forEach(n => {
+                    if(n.userId === currentUser.id || n.userId === 'all'){
+                       n.read = true;
+                    }
+                });
+                saveData('notifications', notifications);
+                checkForUnreadNotifications();
+            }
+        });
+
     }
     
     function renderCards(container, posts) {
@@ -1771,6 +1912,7 @@ document.addEventListener('DOMContentLoaded', function() {
         renderAdminPrivateDataView();
         renderAdminUsersView();
         renderAdminNotificationsView();
+        renderAdminReportsView();
     }
     
     function renderAdminDashboard() {
@@ -1925,6 +2067,31 @@ document.addEventListener('DOMContentLoaded', function() {
         applyTranslations(currentLang);
     }
     
+    function renderAdminReportsView() {
+        const container = document.getElementById('admin-reports-list');
+        const reports = (loadData('aqaratReports') || []).reverse();
+        container.innerHTML = '';
+
+        if (reports.length > 0) {
+            reports.forEach(r => {
+                const card = document.createElement('div');
+                card.className = 'notification-card';
+                card.innerHTML = `
+                    <p class="notification-body" style="font-size: 1em;">${r.text}</p>
+                    <small class="notification-date">
+                        Ji: <strong>${r.userName || 'Nenas'}</strong> di ${new Date(r.timestamp).toLocaleString()}
+                    </small>
+                    <button class="action-btn delete-btn" style="position: absolute; top: 10px; left:10px; width: 40px; height: 40px; padding:0; border-radius: 50% !important;"><i class="fa-solid fa-trash"></i></button>
+                `;
+                card.querySelector('.delete-btn').addEventListener('click', () => deleteReport(r.id));
+                container.appendChild(card);
+            });
+        } else {
+            container.innerHTML = `<p class="empty-page-message" data-translate="noReports"></p>`;
+        }
+        applyTranslations(currentLang);
+    }
+
     function deleteNotification(notifId){
         if(confirm('تو پشتراستی دێ ڤێ ئاگەهداریێ ژێبەی؟')) {
             let notifications = loadData('notifications') || [];
@@ -1934,6 +2101,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    function deleteReport(reportId) {
+        if (confirm('تو پشتراستی دێ ڤێ پەیامێ ژێبەی؟')) {
+            allReports = allReports.filter(r => r.id !== reportId);
+            saveData('aqaratReports', allReports);
+            renderAdminReportsView();
+        }
+    }
 
     function renderFavoritesPage() {
         if(!elements.favoritesContainer) return;
@@ -2046,13 +2220,68 @@ document.addEventListener('DOMContentLoaded', function() {
             container.appendChild(button);
         }
     }
+    
+    function renderEditProfilePage() {
+        const container = document.getElementById('edit-profile-page');
+        if (!container) return;
+        container.innerHTML = `
+            <div class="form-container">
+                <div class="detail-header" style="border-radius: 0 !important; margin: -20px -20px 20px -20px;">
+                     <button id="back-to-profile-btn" class="back-btn"><i class="fa-solid fa-arrow-left"></i></button>
+                     <div class="detail-title-wrapper"><h3 class="detail-title" data-translate="editProfilePageTitle"></h3></div>
+                     <div style="width: 40px;"></div>
+                </div>
+                
+                <form id="edit-profile-form-page">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <label for="edit-profile-pic-input-page" id="edit-profile-pic-container" style="position: relative; display: inline-block;">
+                            <img src="${currentUser.pic}" id="edit-profile-pic-preview" style="width: 150px; height: 150px; border-radius: 20px; object-fit: cover; cursor: pointer; border: 4px solid var(--border-color);">
+                            <div style="position: absolute; bottom: 10px; right: 10px; background-color: var(--card-background); border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow);">
+                                <i class="fa-solid fa-camera" style="color: var(--primary-color);"></i>
+                            </div>
+                        </label>
+                        <input type="file" id="edit-profile-pic-input-page" accept="image/*" style="display: none;">
+                    </div>
+
+                    <div class="form-group">
+                        <label data-translate="nameLabel"></label>
+                        <input type="text" id="edit-profile-name-input-page" value="${currentUser.name}" required>
+                    </div>
+                    <button type="submit" class="submit-btn" data-translate="updateButton"></button>
+                </form>
+            </div>
+        `;
+        applyTranslations(currentLang);
+    }
+
 
     function renderAddForm(post = {}) {
         const isEditing = Object.keys(post).length > 0;
-        
+        editingPostId = isEditing ? post.id : null;
+        uploadedImages = [];
+
         elements.addPropertyForm.innerHTML = `
             <h2 id="form-title" style="text-align:center; margin-bottom: 25px;"></h2>
             
+            <div class="form-card">
+                <div class="form-card-header">
+                    <i class="fa-solid fa-images"></i>
+                    <h3 data-translate="propertyImage"></h3>
+                </div>
+                <div class="form-card-body">
+                    <div class="form-group">
+                        <label for="image-upload-input" class="image-upload-box">
+                            <div class="upload-icon">
+                                <i class="fa-solid fa-cloud-arrow-up" style="font-size: 2.5em; margin-bottom: 10px;"></i>
+                                <p data-translate="chooseImage"></p>
+                            </div>
+                        </label>
+                        <input type="file" id="image-upload-input" accept="image/*" multiple>
+                        <div id="image-previews-container"></div>
+                    </div>
+                </div>
+            </div>
+
             <div class="form-card">
                 <div class="form-card-header">
                     <i class="fa-solid fa-circle-info"></i>
@@ -2093,7 +2322,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
             </div>
             
-            <div class="form-notice"><i class="fa-solid fa-check-double"></i><p><strong>تێبینی:</strong> پشتی هنارتنا زانیاریێن سەرەکی، دێ تیمەکا مە سەرەدانا مولکێ هەوە کەت بۆ پشتراستبوونێ و گرتنا وێنەیێن پرۆفێشنال، و پاشی دێ پۆستێ هەوە هێتە بەلاڤکرن.</p></div>
+            <div class="form-notice"><i class="fa-solid fa-check-double"></i><p><strong>تێبینی:</strong> پشتی هنارتنا پۆستی، دێ ل ژێر پێداچوونێ دا بیت هەتا ژ لایێ تیمێ ڤە بهێتە پەسەندکرن.</p></div>
             <button type="submit" class="submit-btn"><span data-translate="postButton"></span></button>
         `;
         
@@ -2119,9 +2348,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         const priceValueContainer = document.getElementById('price-value-container');
-        const togglePriceInputVisibility = (type) => {
-            priceValueContainer.style.display = type === 'numeric' ? 'block' : 'none';
-        };
+        const togglePriceInputVisibility = (type) => { priceValueContainer.style.display = type === 'numeric' ? 'block' : 'none'; };
 
         setupSegmentedControl('priceType-control', 'priceType-input', post.priceType || 'numeric', togglePriceInputVisibility);
         setupSegmentedControl('listingType-control', 'listingType-input', post.listingType);
@@ -2134,55 +2361,108 @@ document.addEventListener('DOMContentLoaded', function() {
         setupNumberSelector('floors-control', 5, 'floors-input', post.floors);
         setupPropertyTypeSelector('propertyType-control', 'propertyType-input', post.propertyType);
         
+        const imageInput = document.getElementById('image-upload-input');
+        const previewsContainer = document.getElementById('image-previews-container');
+
+        if (isEditing && post.imageUrls) {
+            uploadedImages = [...post.imageUrls];
+            renderImagePreviews();
+        }
+
+        imageInput.addEventListener('change', (e) => {
+            const files = Array.from(e.target.files);
+            files.forEach(file => {
+                 const reader = new FileReader();
+                 reader.onload = (event) => {
+                     uploadedImages.push(event.target.result);
+                     renderImagePreviews();
+                 };
+                 reader.readAsDataURL(file);
+            });
+        });
+
+        function renderImagePreviews() {
+            previewsContainer.innerHTML = '';
+            uploadedImages.forEach((imgSrc, index) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'img-preview-wrapper';
+                wrapper.innerHTML = `
+                    <img src="${imgSrc}" alt="Preview">
+                    <div class="delete-img-btn" data-index="${index}">&times;</div>
+                `;
+                previewsContainer.appendChild(wrapper);
+            });
+        }
+        
+        previewsContainer.addEventListener('click', function(e){
+            if(e.target.classList.contains('delete-img-btn')){
+                const indexToRemove = parseInt(e.target.dataset.index, 10);
+                uploadedImages.splice(indexToRemove, 1);
+                renderImagePreviews();
+            }
+        });
+
+
         applyTranslations(currentLang);
-        const initialMapCoords = isEditing ? (post.coords || defaultCoords) : defaultCoords;
+        const initialMapCoords = isEditing && post.coords ? post.coords : defaultCoords;
         initializePickerMap(initialMapCoords);
     }
     function enableDarkMode() { document.body.classList.add('dark-mode'); localStorage.setItem('theme', 'dark'); }
     function disableDarkMode() { document.body.classList.remove('dark-mode'); localStorage.setItem('theme', 'light'); }
+    
     function handleFormSubmit(e) {
         e.preventDefault();
         const formData = new FormData(e.target);
         const formValues = Object.fromEntries(formData.entries());
-        formValues.imageUrls = []; 
-        formValues.coords = selectedCoords;
         
         const isEditing = !!editingPostId;
+        const notifications = loadData('notifications') || [];
+        
         const postData = { 
             ...formValues, 
             id: editingPostId || Date.now().toString(), 
-            status: 'pending',
-            userId: currentUser.id
+            coords: selectedCoords,
+            imageUrls: uploadedImages,
+            userId: currentUser.id,
+            status: 'pending' // Always set to pending initially
         };
         
         if (isEditing) {
             const index = allPosts.findIndex(p => p.id === editingPostId);
             if (index > -1) {
-                postData.imageUrls = allPosts[index].imageUrls || []; 
-                postData.status = allPosts[index].status;
-                postData.userId = allPosts[index].userId;
+                postData.userId = allPosts[index].userId; // Keep original owner
                 allPosts[index] = postData;
+                
+                notifications.push({
+                    id: Date.now(),
+                    title: 'پۆستەک هاتە نویکرن',
+                    body: `پۆستێ "${postData.location}" ژلایێ "${currentUser.name}" ڤە هاتە نویکرن و چوو د چاڤەرێکرنێ دا.`,
+                    userId: 'admin_user_id',
+                    read: false
+                });
             }
         } else {
             allPosts.unshift(postData);
+            notifications.push({
+                id: Date.now(),
+                title: 'پۆستەکێ نوو یێ چاڤەرێیە',
+                body: `پۆستەکێ نوو ب ناڤونیشانێ "${postData.location}" ژلایێ "${currentUser.name}" ڤە هاتە هنارتن.`,
+                userId: 'admin_user_id',
+                read: false
+            });
         }
         
+        saveData('notifications', notifications);
         saveData('aqaratPosts', allPosts);
         editingPostId = null; 
+        uploadedImages = [];
         
-        if (isEditing) {
-            showToast(translations.postUpdatedSuccess[currentLang]);
-        } else {
-            showToast(translations.postSubmittedSuccess[currentLang]);
-        }
+        showToast(isEditing ? translations.postUpdatedSuccess[currentLang] : translations.postSubmittedSuccess[currentLang]);
         
         renderAll();
-        if (sessionStorage.getItem('isAdmin')) {
-            switchPage('admin-page');
-        } else {
-            switchPage('profile-page');
-        }
+        switchPage('profile-page');
     }
+
     function toggleFavorite(postId) {
         const index = favoritePostIds.indexOf(postId);
         if (index > -1) favoritePostIds.splice(index, 1);
@@ -2204,8 +2484,21 @@ document.addEventListener('DOMContentLoaded', function() {
         if(post && post.status === 'pending') {
             post.status = null;
             saveData('aqaratPosts', allPosts);
+
+            const user = allUsers.find(u => u.id === post.userId);
+            if (user) { 
+                const notifications = loadData('notifications') || [];
+                notifications.push({
+                    id: Date.now(),
+                    title: 'پۆستێ تە هاتە پەسەندکرن',
+                    body: `پۆستێ تە ب ناڤونیشانێ "${post.location}" هاتە پەسەندکرن و نوکە بۆ هەمیان دیارە.`,
+                    userId: post.userId,
+                    read: false
+                });
+                saveData('notifications', notifications);
+            }
             showToast(translations.postApprovedSuccess[currentLang]);
-            renderAdminPage();
+            renderAll();
         }
     }
     function togglePostStatus(postId) {
@@ -2218,11 +2511,8 @@ document.addEventListener('DOMContentLoaded', function() {
         renderAdminPage();
     }
     function editPost(postId) {
-        const post = allPosts.find(p => p.id === postId);
-        if (!post) return;
         editingPostId = postId;
         switchPage('add-page');
-        renderAddForm(post);
     }
     function deletePost(postId) {
         if (!confirm(translations.confirmDelete[currentLang])) return;
@@ -2254,6 +2544,7 @@ document.addEventListener('DOMContentLoaded', function() {
         baseLayers['Sade'].addTo(pickerMap);
         const pickerIcon = L.divIcon({ className: 'picker-map-marker', iconSize: [20, 20] });
         pickerMarker = L.marker(coords, { draggable: true, icon: pickerIcon }).addTo(pickerMap);
+        selectedCoords = coords;
         pickerMap.on('click', e => { selectedCoords = e.latlng; pickerMarker.setLatLng(selectedCoords); });
         pickerMarker.on('dragend', e => { selectedCoords = e.target.getLatLng(); });
     }
@@ -2472,13 +2763,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const code = Math.floor(100000 + Math.random() * 900000);
         registrationState = { name, email, password, code };
         
-        // --- گوهۆڕینا ژمارە ١ ---
-        // ل ڤێرێ کۆد دهاتە نیشاندان. نوکە مە ئەو ڕاکر و بتنێ دێ پەیامەکێ نیشاندەین.
         showToast(translations.verificationCodeSent[currentLang]);
-        
-        // بۆ مەبەستێن تێستکرنێ، کۆد دێ ل کونسۆلێ (Console) برەوزەری هێتە نیشاندان.
         console.log(`کۆدێ پشتراستکرنێ بۆ (${email}): ${code}`);
-        
         showAuthView('verify-email-container');
     }
 
@@ -2542,13 +2828,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const code = Math.floor(100000 + Math.random() * 900000);
         passwordResetState = { email, code };
         
-        // --- گوهۆڕینا ژمارە ٢ ---
-        // ل ڤێرێ ژی کۆد دهاتە نیشاندان. نوکە مە ئەو ژی ڕاکر.
         showToast(translations.verificationCodeSent[currentLang]);
-        
-        // بۆ مەبەستێن تێستکرنێ، کۆد دێ ل کونسۆلێ هێتە نیشاندان.
         console.log(`کۆدێ ژبیرکرنا پاسوۆردی بۆ (${email}): ${code}`);
-        
         showAuthView('reset-password-container');
     }
 
@@ -2588,9 +2869,22 @@ document.addEventListener('DOMContentLoaded', function() {
         };
         currentUser = defaultUser;
         saveData('currentUser', currentUser);
-        sessionStorage.removeItem('isAdmin'); // Remove admin session on logout
+        sessionStorage.removeItem('isAdmin');
         renderProfilePage();
     }
+    
+    function checkForUnreadNotifications(){
+        const allNotifications = loadData('notifications') || [];
+        const userNotifications = allNotifications.filter(n => n.userId === currentUser.id || n.userId === 'all' || (n.userId === 'admin_user_id' && sessionStorage.getItem('isAdmin')));
+        const hasUnread = userNotifications.some(n => !n.read);
+
+        const profileBtn = document.getElementById('profile-header-btn');
+        const notificationsSummary = document.querySelector('#notifications-details summary');
+        
+        if (profileBtn) profileBtn.classList.toggle('has-notification', hasUnread);
+        if (notificationsSummary) notificationsSummary.classList.toggle('has-notification', hasUnread);
+    }
+    
     function handleSendNotification(e) {
         e.preventDefault();
         const title = document.getElementById('notification-title').value;
@@ -2605,16 +2899,36 @@ document.addEventListener('DOMContentLoaded', function() {
         const newNotification = {
             id: Date.now(),
             title: title,
-            body: body
+            body: body,
+            userId: 'all',
+            read: false
         };
         notifications.push(newNotification);
         saveData('notifications', notifications);
         
         showToast(translations.notificationSent[currentLang]);
         document.getElementById('send-notification-form').reset();
-        renderAdminNotificationsView();
+        renderAll();
     }
     
+    function handleSendReport(e) {
+        e.preventDefault();
+        const reportText = document.getElementById('report-text').value;
+        if (!reportText) return;
+
+        const newReport = {
+            id: Date.now().toString(),
+            userId: currentUser.id,
+            userName: currentUser.name,
+            text: reportText,
+            timestamp: new Date().toISOString()
+        };
+
+        allReports.push(newReport);
+        saveData('aqaratReports', allReports);
+        showToast(translations.reportSentSuccess[currentLang]);
+        e.target.reset();
+    }
 
     function setupEventListeners() {
         document.querySelectorAll('.bottom-nav a').forEach(l => {
@@ -2654,7 +2968,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         elements.body.addEventListener('click', function(e) {
-            const target = e.target.closest('a, button, p');
+            const target = e.target.closest('a, button, p, span');
             if (!target) return;
 
             if (target.closest('#locate-me-btn')) mainMap.locate({setView: true, maxZoom: 16});
@@ -2662,10 +2976,9 @@ document.addEventListener('DOMContentLoaded', function() {
             if (target.closest('#zoom-out-btn')) mainMap.zoomOut();
             if (target.id === 'forgot-password-link') { e.preventDefault(); showAuthView('forgot-password-container'); }
             
-            if (target.id === 'edit-profile-btn') {
-                const newName = prompt(translations.promptNewName[currentLang], currentUser.name);
-                if (newName) { currentUser.name = newName; saveData('currentUser', currentUser); renderProfilePage(); }
-            }
+            if (target.id === 'go-to-edit-profile-btn') switchPage('edit-profile-page');
+            if (target.id === 'back-to-profile-btn') switchPage('profile-page');
+            
             if (target.closest('#profile-pic-container')) document.getElementById('profile-pic-input').click();
             if (target.closest('#logout-btn')) handleLogout();
 
@@ -2680,8 +2993,6 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if(target.id === 'show-register-link') showAuthView('register-container');
             if(['show-login-link', 'back-to-login-link-1', 'back-to-login-link-2', 'back-to-login-link-3'].includes(target.id)) showAuthView('login-container');
-
-
              if(target.closest('.dev-name')) {
                 adminClickCount++;
                 clearTimeout(adminClickTimer);
@@ -2689,18 +3000,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (adminClickCount >= 7) {
                     clearTimeout(adminClickTimer);
                     adminClickCount = 0;
-                    const username = prompt("ناڤێ بکارهێنەری بنڤیسە:");
-                    if (username) {
-                        const password = prompt("پەیڤا نهێنی بنڤیسە:");
-                        if (password) {
-                            if (username.toLowerCase() === 'omed' && password === 'Omed@2008') {
-                                sessionStorage.setItem('isAdmin', 'true');
-                                switchPage('admin-page');
-                            } else {
-                                showToast(translations.adminLoginError[currentLang]);
-                            }
-                        }
-                    }
+                    document.getElementById('admin-login-modal').style.display = 'block';
                 }
             }
             if (target.id === 'admin-home-btn') {
@@ -2710,12 +3010,18 @@ document.addEventListener('DOMContentLoaded', function() {
             if(target.id === 'btn-show-users') showAdminView('admin-users-view');
             if(target.id === 'btn-show-private-data') showAdminView('admin-private-data-view');
             if(target.id === 'btn-show-notifications') showAdminView('admin-notifications-view');
-            if(['btn-back-to-dashboard-1','btn-back-to-dashboard-2','btn-back-to-dashboard-3', 'btn-back-to-dashboard-4'].includes(target.id) ) showAdminView('admin-dashboard');
+            if(target.id === 'btn-show-reports') showAdminView('admin-reports-view');
+            if(['btn-back-to-dashboard-1','btn-back-to-dashboard-2','btn-back-to-dashboard-3', 'btn-back-to-dashboard-4', 'btn-back-to-dashboard-5'].includes(target.id) ) showAdminView('admin-dashboard');
 
             if(target.id === 'btn-add-private-record') openPrivateDataModal();
-            const modal = document.getElementById('private-data-modal');
+            const privateModal = document.getElementById('private-data-modal');
+            const adminModal = document.getElementById('admin-login-modal');
+            const editProfileModal = document.getElementById('edit-profile-modal');
+            
             if(e.target.classList.contains('close-btn') && e.target.closest('.modal')) e.target.closest('.modal').style.display = 'none';
-            if (e.target === modal) modal.style.display = 'none';
+            if (e.target === privateModal) privateModal.style.display = 'none';
+            if (e.target === adminModal) adminModal.style.display = 'none';
+            if (e.target === editProfileModal) editProfileModal.style.display = 'none';
         });
         
         document.getElementById('private-data-form').addEventListener('submit', savePrivateRecord);
@@ -2730,13 +3036,45 @@ document.addEventListener('DOMContentLoaded', function() {
             if (e.target.id === 'request-code-form') handleForgotPasswordRequest(e);
             if (e.target.id === 'reset-password-form') handlePasswordReset(e);
             if (e.target.id === 'send-notification-form') handleSendNotification(e);
+            if (e.target.id === 'report-form') handleSendReport(e);
+            if (e.target.id === 'edit-profile-form-page') {
+                e.preventDefault();
+                const newName = document.getElementById('edit-profile-name-input-page').value;
+                if (newName && newName !== currentUser.name) {
+                    currentUser.name = newName;
+                    saveData('currentUser', currentUser);
+                }
+                showToast(translations.profileUpdated[currentLang]);
+                switchPage('profile-page');
+            }
+            if (e.target.id === 'admin-login-form') {
+                 e.preventDefault();
+                 const username = document.getElementById('admin-username').value;
+                 const password = document.getElementById('admin-password').value;
+                 if ((username.toLowerCase() === 'omed' && password === 'Omed@2008') || (username.toLowerCase() === 'admin' && password === 'admin')) {
+                    sessionStorage.setItem('isAdmin', 'true');
+                    document.getElementById('admin-login-modal').style.display = 'none';
+                    e.target.reset();
+                    switchPage('admin-page');
+                } else {
+                    showToast(translations.adminLoginError[currentLang]);
+                }
+            }
         });
 
         elements.body.addEventListener('change', function(e){
-            if(e.target.id === 'profile-pic-input'){
+            if(e.target.id === 'profile-pic-input' || e.target.id === 'edit-profile-pic-input-page') {
                 if (e.target.files && e.target.files[0]) { 
                     const reader = new FileReader(); 
-                    reader.onload = e => { currentUser.pic = e.target.result; saveData('currentUser', currentUser); renderProfilePage(); }; 
+                    reader.onload = event => { 
+                        const newPicUrl = event.target.result;
+                        currentUser.pic = newPicUrl; 
+                        saveData('currentUser', currentUser);
+                        
+                        if (elements.profilePic) elements.profilePic.src = newPicUrl;
+                        const editPreview = document.getElementById('edit-profile-pic-preview');
+                        if (editPreview) editPreview.src = newPicUrl;
+                    }; 
                     reader.readAsDataURL(e.target.files[0]); 
                 }
             }
@@ -2782,7 +3120,6 @@ document.addEventListener('DOMContentLoaded', function() {
         renderAll();
         setupEventListeners();
 
-        // Must be called last after everything is ready
         document.getElementById('language-select').value = currentLang;
         applyTranslations(currentLang);
     }
@@ -2791,3 +3128,4 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 </body>
 </html>
+```
