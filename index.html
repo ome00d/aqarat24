@@ -1096,7 +1096,29 @@
     <!-- Edit Profile Modal (Now replaced by a page, but keeping the div just in case) -->
     <div id="edit-profile-modal" class="modal"></div>
 
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+
 <script>
+
+    // *** گرنگ: ڤی کۆدی ژ Firebase بینە و ل ڤێرێ بدانە ***
+    const firebaseConfig = {
+  apiKey: "AIzaSyBLp9kxXOrR03VQuDT3ubgkKWsRhhy1Co8",
+  authDomain: "aqarat24-1bfd0.firebaseapp.com",
+  projectId: "aqarat24-1bfd0",
+  storageBucket: "aqarat24-1bfd0.firebasestorage.app",
+  messagingSenderId: "277101382699",
+  appId: "1:277101382699:web:6fe815d8554aefb4532e6e",
+  measurementId: "G-ERRDLL3992"
+    };
+    
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+
 document.addEventListener('DOMContentLoaded', function() {
     const translations = {
         loginTitle: { "ku-bad": "چوونەژوور", "ku-sor": "چوونەژوورەوە", "ar": "تسجيل الدخول", "en": "Login" },
@@ -1424,7 +1446,7 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
             <div id="logged-in-view" style="display: none;">
                 <div class="profile-header">
-                    <div id="profile-pic-container"><img src="https://via.placeholder.com/100" alt="Wêneyê Profaylê" id="profile-pic"><input type="file" id="profile-pic-input" accept="image/*" style="display:none;"><i class="fa-solid fa-camera" id="profile-pic-edit-icon"></i></div>
+                    <div id="profile-pic-container"><img src="https://via.placeholder.com/100" alt="Wêneyê Profaylê" id="profile-pic"></div>
                     <h2 id="username-display"></h2>
                 </div>
                 <button id="go-to-edit-profile-btn" class="submit-btn" style="margin-top:0; margin-bottom: 20px;"><i class="fa-solid fa-user-pen"></i> <span data-translate="editProfilePageTitle"></span></button>
@@ -3016,12 +3038,10 @@ document.addEventListener('DOMContentLoaded', function() {
             if(target.id === 'btn-add-private-record') openPrivateDataModal();
             const privateModal = document.getElementById('private-data-modal');
             const adminModal = document.getElementById('admin-login-modal');
-            const editProfileModal = document.getElementById('edit-profile-modal');
             
             if(e.target.classList.contains('close-btn') && e.target.closest('.modal')) e.target.closest('.modal').style.display = 'none';
             if (e.target === privateModal) privateModal.style.display = 'none';
             if (e.target === adminModal) adminModal.style.display = 'none';
-            if (e.target === editProfileModal) editProfileModal.style.display = 'none';
         });
         
         document.getElementById('private-data-form').addEventListener('submit', savePrivateRecord);
@@ -3128,4 +3148,3 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 </body>
 </html>
-```
