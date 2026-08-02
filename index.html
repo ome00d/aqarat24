@@ -60,19 +60,19 @@
 </head>
 <body class="bg-slate-950 text-slate-100 flex flex-col h-screen overflow-hidden select-none">
 
-    <!-- شاشەیا چوونە ژوورێ (LOGIN SCREEN) -->
+    <!-- شاشەیا چوونە ژوورێ (LOGIN SCREEN WITH MANUAL TEXT INPUT) -->
     <div id="login-overlay" class="fixed inset-0 bg-slate-950/95 backdrop-blur-xl z-50 flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-sm space-y-5 shadow-2xl relative overflow-hidden">
             <div class="text-center space-y-2">
                 <div class="w-14 h-10 bg-gradient-to-tr from-emerald-500 via-indigo-500 to-purple-600 rounded-2xl mx-auto flex items-center justify-center font-black text-white text-xl shadow-lg shadow-indigo-500/30">ع</div>
                 <h2 class="text-lg font-black text-white">سیستەمێ ناوەندی یێ عەقاراتی</h2>
-                <p class="text-xs text-slate-400">تکایە ناڤێ مەکتەبا خۆ و پاسکۆدێ خۆ بنڤیسە</p>
+                <p class="text-xs text-slate-400">تکایە ناڤێ مەکتەبا خۆ (ب ئینگلیزی) و پاسکۆدێ خۆ بنڤیسە</p>
             </div>
 
             <div class="space-y-3 text-xs">
                 <div>
-                    <label class="block font-bold text-slate-300 mb-1.5">ناڤێ مەکتەبا تە *</label>
-                    <input type="text" id="login-office-input" placeholder="بۆ نموونە: عەقاراتێ بارزان" class="w-full px-4 py-3 border border-slate-800 bg-slate-950 text-slate-100 rounded-2xl text-xs focus:outline-none focus:border-indigo-500">
+                    <label class="block font-bold text-slate-300 mb-1.5">ناڤێ مەکتەبا تە (Office Name) *</label>
+                    <input type="text" id="login-office-input" placeholder="بۆ نموونە: Duhok City Real Estate" class="w-full px-4 py-3 border border-slate-800 bg-slate-950 text-slate-100 rounded-2xl text-xs focus:outline-none focus:border-indigo-500">
                 </div>
 
                 <div>
@@ -119,13 +119,12 @@
     <!-- ناڤەڕۆکا سەرەکی -->
     <main class="flex-1 overflow-hidden relative">
         
-        <!-- ١. پشکا داشبۆردێ نوو و قفلکری تەنێ بۆ مەکتەبا ئامادەبووی -->
+        <!-- ١. پشکا داشبۆردێ نوو و گڵۆو -->
         <div id="dashboard-tab" class="tab-content active px-5 py-4 space-y-5 pb-28">
             
-            <!-- بڵقا بەخێرهاتنێ -->
             <div class="bg-gradient-to-r from-indigo-950 via-slate-900 to-slate-900 p-4 rounded-3xl border border-indigo-500/30 flex justify-between items-center shadow-lg">
                 <div>
-                    <span class="text-[10px] text-indigo-400 font-bold uppercase tracking-wider">داشبۆردا مەکتەبێ</span>
+                    <span class="text-[10px] text-indigo-400 font-bold uppercase tracking-wider">داشبۆردا ناوەندی</span>
                     <h3 class="text-sm font-bold text-white mt-0.5 flex items-center gap-1.5">
                         🏢 <span id="dash-welcome-office">بەخێرهاتی</span>
                     </h3>
@@ -135,7 +134,6 @@
                 </div>
             </div>
 
-            <!-- ٦ کارتێن ئامارێن زێندوو -->
             <div class="grid grid-cols-2 gap-3">
                 <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 shadow-sm flex items-center justify-between">
                     <div>
@@ -198,12 +196,11 @@
                 </div>
             </div>
 
-            <!-- لیستا دوماهیک مڵکێن زێدەکری (تەنێ یێن ڤێ مەکتەبێ) -->
             <div class="bg-slate-900 p-5 rounded-3xl border border-slate-800 shadow-sm space-y-3">
                 <div class="flex items-center justify-between border-b border-slate-800 pb-3">
                     <h3 class="text-xs font-bold text-slate-200 flex items-center gap-2">
                         <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        دوماهیک مڵکێن مەکتەبا تە
+                        دوماهیک مڵکێن زێدەکرن
                     </h3>
                 </div>
                 <div id="recent-list" class="space-y-2"></div>
@@ -546,7 +543,7 @@
                     ➕ زێدەکرنا هەژمارەکا نوو یاما مەکتەبێ
                 </h4>
                 <div class="grid grid-cols-2 gap-2">
-                    <input type="text" id="new-dev-acc-name" placeholder="ناڤێ مەکتەبا نوو" class="px-3 py-2 bg-slate-900 border border-slate-800 text-slate-100 rounded-xl text-xs focus:outline-none focus:border-emerald-500">
+                    <input type="text" id="new-dev-acc-name" placeholder="ناڤێ مەکتەبا نوو (ب ئینگلیزی)" class="px-3 py-2 bg-slate-900 border border-slate-800 text-slate-100 rounded-xl text-xs focus:outline-none focus:border-emerald-500">
                     <input type="text" id="new-dev-acc-pin" placeholder="پاسوۆردێ نوو" class="px-3 py-2 bg-slate-900 border border-slate-800 text-indigo-300 font-bold rounded-xl text-xs focus:outline-none focus:border-emerald-500">
                 </div>
                 <button onclick="addNewOfficeAccountFromDevPanel()" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs transition">تۆمارکرنا ڤێ مەکتەبا نوو د سێرڤەرێ فایربەیس دا</button>
@@ -635,17 +632,17 @@
         const MASTER_DEV_PIN = "Omed#710"; // یان ژمارا تەلەفۆنا تە 07507100238
 
         // ----------------------------------------------------
-        // ٥ مەکتەبێن بنەڕەتی
+        // ٥ مەکتەبێن بنەڕەتی (ئینگلیزی)
         // ----------------------------------------------------
         const DEFAULT_OFFICE_ACCOUNTS = [
-            { name: "عەقاراتێ دهۆک سیتی", pin: "D729#k" },
-            { name: "عەقاراتێ بارزان", pin: "B841#z" },
-            { name: "مەکتەبا ماسیکێ", pin: "M390#s" },
-            { name: "عەقاراتێ زاخۆ دڵدار", pin: "Z512#kh" },
-            { name: "مەکتەبا ئامێدیێ", pin: "A435#m" }
+            { name: "Duhok City Real Estate", pin: "D729#k" },
+            { name: "Barzan Real Estate", pin: "B841#z" },
+            { name: "Maseek Office", pin: "M390#s" },
+            { name: "Zakho Dildar Office", pin: "Z512#kh" },
+            { name: "Amedi Real Estate", pin: "A435#m" }
         ];
 
-        let OFFICE_ACCOUNTS = JSON.parse(localStorage.getItem('office_accounts_v2')) || DEFAULT_OFFICE_ACCOUNTS;
+        let OFFICE_ACCOUNTS = JSON.parse(localStorage.getItem('office_accounts_v3')) || DEFAULT_OFFICE_ACCOUNTS;
 
         let properties = [];
         let addMap, mainMap;
@@ -681,7 +678,7 @@
             db.collection("system").doc("offices").onSnapshot((doc) => {
                 if (doc.exists && doc.data().list && Array.isArray(doc.data().list)) {
                     OFFICE_ACCOUNTS = doc.data().list;
-                    localStorage.setItem('office_accounts_v2', JSON.stringify(OFFICE_ACCOUNTS));
+                    localStorage.setItem('office_accounts_v3', JSON.stringify(OFFICE_ACCOUNTS));
                 } else {
                     db.collection("system").doc("offices").set({ list: DEFAULT_OFFICE_ACCOUNTS }).catch(err => {
                         console.error("Firebase Offices Seed Error:", err);
@@ -790,7 +787,7 @@
             
             db.collection("system").doc("offices").set({ list: OFFICE_ACCOUNTS })
             .then(() => {
-                localStorage.setItem('office_accounts_v2', JSON.stringify(OFFICE_ACCOUNTS));
+                localStorage.setItem('office_accounts_v3', JSON.stringify(OFFICE_ACCOUNTS));
                 openMasterAdminPanelModal();
                 document.getElementById('new-dev-acc-name').value = '';
                 document.getElementById('new-dev-acc-pin').value = '';
@@ -806,7 +803,7 @@
                 OFFICE_ACCOUNTS.splice(idx, 1);
                 db.collection("system").doc("offices").set({ list: OFFICE_ACCOUNTS })
                 .then(() => {
-                    localStorage.setItem('office_accounts_v2', JSON.stringify(OFFICE_ACCOUNTS));
+                    localStorage.setItem('office_accounts_v3', JSON.stringify(OFFICE_ACCOUNTS));
                     openMasterAdminPanelModal();
                 })
                 .catch(err => {
@@ -827,7 +824,7 @@
 
             db.collection("system").doc("offices").set({ list: OFFICE_ACCOUNTS })
             .then(() => {
-                localStorage.setItem('office_accounts_v2', JSON.stringify(OFFICE_ACCOUNTS));
+                localStorage.setItem('office_accounts_v3', JSON.stringify(OFFICE_ACCOUNTS));
                 alert('هەمی ناڤ و پاسوۆردێن نوو د فایربەیس دا پاشکەفت بوون و ل سەر هەمی مۆبایلان نوو بوونەڤە!');
                 closeMasterAdminPanelModal();
             })
@@ -873,7 +870,9 @@
             document.getElementById('login-overlay').classList.add('hidden');
         }
 
+        // ----------------------------------------------------
         // MANUAL TEXT INPUT LOGIN LOGIC
+        // ----------------------------------------------------
         function performLogin() {
             const inputOfficeName = document.getElementById('login-office-input').value.trim();
             const inputPin = document.getElementById('login-pin-input').value.trim();
@@ -898,7 +897,7 @@
                 document.getElementById('login-pin-input').value = '';
                 hideLoginOverlay();
                 updateOfficeBadge();
-                updateUI();
+                filterProperties();
             } else {
                 errorMsg.innerText = "ناڤێ مەکتەبێ یان پاسکۆد شاشە! تکایە دووبارە تاقیبکەڤە.";
                 errorMsg.classList.remove('hidden');
@@ -1142,7 +1141,7 @@
             editingPropertyId = null;
             document.getElementById('form-heading').innerText = "تۆمارکرنا مڵکێ نوو";
             document.getElementById('submit-btn').innerText = "تۆمارکرن و پاشکەفتکرن";
-            document.getElementById('cancel-edit-btn').classList.remove('hidden');
+            document.getElementById('cancel-edit-btn').classList.add('hidden');
             document.getElementById('add-property-form').reset();
             toggleConditionalFields();
             if (addMarker) {
@@ -1182,15 +1181,8 @@
             }
         }
 
-        function isOfficeMatch(office1, office2) {
-            if (!office1 || !office2) return false;
-            return office1.toString().trim().toLowerCase() === office2.toString().trim().toLowerCase();
-        }
-
         function updateUI() {
-            if (!activeOfficeName) return;
-
-            const myOfficeProps = properties.filter(p => isOfficeMatch(p.office, activeOfficeName));
+            const myOfficeProps = properties.filter(p => p.office === activeOfficeName);
 
             document.getElementById('stat-total').innerText = myOfficeProps.length;
             document.getElementById('stat-houses').innerText = myOfficeProps.filter(p => p.type === 'خانی').length;
@@ -1205,9 +1197,9 @@
 
             const recentList = document.getElementById('recent-list');
             recentList.innerHTML = '';
-            const recentProps = [...myOfficeProps].reverse().slice(0, 4);
+            const recentProps = [...myOfficeProps].reverse().slice(0, 3);
             if (recentProps.length === 0) {
-                recentList.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">چ مڵک ب ناڤێ مەکتەبا تە نەهاتینە تۆمارکرن</p>`;
+                recentList.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">چ مڵک نەهاتینە تۆمارکرن</p>`;
             } else {
                 recentProps.forEach(p => {
                     const div = document.createElement('div');
@@ -1318,7 +1310,7 @@
 
             // Strict Office Lock: ONLY show properties belonging to active logged-in office!
             let matchingProps = properties.filter(p => {
-                const isMyOffice = isOfficeMatch(p.office, activeOfficeName);
+                const isMyOffice = (p.office === activeOfficeName);
                 const matchType = (type === 'هەمی') || (p.type === type);
                 const matchStatus = (status === 'هەمی') || (p.status === status);
 
@@ -1374,7 +1366,7 @@
             mainMapMarkers.forEach(m => mainMap.removeLayer(m));
             mainMapMarkers = [];
 
-            const myOfficeProps = properties.filter(p => isOfficeMatch(p.office, activeOfficeName));
+            const myOfficeProps = properties.filter(p => p.office === activeOfficeName);
 
             myOfficeProps.forEach(p => {
                 if (p.lat && p.lng) {
