@@ -60,7 +60,7 @@
 </head>
 <body class="bg-slate-950 text-slate-100 flex flex-col h-screen overflow-hidden select-none">
 
-    <!-- شاشەیا چوونە ژوورێ (LOGIN SCREEN WITH MANUAL TEXT INPUT) -->
+    <!-- شاشەیا چوونە ژوورێ (LOGIN SCREEN) -->
     <div id="login-overlay" class="fixed inset-0 bg-slate-950/95 backdrop-blur-xl z-50 flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-sm space-y-5 shadow-2xl relative overflow-hidden">
             <div class="text-center space-y-2">
@@ -119,13 +119,13 @@
     <!-- ناڤەڕۆکا سەرەکی -->
     <main class="flex-1 overflow-hidden relative">
         
-        <!-- ١. پشکا داشبۆردێ نوو و گڵۆو (Redesigned Dashboard) -->
+        <!-- ١. پشکا داشبۆردێ نوو و قفلکری تەنێ بۆ مەکتەبا ئامادەبووی -->
         <div id="dashboard-tab" class="tab-content active px-5 py-4 space-y-5 pb-28">
             
             <!-- بڵقا بەخێرهاتنێ -->
             <div class="bg-gradient-to-r from-indigo-950 via-slate-900 to-slate-900 p-4 rounded-3xl border border-indigo-500/30 flex justify-between items-center shadow-lg">
                 <div>
-                    <span class="text-[10px] text-indigo-400 font-bold uppercase tracking-wider">داشبۆردا ناوەندی</span>
+                    <span class="text-[10px] text-indigo-400 font-bold uppercase tracking-wider">داشبۆردا مەکتەبێ</span>
                     <h3 class="text-sm font-bold text-white mt-0.5 flex items-center gap-1.5">
                         🏢 <span id="dash-welcome-office">بەخێرهاتی</span>
                     </h3>
@@ -198,12 +198,12 @@
                 </div>
             </div>
 
-            <!-- لیستا دوماهیک مڵکێن زێدەکری -->
+            <!-- لیستا دوماهیک مڵکێن زێدەکری (تەنێ یێن ڤێ مەکتەبێ) -->
             <div class="bg-slate-900 p-5 rounded-3xl border border-slate-800 shadow-sm space-y-3">
                 <div class="flex items-center justify-between border-b border-slate-800 pb-3">
                     <h3 class="text-xs font-bold text-slate-200 flex items-center gap-2">
                         <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        دوماهیک مڵکێن زێدەکرن
+                        دوماهیک مڵکێن مەکتەبا تە
                     </h3>
                 </div>
                 <div id="recent-list" class="space-y-2"></div>
@@ -873,9 +873,7 @@
             document.getElementById('login-overlay').classList.add('hidden');
         }
 
-        // ----------------------------------------------------
         // MANUAL TEXT INPUT LOGIN LOGIC
-        // ----------------------------------------------------
         function performLogin() {
             const inputOfficeName = document.getElementById('login-office-input').value.trim();
             const inputPin = document.getElementById('login-pin-input').value.trim();
@@ -887,7 +885,6 @@
                 return;
             }
 
-            // Case-insensitive match on office name & exact PIN match
             const matchedOffice = OFFICE_ACCOUNTS.find(off => 
                 off.name.toLowerCase().trim() === inputOfficeName.toLowerCase().trim() && 
                 off.pin.trim() === inputPin
@@ -901,7 +898,7 @@
                 document.getElementById('login-pin-input').value = '';
                 hideLoginOverlay();
                 updateOfficeBadge();
-                filterProperties();
+                updateUI();
             } else {
                 errorMsg.innerText = "ناڤێ مەکتەبێ یان پاسکۆد شاشە! تکایە دووبارە تاقیبکەڤە.";
                 errorMsg.classList.remove('hidden');
@@ -1145,7 +1142,7 @@
             editingPropertyId = null;
             document.getElementById('form-heading').innerText = "تۆمارکرنا مڵکێ نوو";
             document.getElementById('submit-btn').innerText = "تۆمارکرن و پاشکەفتکرن";
-            document.getElementById('cancel-edit-btn').classList.add('hidden');
+            document.getElementById('cancel-edit-btn').classList.remove('hidden');
             document.getElementById('add-property-form').reset();
             toggleConditionalFields();
             if (addMarker) {
@@ -1185,8 +1182,15 @@
             }
         }
 
+        function isOfficeMatch(office1, office2) {
+            if (!office1 || !office2) return false;
+            return office1.toString().trim().toLowerCase() === office2.toString().trim().toLowerCase();
+        }
+
         function updateUI() {
-            const myOfficeProps = properties.filter(p => p.office === activeOfficeName);
+            if (!activeOfficeName) return;
+
+            const myOfficeProps = properties.filter(p => isOfficeMatch(p.office, activeOfficeName));
 
             document.getElementById('stat-total').innerText = myOfficeProps.length;
             document.getElementById('stat-houses').innerText = myOfficeProps.filter(p => p.type === 'خانی').length;
@@ -1201,9 +1205,9 @@
 
             const recentList = document.getElementById('recent-list');
             recentList.innerHTML = '';
-            const recentProps = [...myOfficeProps].reverse().slice(0, 3);
+            const recentProps = [...myOfficeProps].reverse().slice(0, 4);
             if (recentProps.length === 0) {
-                recentList.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">چ مڵک نەهاتینە تۆمارکرن</p>`;
+                recentList.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">چ مڵک ب ناڤێ مەکتەبا تە نەهاتینە تۆمارکرن</p>`;
             } else {
                 recentProps.forEach(p => {
                     const div = document.createElement('div');
@@ -1312,8 +1316,9 @@
             const type = document.getElementById('filter-type').value;
             const status = document.getElementById('filter-status').value;
 
+            // Strict Office Lock: ONLY show properties belonging to active logged-in office!
             let matchingProps = properties.filter(p => {
-                const isMyOffice = (p.office === activeOfficeName);
+                const isMyOffice = isOfficeMatch(p.office, activeOfficeName);
                 const matchType = (type === 'هەمی') || (p.type === type);
                 const matchStatus = (status === 'هەمی') || (p.status === status);
 
@@ -1369,7 +1374,7 @@
             mainMapMarkers.forEach(m => mainMap.removeLayer(m));
             mainMapMarkers = [];
 
-            const myOfficeProps = properties.filter(p => p.office === activeOfficeName);
+            const myOfficeProps = properties.filter(p => isOfficeMatch(p.office, activeOfficeName));
 
             myOfficeProps.forEach(p => {
                 if (p.lat && p.lng) {
