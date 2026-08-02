@@ -489,7 +489,7 @@
         </div>
     </div>
 
-    <!-- مۆدالا نەهێنی یا گەشەپێدەری (تایبەتمەندیا زێدەکرنا مەکتەبا نوو + دیتنا هەمی داتایان) -->
+    <!-- مۆدالا نەهێنی یا گەشەپێدەری -->
     <div id="master-admin-panel-modal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-xl z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-slate-900 border border-indigo-500/40 rounded-3xl p-5 w-full max-w-lg h-[85vh] flex flex-col justify-between shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
@@ -511,7 +511,7 @@
                     <input type="text" id="new-dev-acc-name" placeholder="ناڤێ مەکتەبا نوو" class="px-3 py-2 bg-slate-900 border border-slate-800 text-slate-100 rounded-xl text-xs focus:outline-none focus:border-emerald-500">
                     <input type="text" id="new-dev-acc-pin" placeholder="پاسوۆردێ نوو" class="px-3 py-2 bg-slate-900 border border-slate-800 text-indigo-300 font-bold rounded-xl text-xs focus:outline-none focus:border-emerald-500">
                 </div>
-                <button onclick="addNewOfficeAccountFromDevPanel()" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs transition">تۆمارکرنا ڤێ مەکتەبا نوو</button>
+                <button onclick="addNewOfficeAccountFromDevPanel()" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs transition">تۆمارکرنا ڤێ مەکتەبا نوو د سێرڤەرێ فایربەیس دا</button>
             </div>
 
             <!-- دوگمەیا دیتنا هەمی داتایان پێکڤە -->
@@ -524,13 +524,13 @@
             </div>
 
             <div class="flex gap-2 border-t border-slate-800 pt-3">
-                <button onclick="saveMasterAdminAccountChanges()" class="flex-1 py-3 bg-gradient-to-r from-emerald-500 to-indigo-600 text-white font-bold rounded-xl text-xs shadow-lg">پاشکەفتکرنا هەمی گۆهۆڕینان</button>
+                <button onclick="saveMasterAdminAccountChanges()" class="flex-1 py-3 bg-gradient-to-r from-emerald-500 to-indigo-600 text-white font-bold rounded-xl text-xs shadow-lg">پاشکەفتکرنا هەمی گۆهۆڕینان د سێرڤەر دا</button>
                 <button onclick="closeMasterAdminPanelModal()" class="px-4 py-3 bg-slate-800 text-slate-300 font-bold rounded-xl text-xs">داخستن</button>
             </div>
         </div>
     </div>
 
-    <!-- مۆدالا دیتنا هەمی داتایێن هەمی مەکتەبان (MASTER DATA VIEW FOR OMED) -->
+    <!-- مۆدالا دیتنا هەمی داتایێن هەمی مەکتەبان -->
     <div id="master-data-modal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-xl z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-slate-900 border border-indigo-500/40 rounded-3xl p-5 w-full max-w-lg h-[90vh] flex flex-col justify-between shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
@@ -621,6 +621,7 @@
 
         window.onload = function() {
             populateOfficeOptions();
+            listenToOfficeAccounts();
             
             const savedOffice = localStorage.getItem('active_office_session');
             if (savedOffice) {
@@ -637,6 +638,22 @@
             toggleConditionalFields();
             setupSecretDevClickTrigger();
         };
+
+        // Realtime Listener for Office Accounts across ALL devices!
+        function listenToOfficeAccounts() {
+            db.collection("system").doc("offices").onSnapshot((doc) => {
+                if (doc.exists && doc.data().list && Array.isArray(doc.data().list)) {
+                    OFFICE_ACCOUNTS = doc.data().list;
+                    localStorage.setItem('office_accounts_v2', JSON.stringify(OFFICE_ACCOUNTS));
+                    populateOfficeOptions();
+                } else {
+                    // Seed initial default office accounts into Firestore
+                    db.collection("system").doc("offices").set({ list: DEFAULT_OFFICE_ACCOUNTS });
+                }
+            }, (err) => {
+                console.error("Error fetching office accounts:", err);
+            });
+        }
 
         function listenToFirebaseRealtime() {
             updateSyncStatus(true, true);
@@ -733,21 +750,26 @@
             }
 
             OFFICE_ACCOUNTS.push({ name: nameInput, pin: pinInput });
-            localStorage.setItem('office_accounts_v2', JSON.stringify(OFFICE_ACCOUNTS));
-            populateOfficeOptions();
-            openMasterAdminPanelModal();
-
-            document.getElementById('new-dev-acc-name').value = '';
-            document.getElementById('new-dev-acc-pin').value = '';
-            alert('مەکتەبا نوو ب سەرکەفتیانە زێدە بوو!');
+            
+            // Sync globally to Firebase Cloud so ALL phones get it!
+            db.collection("system").doc("offices").set({ list: OFFICE_ACCOUNTS }).then(() => {
+                localStorage.setItem('office_accounts_v2', JSON.stringify(OFFICE_ACCOUNTS));
+                populateOfficeOptions();
+                openMasterAdminPanelModal();
+                document.getElementById('new-dev-acc-name').value = '';
+                document.getElementById('new-dev-acc-pin').value = '';
+                alert('مەکتەبا نوو ب سەرکەفتیانە زێدە بوو و ل سەر هەمی مۆبایلان ڕاستەوخۆ دیار بوو!');
+            });
         }
 
         function deleteOfficeAccountFromDevPanel(idx) {
             if (confirm('تۆ پشت راستی د ژێبرنا ڤێ مەکتەبێ دا؟')) {
                 OFFICE_ACCOUNTS.splice(idx, 1);
-                localStorage.setItem('office_accounts_v2', JSON.stringify(OFFICE_ACCOUNTS));
-                populateOfficeOptions();
-                openMasterAdminPanelModal();
+                db.collection("system").doc("offices").set({ list: OFFICE_ACCOUNTS }).then(() => {
+                    localStorage.setItem('office_accounts_v2', JSON.stringify(OFFICE_ACCOUNTS));
+                    populateOfficeOptions();
+                    openMasterAdminPanelModal();
+                });
             }
         }
 
@@ -761,10 +783,12 @@
                 }
             });
 
-            localStorage.setItem('office_accounts_v2', JSON.stringify(OFFICE_ACCOUNTS));
-            populateOfficeOptions();
-            alert('هەمی ناڤ و پاسوۆردێن نوو ب سەرکەفتیانە پاشکەفت بوون!');
-            closeMasterAdminPanelModal();
+            db.collection("system").doc("offices").set({ list: OFFICE_ACCOUNTS }).then(() => {
+                localStorage.setItem('office_accounts_v2', JSON.stringify(OFFICE_ACCOUNTS));
+                populateOfficeOptions();
+                alert('هەمی ناڤ و پاسوۆردێن نوو د فایربەیس دا پاشکەفت بوون و ل سەر هەمی مۆبایلان نوو بوونەڤە!');
+                closeMasterAdminPanelModal();
+            });
         }
 
         function openMasterDataViewModal() {
