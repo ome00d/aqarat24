@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>عەقاراتێ مە - Firebase Engine</title>
+    <title>REAL ESTATE DATA</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -14,17 +14,23 @@
     <!-- Leaflet Map CSS & JS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    
-    <!-- Firebase SDKs (Compat version for single file integration) -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-
     <!-- فۆنتێ NRT Reg -->
     <link href="https://db.onlinewebfonts.com/c/dc9a8bb1a3a65504c8d90566a26d5327?family=NRT+Reg" rel="stylesheet" type="text/css"/>
+    
+    <!-- 1. لاندبۆنا فایەربەیس کۆمبات (Firebase App & Firestore SDKs) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
     <style>
         * {
             font-family: "NRT Reg", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
             -webkit-tap-highlight-color: transparent;
+        }
+        
+        /* ئانیمەیشنا نەرم بۆ گوهۆڕینا لاپەڕەیان */
+        @keyframes tabFadeIn {
+            0% { opacity: 0; transform: scale(0.98) translateY(12px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
         }
         .tab-content {
             display: none;
@@ -33,7 +39,9 @@
         }
         .tab-content.active {
             display: block;
+            animation: tabFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
+        
         #map-tab.active {
             display: flex;
             flex-direction: column;
@@ -53,14 +61,54 @@
         .leaflet-popup-tip {
             background: #0f172a;
         }
-        .leaflet-container {
-            border-radius: 0px;
+        
+        /* خالا شینا لێدەدەر بۆ جی پی ئێسێ زندی */
+        .gps-pulse-dot {
+            width: 14px;
+            height: 14px;
+            background-color: #3b82f6;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.8);
+            animation: pulse 1.6s infinite;
+        }
+        @keyframes pulse {
+            0% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.8);
+            }
+            70% {
+                transform: scale(1);
+                box-shadow: 0 0 0 12px rgba(59, 130, 246, 0);
+            }
+            100% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+            }
         }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 flex flex-col h-screen overflow-hidden select-none">
 
-    <!-- شاشەیا چوونە ژوورێ (LOGIN SCREEN) -->
+    <!-- شاشەیا دەستپێکێ (REAL ESTATE DATA SPLASH SCREEN) -->
+    <div id="splash-screen" class="fixed inset-0 bg-slate-950 z-[100] flex flex-col items-center justify-center transition-all duration-700 ease-in-out">
+        <div class="text-center space-y-4">
+            <div class="w-20 h-20 bg-gradient-to-tr from-emerald-500 via-indigo-500 to-purple-600 rounded-3xl mx-auto flex items-center justify-center font-black text-white text-3xl shadow-2xl shadow-indigo-500/30 animate-bounce">
+                ع
+            </div>
+            <h1 class="text-2xl font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-indigo-400 to-purple-400 uppercase">
+                REAL ESTATE DATA
+            </h1>
+            <p class="text-[10px] text-slate-500 font-bold tracking-widest">سیستەمێ ناوەندی یێ زانیاریێن عەقاراتی</p>
+            <div class="flex justify-center gap-1.5 mt-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-bounce [animation-delay:-0.3s]"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-indigo-400 animate-bounce [animation-delay:-0.15s]"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-purple-400 animate-bounce"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- شاشەیا چوونە ژوورێ (LOGIN SCREEN) - نوکە ب فەرمی یا ڤەکرییە بۆ پاراستنا داتایان -->
     <div id="login-overlay" class="fixed inset-0 bg-slate-950/95 backdrop-blur-xl z-50 flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-sm space-y-5 shadow-2xl relative overflow-hidden">
             <div class="text-center space-y-2">
@@ -81,14 +129,14 @@
                     <input type="password" id="login-pin-input" placeholder="پاسکۆدێ خۆ بنڤیسە" class="w-full px-4 py-3 border border-slate-800 bg-slate-950 text-slate-100 rounded-2xl text-xs focus:outline-none focus:border-indigo-500 text-center font-bold tracking-widest">
                 </div>
 
-                <p id="login-error-msg" class="text-red-400 text-[11px] font-bold text-center hidden">پاسکۆد شاشە! تکایە دووبارە تاقیبکەڤە.</p>
+                <p id="login-error-msg" class="text-red-400 text-[11px] font-bold text-center hidden">پاسکۆد شاش! تکایە دووبارە تاقیکەڤە.</p>
 
                 <button onclick="performLogin()" class="w-full py-3.5 bg-gradient-to-r from-emerald-500 via-indigo-600 to-purple-600 text-white font-bold rounded-2xl text-xs transition shadow-lg shadow-indigo-950 active:scale-95">چوونە ژوور (Login)</button>
             </div>
         </div>
     </div>
 
-    <!-- سەرێ بەرنامەیێ زۆر ڕێکخستی -->
+    <!-- سەرێ بەرنامەیی (Fixed Header) -->
     <header class="bg-slate-900/90 backdrop-blur-md border-b border-slate-800/80 px-4 py-3 flex items-center justify-between shadow-xl shrink-0 sticky top-0 z-40">
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 bg-gradient-to-tr from-emerald-500 via-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center font-black text-white text-lg shadow-md shadow-indigo-500/20">
@@ -99,7 +147,7 @@
                     <h1 class="text-xs font-black text-white tracking-wide" id="app-title">داشبۆرد</h1>
                     <div class="flex items-center gap-1 bg-slate-950 border border-slate-800 px-2 py-0.5 rounded-full">
                         <span id="sync-indicator" class="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399] animate-pulse"></span>
-                        <span id="sync-text" class="text-[9px] text-slate-400 font-medium">Firebase</span>
+                        <span class="text-[9px] text-slate-400 font-medium">سێرڤەر</span>
                     </div>
                 </div>
 
@@ -111,7 +159,12 @@
         </div>
 
         <div class="flex items-center gap-2">
-            <button onclick="logoutOffice()" class="p-2.5 bg-slate-800/80 hover:bg-red-950/60 text-slate-200 hover:text-red-400 rounded-xl transition border border-slate-700/80 flex items-center justify-center" title="دەرکەڤتن">
+            <button onclick="fetchFromFirebase(true)" class="p-2.5 bg-slate-800/80 hover:bg-slate-700 text-slate-200 rounded-xl transition border border-slate-700/80 flex items-center justify-center" title="نووکرن ژ سێرڤەری">
+                <svg id="refresh-icon" class="w-4 h-4 transition duration-500 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 15.19M9 5.5l3 3m0 0l3-3m-3 3V3"></path>
+                </svg>
+            </button>
+            <button onclick="logoutOffice()" class="p-2.5 bg-slate-800/80 hover:bg-red-950/60 text-slate-200 hover:text-red-400 rounded-xl transition border border-slate-700/80 flex items-center justify-center">
                 <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
             </button>
         </div>
@@ -122,50 +175,93 @@
         
         <!-- ١. پشکا داشبۆردێ -->
         <div id="dashboard-tab" class="tab-content active px-5 py-4 space-y-6 pb-28">
-            <div class="grid grid-cols-2 gap-4">
-                <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800/80 shadow-sm flex items-center justify-between">
+            
+            <!-- ستاتێن سەرەکی ب دیزاینەکا شیشەیی یا گەشاوە -->
+            <div class="grid grid-cols-2 gap-3.5">
+                <div class="bg-gradient-to-br from-indigo-950/40 to-slate-900 p-4 rounded-3xl border border-indigo-900/30 shadow-md flex items-center justify-between">
                     <div>
-                        <p class="text-[11px] text-slate-400 font-semibold tracking-wider">کۆما مڵکان</p>
-                        <h4 id="stat-total" class="text-2xl font-extrabold text-white mt-1">0</h4>
+                        <p class="text-[10px] text-indigo-300/85 font-semibold tracking-wider">کۆما مڵکان</p>
+                        <h4 id="stat-total" class="text-2xl font-black text-white mt-0.5">0</h4>
                     </div>
-                    <div class="p-3 bg-indigo-950/60 text-indigo-400 rounded-xl border border-indigo-900/40">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                    <div class="p-2.5 bg-indigo-950/80 text-indigo-400 rounded-2xl border border-indigo-800/50">
+                        <svg class="w-5.5 h-5.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
                     </div>
                 </div>
-                <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800/80 shadow-sm flex items-center justify-between">
+
+                <div class="bg-gradient-to-br from-emerald-950/40 to-slate-900 p-4 rounded-3xl border border-emerald-900/30 shadow-md flex items-center justify-between">
                     <div>
-                        <p class="text-[11px] text-slate-400 font-semibold tracking-wider">خانی</p>
-                        <h4 id="stat-houses" class="text-2xl font-extrabold text-white mt-1">0</h4>
+                        <p class="text-[10px] text-emerald-300/85 font-semibold tracking-wider">تێکڕایێ بها (USD)</p>
+                        <h4 id="stat-avg-price" class="text-xl font-black text-emerald-400 mt-1">$0</h4>
                     </div>
-                    <div class="p-3 bg-emerald-950/60 text-emerald-400 rounded-xl border border-emerald-900/40">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                    <div class="p-2.5 bg-emerald-950/80 text-emerald-400 rounded-2xl border border-emerald-800/50">
+                        <span class="text-lg font-black">$</span>
                     </div>
                 </div>
-                <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800/80 shadow-sm flex items-center justify-between">
+
+                <div class="bg-slate-900 p-4 rounded-3xl border border-slate-800 shadow-sm flex items-center justify-between">
                     <div>
-                        <p class="text-[11px] text-slate-400 font-semibold tracking-wider">شقە</p>
-                        <h4 id="stat-apartments" class="text-2xl font-extrabold text-white mt-1">0</h4>
+                        <p class="text-[10px] text-slate-400 font-semibold tracking-wider">مڵکێن چالاک (Active)</p>
+                        <h4 id="stat-active-props" class="text-xl font-black text-white mt-0.5">0</h4>
                     </div>
-                    <div class="p-3 bg-blue-950/60 text-blue-400 rounded-xl border border-blue-900/40">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"></path></svg>
+                    <div class="p-2.5 bg-slate-950/80 text-amber-500 rounded-2xl border border-slate-800">
+                        ⚡
                     </div>
                 </div>
-                <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800/80 shadow-sm flex items-center justify-between">
+
+                <!-- کارێن ب دوماهیک هاتین (هاتە فرۆشتن / هاتە کرێدان) -->
+                <div class="bg-gradient-to-br from-rose-950/30 to-slate-900 p-4 rounded-3xl border border-rose-900/30 shadow-md flex items-center justify-between">
                     <div>
-                        <p class="text-[11px] text-slate-400 font-semibold tracking-wider">مزرەعە / باغ</p>
-                        <h4 id="stat-farms" class="text-2xl font-extrabold text-white mt-1">0</h4>
+                        <p class="text-[10px] text-rose-300/90 font-semibold tracking-wider">کارێن سەرکەفتی (Done)</p>
+                        <h4 id="stat-deals-done" class="text-xl font-black text-rose-400 mt-0.5">0</h4>
                     </div>
-                    <div class="p-3 bg-amber-950/60 text-amber-400 rounded-xl border border-amber-900/40">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707-.707M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <div class="p-2.5 bg-rose-950/80 text-rose-400 rounded-2xl border border-rose-800/50">
+                        🏆
                     </div>
                 </div>
             </div>
 
-            <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800/80 shadow-sm">
+            <!-- پێزانینێن دابەشبوونێ -->
+            <div class="bg-slate-900/80 p-5 rounded-3xl border border-slate-800/80 shadow-md space-y-4">
+                <h3 class="text-xs font-black text-indigo-400 flex items-center gap-2">
+                    📊 رێژەیا دابەشبوونا مڵکێن تە
+                </h3>
+                <div class="space-y-3 text-xs">
+                    <div>
+                        <div class="flex justify-between text-slate-300 mb-1">
+                            <span>خانی (Houses)</span>
+                            <span id="pct-houses" class="font-bold">0%</span>
+                        </div>
+                        <div class="w-full bg-slate-950 h-2.5 rounded-full overflow-hidden">
+                            <div id="bar-houses" class="bg-emerald-500 h-full transition-all duration-1000" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-slate-300 mb-1">
+                            <span>شقە (Apartments)</span>
+                            <span id="pct-apartments" class="font-bold">0%</span>
+                        </div>
+                        <div class="w-full bg-slate-950 h-2.5 rounded-full overflow-hidden">
+                            <div id="bar-apartments" class="bg-blue-500 h-full transition-all duration-1000" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-slate-300 mb-1">
+                            <span>مزرەعە / باغ (Farms)</span>
+                            <span id="pct-farms" class="font-bold">0%</span>
+                        </div>
+                        <div class="w-full bg-slate-950 h-2.5 rounded-full overflow-hidden">
+                            <div id="bar-farms" class="bg-amber-500 h-full transition-all duration-1000" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- دوماهیک مڵکێن هاتینە زێدەکرن -->
+            <div class="bg-slate-900 p-5 rounded-3xl border border-slate-800/80 shadow-sm">
                 <div class="flex items-center justify-between mb-4 border-b border-slate-800/80 pb-3">
-                    <h3 class="text-sm font-bold text-slate-200 flex items-center gap-2">
-                        <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        دوماهیک مڵکێن هاتینە زێدەکرن
+                    <h3 class="text-xs font-bold text-slate-200 flex items-center gap-2">
+                        <svg class="w-4.5 h-4.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        دوماهیک مڵکێن هاتینە تۆمارکرن
                     </h3>
                 </div>
                 <div id="recent-list" class="space-y-3"></div>
@@ -198,11 +294,11 @@
                     <div class="grid grid-cols-2 gap-3">
                         <div>
                             <label class="block text-xs font-bold text-slate-400 mb-1.5">ناڤێ مڵکی *</label>
-                            <input type="text" id="prop-title" required placeholder="بۆ نموونە: خانیێ دهۆکا نوو" class="w-full px-3 py-2.5 border border-slate-800 bg-slate-950 text-slate-100 rounded-xl text-xs focus:outline-none focus:border-indigo-500">
+                            <input type="text" id="prop-title" required placeholder="خانیێ دهۆکا نوو" class="w-full px-3 py-2.5 border border-slate-800 bg-slate-950 text-slate-100 rounded-xl text-xs focus:outline-none focus:border-indigo-500">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-400 mb-1.5">ناڤێ شریکی / کارمەندی *</label>
-                            <input type="text" id="prop-added-by" required placeholder="بۆ نموونە: ئەحمەد (شریک)" class="w-full px-3 py-2.5 border border-slate-800 bg-slate-950 text-slate-100 rounded-xl text-xs focus:outline-none focus:border-indigo-500">
+                            <input type="text" id="prop-added-by" required placeholder="ئەحمەد (شریک)" class="w-full px-3 py-2.5 border border-slate-800 bg-slate-950 text-slate-100 rounded-xl text-xs focus:outline-none focus:border-indigo-500">
                         </div>
                     </div>
 
@@ -222,6 +318,8 @@
                             <select id="prop-status" required class="w-full px-3 py-2.5 border border-slate-800 bg-slate-950 text-slate-100 rounded-xl text-sm focus:outline-none focus:border-indigo-500">
                                 <option value="بۆ فرۆشتن">بۆ فرۆشتن</option>
                                 <option value="بۆ کرێ">بۆ کرێ</option>
+                                <option value="هاتە فرۆشتن">هاتە فرۆشتن (Sold)</option>
+                                <option value="هاتە کرێدان">هاتە کرێدان (Rented)</option>
                             </select>
                         </div>
                     </div>
@@ -237,19 +335,33 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-400 mb-1.5">ئاراستە (ڕووگەهـ)</label>
-                            <select id="prop-orientation" class="w-full px-3 py-2.5 border border-slate-800 bg-slate-950 text-slate-100 rounded-xl text-sm focus:outline-none focus:border-indigo-500">
-                                <option value="دیار نینە">دیار نینە</option>
-                                <option value="جنوب شرق (باشوورێ ڕۆژهەڵات)">جنوب شرق (باشوورێ ڕۆژهەڵات)</option>
-                                <option value="جنوب غرب (باشوورێ ڕۆژئاوا)">جنوب غرب (باشوورێ ڕۆژئاوا)</option>
-                                <option value="شمال شرق (باکوورێ ڕۆژهەڵات)">شمال شرق (باکوورێ ڕۆژهەڵات)</option>
-                                <option value="شمال غرب (باکوورێ ڕۆژئاوا)">شمال غرب (باکوورێ ڕۆژئاوا)</option>
-                                <option value="باکوور (شمال)">باکوور (شمال)</option>
-                                <option value="باشوور (جنوب)">باشوور (جنوب)</option>
-                                <option value="ڕۆژهەڵات (شرق)">ڕۆژهەڵات (شرق)</option>
-                                <option value="ڕۆژئاوا (غرب)">ڕۆژئاوا (غرب)</option>
-                                <option value="دوو ئاراستە (کۆنەر)">دوو ئاراستە (کۆنەر)</option>
-                            </select>
+                            <label class="block text-xs font-bold text-slate-400 mb-1.5">ئاراستە (ڕووگەهـ) * دشێی چەندین ئاراستە دەستنیشان کەی</label>
+                            <div class="grid grid-cols-2 gap-1.5 text-xs">
+                                <label class="cursor-pointer">
+                                    <input type="checkbox" id="orient-north" value="باکوور" class="orient-checkbox peer hidden">
+                                    <div class="py-2.5 bg-slate-950 border border-slate-800/90 rounded-xl text-slate-400 font-bold flex items-center justify-center gap-1 peer-checked:bg-gradient-to-r peer-checked:from-emerald-950 peer-checked:to-indigo-950 peer-checked:border-emerald-500/80 peer-checked:text-emerald-400 transition-all duration-300">
+                                        <span>🧭 باکوور</span>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="checkbox" id="orient-south" value="باشوور" class="orient-checkbox peer hidden">
+                                    <div class="py-2.5 bg-slate-950 border border-slate-800/90 rounded-xl text-slate-400 font-bold flex items-center justify-center gap-1 peer-checked:bg-gradient-to-r peer-checked:from-emerald-950 peer-checked:to-indigo-950 peer-checked:border-emerald-500/80 peer-checked:text-emerald-400 transition-all duration-300">
+                                        <span>🧭 باشوور</span>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="checkbox" id="orient-east" value="ڕۆژهەڵات" class="orient-checkbox peer hidden">
+                                    <div class="py-2.5 bg-slate-950 border border-slate-800/90 rounded-xl text-slate-400 font-bold flex items-center justify-center gap-1 peer-checked:bg-gradient-to-r peer-checked:from-emerald-950 peer-checked:to-indigo-950 peer-checked:border-emerald-500/80 peer-checked:text-emerald-400 transition-all duration-300">
+                                        <span>🧭 ڕۆژهەڵات</span>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="checkbox" id="orient-west" value="ڕۆژئاوا" class="orient-checkbox peer hidden">
+                                    <div class="py-2.5 bg-slate-950 border border-slate-800/90 rounded-xl text-slate-400 font-bold flex items-center justify-center gap-1 peer-checked:bg-gradient-to-r peer-checked:from-emerald-950 peer-checked:to-indigo-950 peer-checked:border-emerald-500/80 peer-checked:text-emerald-400 transition-all duration-300">
+                                        <span>🧭 ڕۆژئاوا</span>
+                                    </div>
+                                </label>
+                            </div>
                         </div>
                     </div>
 
@@ -267,11 +379,11 @@
                     <div class="grid grid-cols-2 gap-3">
                         <div>
                             <label class="block text-xs font-bold text-slate-400 mb-1.5">جۆرێ عەمارێ / پرۆژەیی</label>
-                            <input type="text" id="prop-building-type" placeholder="بۆ نموونە: پرۆژەیێ ئارام" class="w-full px-3 py-2.5 border border-slate-800 bg-slate-950 text-slate-100 rounded-xl text-xs focus:outline-none focus:border-indigo-500">
+                            <input type="text" id="prop-building-type" placeholder="پرۆژەیێ ئارام" class="w-full px-3 py-2.5 border border-slate-800 bg-slate-950 text-slate-100 rounded-xl text-xs focus:outline-none focus:border-indigo-500">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-400 mb-1.5">ژمارا طابقێ (نهۆم)</label>
-                            <input type="text" id="prop-floor" placeholder="بۆ نموونە: طابقا 3" class="w-full px-3 py-2.5 border border-slate-800 bg-slate-950 text-slate-100 rounded-xl text-xs focus:outline-none focus:border-indigo-500">
+                            <input type="text" id="prop-floor" placeholder="طابقا 3" class="w-full px-3 py-2.5 border border-slate-800 bg-slate-950 text-slate-100 rounded-xl text-xs focus:outline-none focus:border-indigo-500">
                         </div>
                     </div>
                 </div>
@@ -409,7 +521,7 @@
         <div id="properties-tab" class="tab-content px-5 py-4 space-y-4 pb-28">
             <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 shadow-sm space-y-3">
                 <div class="relative">
-                    <input type="text" id="search-input" oninput="filterProperties()" placeholder="🔍 لێگەڕیان ب ژمارا عەردی (پارچەیێ)، ناڤنیشان، تەلەفۆن..." class="w-full pr-10 pl-4 py-2.5 border border-slate-800 bg-slate-950 text-slate-100 rounded-xl text-sm focus:outline-none">
+                    <input type="text" id="search-input" oninput="filterProperties()" placeholder="🔍 لێگەڕیان ب ژمارا عەردی، ناڤنیشان، تەلەفۆن..." class="w-full pr-10 pl-4 py-2.5 border border-slate-800 bg-slate-950 text-slate-100 rounded-xl text-sm focus:outline-none">
                     <span class="absolute right-3.5 top-3 text-slate-500">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                     </span>
@@ -427,6 +539,8 @@
                         <option value="هەمی">بارودۆخ</option>
                         <option value="بۆ فرۆشتن">بۆ فرۆشتن</option>
                         <option value="بۆ کرێ">بۆ کرێ</option>
+                        <option value="هاتە فرۆشتن">هاتە فرۆشتن</option>
+                        <option value="هاتە کرێدان">هاتە کرێدان</option>
                     </select>
                 </div>
             </div>
@@ -436,7 +550,11 @@
         </div>
 
         <!-- ٤. نەخشەیێ گشتی (Full Screen) -->
-        <div id="map-tab" class="tab-content h-full w-full">
+        <div id="map-tab" class="tab-content h-full w-full relative">
+            <button onclick="zoomToUserLiveLocation()" class="absolute top-4 left-4 z-20 bg-slate-900/90 hover:bg-slate-800 text-emerald-400 border border-slate-700/80 px-4 py-2.5 rounded-2xl shadow-2xl flex items-center gap-2 font-bold text-xs backdrop-blur-md transition-all active:scale-95">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399] animate-pulse"></span>
+                <span>جهێ من یێ نوکە</span>
+            </button>
             <div id="main-map" class="h-full w-full z-10"></div>
         </div>
 
@@ -451,14 +569,14 @@
                 </div>
                 <div class="space-y-2 text-xs text-slate-300">
                     <p>🏢 مەکتەب: <strong id="settings-office-name" class="text-emerald-400">---</strong></p>
-                    <p>🔐 داتایێن تە تایبەت و پاراستینە و تەنێ مڵکێن مەکتەبا تە نیشان ددەت.</p>
+                    <p>🔐 داتایێن تە تەواو د پاراستینە د ناڤ سێرڤەرێ فایەربەیس دا.</p>
                 </div>
 
                 <div class="pt-3 border-t border-slate-800">
                     <button onclick="logoutOffice()" class="w-full py-3 bg-red-950/80 hover:bg-red-900 border border-red-900/60 text-red-300 rounded-xl text-xs font-bold transition">دەرکەڤتن ژ هەژمارێ (Logout)</button>
                 </div>
 
-                <!-- 🕵️‍♂️ بەشێ گەشەپێدەری ب زانیاریێن ئۆمێد عبدالوحد -->
+                <!-- بەشێ گەشەپێدەری -->
                 <div class="pt-6 border-t border-slate-800 text-center space-y-1">
                     <p class="text-[10px] text-slate-500 font-semibold tracking-wider">گەشەپێدەرێ بەرنامەی:</p>
                     <p id="dev-credit-btn" class="text-xs font-black text-indigo-400 hover:text-indigo-300 cursor-pointer select-none py-1 px-3 inline-block rounded-xl hover:bg-slate-800/50 transition active:scale-95">
@@ -480,7 +598,7 @@
                 <button onclick="closeSecretLoginModal()" class="text-slate-400 hover:text-white">✕</button>
             </div>
             <p class="text-xs text-slate-300 leading-relaxed">
-                تکایە پاسکۆدێ نهێنی یێ ماستەر (Master Key) بنڤیسە دا کۆ بشێی ناڤ و پاسوۆردێن هەمی مەکتەبان بگۆهۆڕی.
+                تکایە پاسکۆدێ نهێنی یێ ماستەر (Master Key) بنڤیسە.
             </p>
             <div>
                 <input type="password" id="secret-master-pin" placeholder="پاسکۆدێ نهێنی (Omed#710)" class="w-full px-4 py-3 border border-indigo-900/80 bg-slate-950 text-slate-100 rounded-xl text-sm focus:outline-none focus:border-indigo-500 text-center font-bold tracking-widest">
@@ -489,7 +607,7 @@
         </div>
     </div>
 
-    <!-- مۆدالا نەهێنی یا گەشەپێدەری (تایبەتمەندیا زێدەکرنا مەکتەبا نوو + دیتنا هەمی داتایان) -->
+    <!-- مۆدالا نەهێنی یا گەشەپێدەری -->
     <div id="master-admin-panel-modal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-xl z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-slate-900 border border-indigo-500/40 rounded-3xl p-5 w-full max-w-lg h-[85vh] flex flex-col justify-between shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
@@ -497,7 +615,7 @@
                     <h3 class="font-black text-white text-base flex items-center gap-2">
                         👑 پەنێلا کۆنترۆلکرنا ناوەندی (Developer Panel)
                     </h3>
-                    <p class="text-[10px] text-indigo-400 mt-0.5">ل ڤێرێ تو بشێی مەکتەبێن نوو زێدە بکی یان دەستکاریێ دوان دا بکی!</p>
+                    <p class="text-[10px] text-indigo-400 mt-0.5">ل ڤێرێ تو بشێی مەکتەبێن نوو زێدە بکی!</p>
                 </div>
                 <button onclick="closeMasterAdminPanelModal()" class="text-slate-400 hover:text-white text-lg">✕</button>
             </div>
@@ -524,13 +642,13 @@
             </div>
 
             <div class="flex gap-2 border-t border-slate-800 pt-3">
-                <button onclick="saveMasterAdminAccountChanges()" class="flex-1 py-3 bg-gradient-to-r from-emerald-500 to-indigo-600 text-white font-bold rounded-xl text-xs shadow-lg">پاشکەفتکرنا هەمی گۆهۆڕینان</button>
+                <button onclick="saveMasterAdminAccountChanges()" class="flex-1 py-3 bg-gradient-to-r from-emerald-500 to-indigo-600 text-white font-bold rounded-xl text-xs shadow-lg">پاشکەفتکرنا گۆهۆڕینان</button>
                 <button onclick="closeMasterAdminPanelModal()" class="px-4 py-3 bg-slate-800 text-slate-300 font-bold rounded-xl text-xs">داخستن</button>
             </div>
         </div>
     </div>
 
-    <!-- مۆدالا دیتنا هەمی داتایێن هەمی مەکتەبان (MASTER DATA VIEW FOR OMED) -->
+    <!-- مۆدالا دیتنا هەمی داتایێن هەمی مەکتەبان -->
     <div id="master-data-modal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-xl z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-slate-900 border border-indigo-500/40 rounded-3xl p-5 w-full max-w-lg h-[90vh] flex flex-col justify-between shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
@@ -538,7 +656,7 @@
                     <h3 class="font-black text-emerald-400 text-base flex items-center gap-2">
                         📊 هەمی مڵکێن هەمی مەکتەبان
                     </h3>
-                    <p class="text-[10px] text-slate-400 mt-0.5">ل ڤێرێ تو بشێی داتایێن تەواوی مەکتەبان ب جارەکێ ببینی!</p>
+                    <p class="text-[10px] text-slate-400 mt-0.5">ل ڤێرێ داتایێن تەواوی مەکتەبان ب جارەکێ ببینە!</p>
                 </div>
                 <button onclick="closeMasterDataViewModal()" class="text-slate-400 hover:text-white text-lg">✕</button>
             </div>
@@ -553,7 +671,7 @@
     <!-- تاسکبارێ خوارێ (Bottom Taskbar) -->
     <div class="fixed bottom-3 left-4 right-4 h-16 bg-slate-900/95 backdrop-blur-md text-slate-400 flex justify-around items-center z-50 rounded-2xl border border-slate-800/80 shadow-2xl select-none">
         <button onclick="changeTab('dashboard-tab', 'داشبۆرد')" id="btn-dashboard-tab" class="flex flex-col items-center justify-center w-12 text-emerald-400 transition">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z"></path></svg>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z"></path></svg>
             <span class="text-[9px] mt-1 font-medium">داشبۆرد</span>
         </button>
         <button onclick="changeTab('add-tab', 'زێدەکرن')" id="btn-add-tab" class="flex flex-col items-center justify-center w-12 transition">
@@ -576,29 +694,26 @@
 
     <script>
         // ----------------------------------------------------
-        // 🔥 FIREBASE INITIALIZATION & CONFIGURATION
+        // 🔥 فایەربەیس کۆنفیگ (Firebase Configuration)
         // ----------------------------------------------------
         const firebaseConfig = {
-          apiKey: "AIzaSyAHzikKdWWeDadPAAp4qUIwtz3_WBpN_7c",
-          authDomain: "aqarat-24-data.firebaseapp.com",
-          projectId: "aqarat-24-data",
-          storageBucket: "aqarat-24-data.firebasestorage.app",
-          messagingSenderId: "921143642155",
-          appId: "1:921143642155:web:e06beac9326d0007c9c26e",
-          measurementId: "G-X6KKTEG4MK"
+            apiKey: "AIzaSyC9AylsMOVtAWUJBK8zHIiHYq7fiCXCu9g",
+            authDomain: "aqarattt.firebaseapp.com",
+            projectId: "aqarattt",
+            storageBucket: "aqarattt.firebasestorage.app",
+            messagingSenderId: "874140481088",
+            appId: "1:874140481088:web:5dffa7b8e21a5ad303d1a5",
+            measurementId: "G-DYD5T4XYGL"
         };
 
+        // پێزەکردنا فایەربەیس فەرمی
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // ----------------------------------------------------
         // پاسکۆدێ نهێنی یێ ماستەر (MASTER KEY FOR OMED)
-        // ----------------------------------------------------
-        const MASTER_DEV_PIN = "Omed#710"; // یان ژمارا تەلەفۆنا تە 07507100238
+        const MASTER_DEV_PIN = "Omed#710"; 
 
-        // ----------------------------------------------------
         // ٥ مەکتەبێن بنەڕەتی
-        // ----------------------------------------------------
         const DEFAULT_OFFICE_ACCOUNTS = [
             { name: "عەقاراتێ دهۆک سیتی", pin: "D729#k" },
             { name: "عەقاراتێ بارزان", pin: "B841#z" },
@@ -618,39 +733,99 @@
 
         let devClickCount = 0;
         let devClickTimer = null;
+        let gpsLiveMarkerMain = null;
+        let gpsLiveMarkerAdd = null;
 
         window.onload = function() {
             populateOfficeOptions();
             
+            // چێکرنا لۆگینێ فەرمی یێ توند بۆ جوداکرنا داتایان
             const savedOffice = localStorage.getItem('active_office_session');
             if (savedOffice) {
                 activeOfficeName = savedOffice;
                 hideLoginOverlay();
                 updateOfficeBadge();
+                fetchFromFirebase(); // لاندبۆنا مڵکان ژ فایەربەیس ل سەر بنەمایێ ناڤێ مەکتەبێ
             } else {
                 showLoginOverlay();
             }
 
             initMaps();
             loadLocalData();
-            listenToFirebaseRealtime();
             toggleConditionalFields();
             setupSecretDevClickTrigger();
+
+            // چاودێریکرنا لۆکەیشنێ زندی یێ بەکارهێنەری ب شێوەیەکێ ئۆتۆماتیکی
+            watchGPSLiveLocation();
+
+            // کورتکرنا کاتێ شاشەیا سپلاش (Splash Screen) بۆ تەنێ ١ چرکە (1000ms)
+            setTimeout(() => {
+                const splash = document.getElementById('splash-screen');
+                if (splash) {
+                    splash.classList.add('opacity-0', 'pointer-events-none');
+                    setTimeout(() => splash.remove(), 700);
+                }
+            }, 1000);
         };
 
-        function listenToFirebaseRealtime() {
-            updateSyncStatus(true, true);
-            db.collection("properties").onSnapshot((snapshot) => {
-                properties = [];
-                snapshot.forEach((doc) => {
-                    properties.push({ id: doc.id, ...doc.data() });
+        // دۆزینەوە و نووکرنا جهێ بەکارهێنەری ب شێوازەکێ بەردەوام
+        function watchGPSLiveLocation() {
+            if (navigator.geolocation) {
+                const gpsIcon = L.divIcon({
+                    className: 'gps-pulse-dot',
+                    iconSize: [14, 14],
+                    iconAnchor: [7, 7]
                 });
-                saveLocalData();
-                updateSyncStatus(true);
-            }, (error) => {
-                console.error("Firebase Sync Error: ", error);
-                updateSyncStatus(false);
-            });
+
+                navigator.geolocation.watchPosition(pos => {
+                    const lat = pos.coords.latitude;
+                    const lng = pos.coords.longitude;
+
+                    // نیشاندانا خالێ ل سەر نەخشەی گشتی
+                    if (gpsLiveMarkerMain) {
+                        gpsLiveMarkerMain.setLatLng([lat, lng]);
+                    } else {
+                        gpsLiveMarkerMain = L.marker([lat, lng], {icon: gpsIcon}).addTo(mainMap).bindPopup("تۆ ل ڤێرەی (زندی)");
+                    }
+
+                    // نیشاندانا خالێ ل سەر نەخشەی زێدەکرنێ
+                    if (gpsLiveMarkerAdd) {
+                        gpsLiveMarkerAdd.setLatLng([lat, lng]);
+                    } else {
+                        gpsLiveMarkerAdd = L.marker([lat, lng], {icon: gpsIcon}).addTo(addMap);
+                    }
+
+                }, err => {
+                    console.log("GPS dynamic tracking inactive:", err.message);
+                }, { enableHighAccuracy: true });
+            }
+        }
+
+        // ئەنجامدانا کردارا زومکرنێ ل سەر نەخشەی ب ڕێکا دوگمەیا جهێ من یێ نوکە
+        function zoomToUserLiveLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(pos => {
+                    const lat = pos.coords.latitude;
+                    const lng = pos.coords.longitude;
+                    mainMap.setView([lat, lng], 16);
+                    
+                    const gpsIcon = L.divIcon({
+                        className: 'gps-pulse-dot',
+                        iconSize: [14, 14],
+                        iconAnchor: [7, 7]
+                    });
+                    
+                    if (!gpsLiveMarkerMain) {
+                        gpsLiveMarkerMain = L.marker([lat, lng], {icon: gpsIcon}).addTo(mainMap).bindPopup("تۆ ل ڤێرەی (زندی)");
+                    } else {
+                        gpsLiveMarkerMain.setLatLng([lat, lng]);
+                    }
+                }, () => {
+                    alert('تکایە دڵنیابە کو GPS یێ ڤەکۆڵکرییە و ڕێپێدان هاتیە دان!');
+                });
+            } else {
+                alert('سیستەمێ تە پشتگیریێ ل گەڕیانا GPS ناکەت.');
+            }
         }
 
         function setupSecretDevClickTrigger() {
@@ -710,7 +885,7 @@
                     </div>
                     <div class="grid grid-cols-2 gap-2">
                         <input type="text" id="dev-acc-name-${idx}" value="${off.name}" placeholder="ناڤێ مەکتەبێ" class="px-3 py-2 bg-slate-900 border border-slate-800 text-slate-100 rounded-xl text-xs focus:outline-none focus:border-indigo-500">
-                        <input type="password" id="dev-acc-pin-${idx}" value="${off.pin}" placeholder="پاسوۆرد" class="px-3 py-2 bg-slate-900 border border-slate-800 text-indigo-300 font-bold rounded-xl text-xs focus:outline-none focus:border-indigo-500 tracking-wider">
+                        <input type="password" id="dev-acc-pin-${idx}" value="${off.pin}" placeholder="پاسکۆد" class="px-3 py-2 bg-slate-900 border border-slate-800 text-indigo-300 font-bold rounded-xl text-xs focus:outline-none focus:border-indigo-500 tracking-wider">
                     </div>
                 `;
                 container.appendChild(div);
@@ -767,27 +942,41 @@
             closeMasterAdminPanelModal();
         }
 
+        // 👑 پاشکەفتکرنا فایەربەیس فەرمی یا گشتی بۆ کارمەندی سەرەکی (Omed)
         function openMasterDataViewModal() {
             const container = document.getElementById('master-data-list-container');
-            container.innerHTML = '';
+            container.innerHTML = '<p class="text-xs text-slate-400 text-center py-6">لاندبۆنا داتایێن تەواوی مەکتەبان ژ فایەربەیس...</p>';
 
-            if (properties.length === 0) {
-                container.innerHTML = `<p class="text-xs text-slate-400 text-center py-6">هیچ مڵکەک د سێرڤەرێ Firebase دا نینە</p>`;
-            } else {
-                properties.forEach((p, idx) => {
-                    const div = document.createElement('div');
-                    div.className = 'bg-slate-950 p-3 rounded-2xl border border-slate-800 space-y-1';
-                    div.innerHTML = `
-                        <div class="flex justify-between items-center text-indigo-400 font-bold">
-                            <span>🏢 ${p.office || 'گشتی'} | 👤 ${p.addedBy || 'دیار نینە'}</span>
-                            <span class="text-emerald-400 font-extrabold">${p.price}</span>
-                        </div>
-                        <p class="font-bold text-slate-100 text-xs">${idx + 1}. ${p.title}</p>
-                        <p class="text-[10px] text-slate-400">📍 ${p.location} | 🕒 ${p.date || ''} | 📞 ${p.phone}</p>
-                    `;
-                    container.appendChild(div);
+            db.collection("properties")
+                .get()
+                .then(querySnapshot => {
+                    container.innerHTML = '';
+                    let allProps = [];
+                    querySnapshot.forEach(doc => {
+                        allProps.push(doc.data());
+                    });
+
+                    if (allProps.length === 0) {
+                        container.innerHTML = `<p class="text-xs text-slate-400 text-center py-6">هیچ مڵکەک د سێرڤەری دا نینە</p>`;
+                    } else {
+                        allProps.forEach((p, idx) => {
+                            const div = document.createElement('div');
+                            div.className = 'bg-slate-950 p-3 rounded-2xl border border-slate-800 space-y-1';
+                            div.innerHTML = `
+                                <div class="flex justify-between items-center text-indigo-400 font-bold">
+                                    <span>🏢 ${p.office || 'گشتی'} | 👤 ${p.addedBy || 'دیار نینە'}</span>
+                                    <span class="text-emerald-400 font-extrabold">${p.price}</span>
+                                </div>
+                                <p class="font-bold text-slate-100 text-xs">${idx + 1}. ${p.title}</p>
+                                <p class="text-[10px] text-slate-400">📍 ${p.location} | 🕒 ${p.date || ''} | 📞 ${p.phone}</p>
+                            `;
+                            container.appendChild(div);
+                        });
+                    }
+                })
+                .catch(err => {
+                    container.innerHTML = `<p class="text-xs text-red-400 text-center py-6">خەلەتەک ڕوویدا: ${err.message}</p>`;
                 });
-            }
 
             document.getElementById('master-data-modal').classList.remove('hidden');
         }
@@ -798,13 +987,15 @@
 
         function populateOfficeOptions() {
             const select = document.getElementById('login-office-select');
-            select.innerHTML = '';
-            OFFICE_ACCOUNTS.forEach((off, idx) => {
-                const opt = document.createElement('option');
-                opt.value = off.name;
-                opt.innerText = `${idx + 1}. ${off.name}`;
-                select.appendChild(opt);
-            });
+            if (select) {
+                select.innerHTML = '';
+                OFFICE_ACCOUNTS.forEach((off, idx) => {
+                    const opt = document.createElement('option');
+                    opt.value = off.name;
+                    opt.innerText = `${idx + 1}. ${off.name}`;
+                    select.appendChild(opt);
+                });
+            }
         }
 
         function showLoginOverlay() {
@@ -829,7 +1020,7 @@
                 document.getElementById('login-pin-input').value = '';
                 hideLoginOverlay();
                 updateOfficeBadge();
-                filterProperties();
+                fetchFromFirebase(); // گازی داتایێن تایبەت ب ڤێ مەکتەبێ دکەتن پشتی لۆگینی
             } else {
                 errorMsg.classList.remove('hidden');
             }
@@ -839,7 +1030,11 @@
             if (confirm('تۆ پشت راستی د ڤێ دەرکەڤتنێ دا؟')) {
                 localStorage.removeItem('active_office_session');
                 activeOfficeName = "";
+                properties = [];
+                saveLocalData();
                 showLoginOverlay();
+                updateOfficeBadge();
+                updateUI();
             }
         }
 
@@ -862,23 +1057,22 @@
         }
 
         function updateOfficeBadge() {
-            document.getElementById('header-office-name').innerText = activeOfficeName || 'نەهاتیە زانین';
+            const headerBadge = document.getElementById('header-office-name');
+            if (headerBadge) headerBadge.innerText = activeOfficeName || 'نەهاتیە زانین';
             const settingsName = document.getElementById('settings-office-name');
             if (settingsName) settingsName.innerText = activeOfficeName || 'نەهاتیە زانین';
         }
 
         function updateSyncStatus(connected, loading = false) {
             const indicator = document.getElementById('sync-indicator');
-            const syncText = document.getElementById('sync-text');
-            if (loading) {
-                indicator.className = "w-1.5 h-1.5 rounded-full bg-blue-400 shadow-[0_0_8px_#60a5fa] animate-pulse";
-                syncText.innerText = "Firebase Data...";
-            } else if (connected) {
-                indicator.className = "w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399] animate-pulse";
-                syncText.innerText = "Firebase Zندو";
-            } else {
-                indicator.className = "w-1.5 h-1.5 rounded-full bg-amber-400 shadow-[0_0_8px_#fbbf24] animate-pulse";
-                syncText.innerText = "ئۆفلاین";
+            if (indicator) {
+                if (loading) {
+                    indicator.className = "w-1.5 h-1.5 rounded-full bg-blue-400 shadow-[0_0_8px_#60a5fa] animate-pulse";
+                } else if (connected) {
+                    indicator.className = "w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399] animate-pulse";
+                } else {
+                    indicator.className = "w-1.5 h-1.5 rounded-full bg-amber-400 shadow-[0_0_8px_#fbbf24] animate-pulse";
+                }
             }
         }
 
@@ -898,19 +1092,22 @@
             document.getElementById(tabId).classList.add('active');
 
             document.querySelectorAll('.fixed button').forEach(btn => {
-                btn.classList.remove('text-emerald-400');
-                btn.classList.add('text-slate-400');
+                if (btn.id && btn.id.startsWith('btn-')) {
+                    btn.classList.remove('text-emerald-400');
+                    btn.classList.add('text-slate-400');
+                }
             });
-            document.getElementById('btn-' + tabId).classList.add('text-emerald-400');
+            const activeBtn = document.getElementById('btn-' + tabId);
+            if (activeBtn) activeBtn.classList.add('text-emerald-400');
 
             if (tabId === 'map-tab') {
                 setTimeout(() => {
                     mainMap.invalidateSize();
                     renderMainMapMarkers();
-                }, 200);
+                }, 250);
             }
             if (tabId === 'add-tab') {
-                setTimeout(() => { addMap.invalidateSize(); }, 200);
+                setTimeout(() => { addMap.invalidateSize(); }, 250);
             }
         }
 
@@ -952,6 +1149,38 @@
             }
         }
 
+        // 🔥 2. لاندبۆنا تەواو پاراستی یا داتایێن مڵکێن ڤێ مەکتەبێ ب زندی ل فایەربەیس
+        function fetchFromFirebase(manual = false) {
+            if (!activeOfficeName) return;
+
+            updateSyncStatus(true, true);
+            const refreshIcon = document.getElementById('refresh-icon');
+            if (refreshIcon) refreshIcon.classList.add('rotate-180');
+
+            // 🔒 جوداکرنا دژوار: تەنێ داتایێن وێ مەکتەبا لۆگینبووی ژ سێرڤەری دکێشیت
+            db.collection("properties")
+                .where("office", "==", activeOfficeName)
+                .get()
+                .then(querySnapshot => {
+                    let fetchedProps = [];
+                    querySnapshot.forEach(doc => {
+                        fetchedProps.push(doc.data());
+                    });
+                    properties = fetchedProps;
+                    saveLocalData();
+                    updateSyncStatus(true);
+                    if (manual) alert("داتایێن مەکتەبێ هاتنە نووکرن ژ سێرڤەرێ فایەربەیس!");
+                })
+                .catch(err => {
+                    console.error("Error fetching from Firebase:", err);
+                    updateSyncStatus(false);
+                })
+                .finally(() => {
+                    if (refreshIcon) setTimeout(() => refreshIcon.classList.remove('rotate-180'), 500);
+                });
+        }
+
+        // 🔥 3. پاراستنا مڵکێ نوو یان نووکرنا مڵکی د ناڤ فایەربەیس دا
         function saveProperty(e) {
             e.preventDefault();
 
@@ -976,22 +1205,44 @@
                 if (document.getElementById('farm-trees').checked) amenities.push('🌳 دار و باغ');
             }
 
+            const selectedOrients = [];
+            if (document.getElementById('orient-north').checked) selectedOrients.push('باکوور');
+            if (document.getElementById('orient-south').checked) selectedOrients.push('باشوور');
+            if (document.getElementById('orient-east').checked) selectedOrients.push('ڕۆژهەڵات');
+            if (document.getElementById('orient-west').checked) selectedOrients.push('ڕۆژئاوا');
+            const orientationStr = selectedOrients.length > 0 ? selectedOrients.join(' + ') : 'دیار نینە';
+
             const now = new Date();
             const timeStr = now.toLocaleTimeString('ku-Arab', { hour: '2-digit', minute: '2-digit' });
             const dateStr = now.toLocaleDateString('ku-Arab');
             const fullDateTime = `${dateStr} | ${timeStr}`;
 
-            const docId = editingPropertyId || Date.now().toString();
+            let originalAddedBy = document.getElementById('prop-added-by').value || 'دیار نینە';
+            let originalDate = fullDateTime;
+            let lastUpdatedBy = '';
+            let lastUpdatedDate = '';
+
+            if (editingPropertyId) {
+                const existing = properties.find(p => p.id.toString() === editingPropertyId.toString());
+                if (existing) {
+                    originalAddedBy = existing.addedBy || originalAddedBy;
+                    originalDate = existing.date || originalDate;
+                    lastUpdatedBy = document.getElementById('prop-added-by').value || 'دیار نینە';
+                    lastUpdatedDate = fullDateTime;
+                }
+            }
+
+            const propId = editingPropertyId || Date.now().toString();
 
             const propData = {
-                id: docId,
+                id: propId,
                 office: activeOfficeName,
-                addedBy: document.getElementById('prop-added-by').value || 'دیار نینە',
+                addedBy: originalAddedBy,
                 title: document.getElementById('prop-title').value,
                 type: type,
                 status: document.getElementById('prop-status').value,
                 docType: document.getElementById('prop-doc-type').value,
-                orientation: document.getElementById('prop-orientation').value,
+                orientation: orientationStr,
                 buildingType: (type === 'شقە') ? (document.getElementById('prop-building-type').value || '') : '',
                 floor: (type === 'شقە') ? (document.getElementById('prop-floor').value || '') : '',
                 plotNum: document.getElementById('prop-plot-num').value || '',
@@ -1004,20 +1255,29 @@
                 lat: document.getElementById('prop-lat').value || '',
                 lng: document.getElementById('prop-lng').value || '',
                 notes: document.getElementById('prop-notes').value || '',
-                date: fullDateTime
+                date: originalDate,
+                lastUpdatedBy: lastUpdatedBy,
+                lastUpdatedDate: lastUpdatedDate
             };
 
-            // Save directly to Firebase Firestore!
-            db.collection("properties").doc(docId).set(propData, { merge: true })
-            .then(() => {
-                resetFormState();
-                alert('مڵک ب سەرکەفتیانە هاتە تۆمارکرن د سێرڤەرێ فایربەیس دا ب ناڤێ (' + activeOfficeName + ')');
-                changeTab('properties-tab', 'لیستا مڵکان');
-            })
-            .catch((error) => {
-                console.error("Error saving document: ", error);
-                alert("ئاریشەیەک چێبوو د تۆمارکرنێ دا! ڕێپێدانا فایربەیس بپشکنە.");
-            });
+            // پاشکەفتکرن ل سەر فایەربەیس
+            db.collection("properties").doc(propId).set(propData)
+                .then(() => {
+                    if (editingPropertyId) {
+                        const index = properties.findIndex(p => p.id.toString() === editingPropertyId.toString());
+                        if (index !== -1) properties[index] = propData;
+                    } else {
+                        properties.push(propData);
+                    }
+                    saveLocalData();
+                    resetFormState();
+                    alert('مڵک ب سەرکەفتیانە د ناڤ سێرڤەرێ فایەربەیس دا هاتە پاراستن!');
+                    changeTab('properties-tab', 'لیستا مڵکان');
+                })
+                .catch((error) => {
+                    console.error("Error saving document to Firebase: ", error);
+                    alert("خەلەتەک ڕوویدا د شاندنا داتایان دا بۆ فایەربەیس!");
+                });
         }
 
         function editProperty(id) {
@@ -1030,11 +1290,16 @@
             document.getElementById('cancel-edit-btn').classList.remove('hidden');
 
             document.getElementById('prop-title').value = p.title || '';
-            document.getElementById('prop-added-by').value = p.addedBy || '';
+            document.getElementById('prop-added-by').value = p.lastUpdatedBy || p.addedBy || '';
             document.getElementById('prop-type').value = p.type || 'خانی';
             document.getElementById('prop-status').value = p.status || 'بۆ فرۆشتن';
             document.getElementById('prop-doc-type').value = p.docType || 'تاپۆیا سڕف';
-            document.getElementById('prop-orientation').value = p.orientation || 'دیار نینە';
+            
+            const orientStr = p.orientation || '';
+            document.getElementById('orient-north').checked = orientStr.includes('باکوور');
+            document.getElementById('orient-south').checked = orientStr.includes('باشوور');
+            document.getElementById('orient-east').checked = orientStr.includes('ڕۆژهەڵات');
+            document.getElementById('orient-west').checked = orientStr.includes('ڕۆژئاوا');
             
             toggleConditionalFields();
 
@@ -1073,6 +1338,12 @@
             document.getElementById('submit-btn').innerText = "تۆمارکرن و پاشکەفتکرن";
             document.getElementById('cancel-edit-btn').classList.add('hidden');
             document.getElementById('add-property-form').reset();
+            
+            document.getElementById('orient-north').checked = false;
+            document.getElementById('orient-south').checked = false;
+            document.getElementById('orient-east').checked = false;
+            document.getElementById('orient-west').checked = false;
+
             toggleConditionalFields();
             if (addMarker) {
                 addMap.removeLayer(addMarker);
@@ -1080,13 +1351,19 @@
             }
         }
 
+        // 🔥 4. ژێبرنا مڵکی ل سەر سێرڤەرێ فایەربەیس
         function deleteProperty(id) {
-            if (confirm('تۆ پشت راستی د ژێبرنا ڤی مڵکی دا؟')) {
-                db.collection("properties").doc(id.toString()).delete().then(() => {
-                    alert("مڵک ب سەرکەفتیانە هاتە ژێبرن!");
-                }).catch((error) => {
-                    console.error("Error deleting document: ", error);
-                });
+            if (confirm('تۆ پشت راستی د ژێبرنا ڤی مڵکی دا ژ سێرڤەری؟')) {
+                db.collection("properties").doc(id.toString()).delete()
+                    .then(() => {
+                        properties = properties.filter(p => p.id.toString() !== id.toString());
+                        saveLocalData();
+                        alert('مڵک ب سەرکەفتیانە ژ سێرڤەرێ فایەربەیس هاتە ژێبرن!');
+                    })
+                    .catch((error) => {
+                        console.error("Error removing document from Firebase: ", error);
+                        alert("خەلەتەک ڕوویدا د ژێبرنا داتایان دا!");
+                    });
             }
         }
 
@@ -1103,31 +1380,62 @@
         }
 
         function updateUI() {
-            const myOfficeProps = properties.filter(p => p.office === activeOfficeName);
+            // 🔒 جوداکرنا داتایان: داتایێن properties ژبەر کو ل سەر ئاستێ فایەربەیس فلتەر دبن، تەنێ مڵکێن ڤێ مەکتەبێ نە
+            const myOfficeProps = properties;
 
             document.getElementById('stat-total').innerText = myOfficeProps.length;
-            document.getElementById('stat-houses').innerText = myOfficeProps.filter(p => p.type === 'خانی').length;
-            document.getElementById('stat-apartments').innerText = myOfficeProps.filter(p => p.type === 'شقە').length;
-            document.getElementById('stat-farms').innerText = myOfficeProps.filter(p => p.type === 'مزرەعە').length;
+            document.getElementById('stat-active-props').innerText = myOfficeProps.filter(p => p.status === 'بۆ فرۆشتن' || p.status === 'بۆ کرێ').length;
+            document.getElementById('stat-deals-done').innerText = myOfficeProps.filter(p => p.status === 'هاتە فرۆشتن' || p.status === 'هاتە کرێدان').length;
+
+            let totalPriceSum = 0;
+            let priceCount = 0;
+            myOfficeProps.forEach(p => {
+                const cleanPrice = p.price.toString().replace(/[^0-9]/g, '');
+                const parsedVal = parseFloat(cleanPrice);
+                if (!isNaN(parsedVal)) {
+                    totalPriceSum += parsedVal;
+                    priceCount++;
+                }
+            });
+            const avgVal = priceCount > 0 ? Math.round(totalPriceSum / priceCount) : 0;
+            document.getElementById('stat-avg-price').innerText = avgVal > 0 ? "$" + avgVal.toLocaleString() : "$0";
+
+            const housesCount = myOfficeProps.filter(p => p.type === 'خانی').length;
+            const apartmentsCount = myOfficeProps.filter(p => p.type === 'شقە').length;
+            const farmsCount = myOfficeProps.filter(p => p.type === 'مزرەعە').length;
+
+            const pctHouses = myOfficeProps.length > 0 ? Math.round((housesCount / myOfficeProps.length) * 100) : 0;
+            const pctApartments = myOfficeProps.length > 0 ? Math.round((apartmentsCount / myOfficeProps.length) * 100) : 0;
+            const pctFarms = myOfficeProps.length > 0 ? Math.round((farmsCount / myOfficeProps.length) * 100) : 0;
+
+            document.getElementById('pct-houses').innerText = pctHouses + "%";
+            document.getElementById('pct-apartments').innerText = pctApartments + "%";
+            document.getElementById('pct-farms').innerText = pctFarms + "%";
+
+            document.getElementById('bar-houses').style.width = pctHouses + "%";
+            document.getElementById('bar-apartments').style.width = pctApartments + "%";
+            document.getElementById('bar-farms').style.width = pctFarms + "%";
 
             const recentList = document.getElementById('recent-list');
-            recentList.innerHTML = '';
-            const recentProps = [...myOfficeProps].reverse().slice(0, 3);
-            if (recentProps.length === 0) {
-                recentList.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">چ مڵک نەهاتینە تۆمارکرن</p>`;
-            } else {
-                recentProps.forEach(p => {
-                    const div = document.createElement('div');
-                    div.className = 'flex justify-between items-center bg-slate-950 p-3.5 rounded-2xl text-xs border border-slate-800/80';
-                    div.innerHTML = `
-                        <div>
-                            <p class="font-bold text-slate-200 text-sm">${p.title}</p>
-                            <p class="text-[10px] text-indigo-400 font-medium mt-0.5">👤 ${p.addedBy || 'شریک'} | 📍 ${p.location}</p>
-                        </div>
-                        <span class="text-sm font-extrabold text-emerald-400">${p.price}</span>
-                    `;
-                    recentList.appendChild(div);
-                });
+            if (recentList) {
+                recentList.innerHTML = '';
+                const recentProps = [...myOfficeProps].reverse().slice(0, 3);
+                if (recentProps.length === 0) {
+                    recentList.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">چ مڵک نەهاتینە تۆمارکرن</p>`;
+                } else {
+                    recentProps.forEach(p => {
+                        const div = document.createElement('div');
+                        div.className = 'flex justify-between items-center bg-slate-950 p-3.5 rounded-2xl text-xs border border-slate-800/80';
+                        div.innerHTML = `
+                            <div>
+                                <p class="font-bold text-slate-200 text-sm">${p.title}</p>
+                                <p class="text-[10px] text-indigo-400 font-medium mt-0.5">👤 ${p.addedBy || 'شریک'} | 📍 ${p.location}</p>
+                            </div>
+                            <span class="text-sm font-extrabold text-emerald-400">${p.price}</span>
+                        `;
+                        recentList.appendChild(div);
+                    });
+                }
             }
 
             filterProperties();
@@ -1135,6 +1443,7 @@
 
         function renderPropertiesGrid(filteredList) {
             const grid = document.getElementById('properties-grid');
+            if (!grid) return;
             grid.innerHTML = '';
 
             if (filteredList.length === 0) {
@@ -1143,7 +1452,8 @@
             }
 
             filteredList.forEach(p => {
-                const cleanPhone = p.phone.replace(/[^0-9]/g, '');
+                const normalizedPhone = normalizeDigits(p.phone);
+                const cleanPhone = normalizedPhone.replace(/[^0-9]/g, '');
                 const waPhone = cleanPhone.startsWith('0') ? '964' + cleanPhone.substring(1) : cleanPhone;
                 const waUrl = `https://wa.me/${waPhone}?text=${encodeURIComponent('سڵاڤ، دبارەی ڤی مڵکی: ' + p.title)}`;
 
@@ -1160,12 +1470,26 @@
                     </div>`;
                 }
 
+                let statusBadgeColor = 'bg-amber-950 text-amber-300 border-amber-900/50';
+                if (p.status === 'بۆ فرۆشتن') statusBadgeColor = 'bg-emerald-950 text-emerald-300 border-emerald-900/50';
+                if (p.status === 'بۆ کرێ') statusBadgeColor = 'bg-indigo-950 text-indigo-300 border-indigo-900/50';
+                if (p.status === 'هاتە فرۆشتن') statusBadgeColor = 'bg-rose-950 text-rose-400 border-rose-900/60 font-black animate-pulse';
+                if (p.status === 'هاتە کرێدان') statusBadgeColor = 'bg-slate-850 text-slate-300 border-slate-700/60 font-black animate-pulse';
+
+                let editHistoryHtml = '';
+                if (p.lastUpdatedBy && p.lastUpdatedDate) {
+                    editHistoryHtml = `
+                    <div class="text-[10px] text-amber-400 bg-amber-955/20 border border-amber-900/30 px-3 py-1.5 rounded-xl mt-2 flex items-center gap-1.5 font-bold">
+                        <span>✏️ دەستکاری د کر ژ لایێ: <strong class="text-white">${p.lastUpdatedBy}</strong> ل ڕێکەفتا <strong class="text-slate-300">${p.lastUpdatedDate}</strong></span>
+                    </div>`;
+                }
+
                 card.innerHTML = `
                     <div class="flex justify-between items-center">
                         <div class="flex flex-wrap gap-1.5">
                             <span class="text-[10px] bg-indigo-950 text-indigo-300 font-bold px-2.5 py-1 rounded-lg border border-indigo-900/50">👤 ${p.addedBy || 'شریک'}</span>
-                            <span class="text-[10px] bg-emerald-950 text-emerald-300 font-bold px-2.5 py-1 rounded-lg border border-emerald-900/50">${p.type}</span>
-                            <span class="text-[10px] bg-amber-950 text-amber-300 font-bold px-2.5 py-1 rounded-lg border border-amber-900/50">${p.status}</span>
+                            <span class="text-[10px] bg-slate-950 text-slate-300 font-bold px-2.5 py-1 rounded-lg border border-slate-800">${p.type}</span>
+                            <span class="text-[10px] ${statusBadgeColor} font-bold px-2.5 py-1 rounded-lg border">${p.status}</span>
                         </div>
                         <span class="text-[10px] text-slate-400 font-medium">🕒 ${p.date || ''}</span>
                     </div>
@@ -1178,6 +1502,7 @@
                         </div>
                         ${extraDetailsHtml}
                         ${amenitiesHtml}
+                        ${editHistoryHtml}
                     </div>
                     <div class="grid grid-cols-2 gap-3 bg-slate-950 p-3 rounded-2xl text-xs text-slate-400 border border-slate-800">
                         <div>📏 رووبەر: <strong class="text-slate-200">${p.area} م٢</strong></div>
@@ -1223,7 +1548,6 @@
             const type = document.getElementById('filter-type').value;
             const status = document.getElementById('filter-status').value;
 
-            // Strict Office Lock: ONLY show properties belonging to active logged-in office!
             let matchingProps = properties.filter(p => {
                 const isMyOffice = (p.office === activeOfficeName);
                 const matchType = (type === 'هەمی') || (p.type === type);
@@ -1246,7 +1570,6 @@
                        addedByClean.includes(searchClean);
             });
 
-            // PRIORITIZE PLOT NUMBER MATCHES
             if (searchClean) {
                 matchingProps.sort((a, b) => {
                     const plotA = normalizeDigits(a.plotNum);
@@ -1266,9 +1589,14 @@
 
         function normalizeDigits(str) {
             if (!str) return '';
+            const easternDigits = {
+                '٠': '0', '١': '1', '٢': '2', '٣': '3', '٤': '4',
+                '٥': '5', '٦': '6', '٧': '7', '٨': '8', '٩': '9',
+                '۰': '0', '۱': '1', '۲': '2', '۳': '3', '۴': '4',
+                '۵': '5', '۶': '6', '۷': '7', '٨': '8', '٩': '9'
+            };
             return str.toString()
-                      .replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d))
-                      .replace(/[0-9]/g, d => d)
+                      .replace(/[٠-٩۰-۹]/g, d => easternDigits[d] !== undefined ? easternDigits[d] : d)
                       .toLowerCase().trim();
         }
 
