@@ -109,50 +109,26 @@
         </div>
     </div>
 
-    <!-- شاشەیا چوونە ژوورێ (LOGIN SCREEN) -->
+    <!-- شاشەیا چوونە ژوورێ (LOGIN SCREEN) - تەنیا ب جیمێڵ -->
     <div id="login-overlay" class="fixed inset-0 bg-slate-950/95 backdrop-blur-xl z-50 flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-sm space-y-5 shadow-2xl relative overflow-hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-sm space-y-6 shadow-2xl relative overflow-hidden">
             <div class="text-center space-y-2">
                 <div class="w-14 h-10 bg-gradient-to-tr from-emerald-500 via-indigo-500 to-purple-600 rounded-2xl mx-auto flex items-center justify-center font-black text-white text-xl shadow-lg shadow-indigo-500/30">ع</div>
                 <h2 class="text-lg font-black text-white">تۆماربوون د سیستەمێ عەقاراتی دا</h2>
-                <p class="text-xs text-slate-400">تکایە ب جیمێڵ، ئەپڵ یان ئیمەیڵ داخل ببە</p>
+                <p class="text-xs text-slate-400">بۆ دەستپێکرن و دیتنا داتایێن خۆ، تکایە ب جیمێڵ داخل ببە</p>
             </div>
 
-            <!-- بەشێ ئیمەیڵ و پاسوۆرد فەرمی -->
-            <div class="space-y-3.5 text-xs">
-                <div>
-                    <label class="block font-bold text-slate-300 mb-1.5">ئیمەیڵ (Email)</label>
-                    <input type="email" id="login-email-input" placeholder="example@email.com" class="w-full px-4 py-3 border border-slate-800 bg-slate-950 text-slate-100 rounded-2xl text-xs focus:outline-none focus:border-indigo-500">
-                </div>
-
-                <div>
-                    <label class="block font-bold text-slate-300 mb-1.5">پاسوۆرد (Password)</label>
-                    <input type="password" id="login-pin-input" placeholder="••••••••" class="w-full px-4 py-3 border border-slate-800 bg-slate-950 text-slate-100 rounded-2xl text-xs focus:outline-none focus:border-indigo-500 text-center font-bold tracking-widest">
-                </div>
-
-                <div class="grid grid-cols-2 gap-2 pt-1">
-                    <button onclick="loginWithEmail()" class="py-3 bg-gradient-to-r from-emerald-500 to-indigo-600 hover:opacity-95 text-white font-bold rounded-2xl transition shadow-lg text-[11px] active:scale-95">چوونە ژوور (Login)</button>
-                    <button onclick="signUpWithEmail()" class="py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-2xl transition border border-slate-700 text-[11px] active:scale-95">تۆماربوونا نوو (Sign Up)</button>
-                </div>
-
-                <!-- خەتێ جوداکەر -->
-                <div class="relative flex py-2 items-center">
-                    <div class="flex-grow border-t border-slate-800/80"></div>
-                    <span class="flex-shrink mx-3 text-[10px] text-slate-500 font-bold uppercase">یان ب ڕێکا</span>
-                    <div class="flex-grow border-t border-slate-800/80"></div>
-                </div>
-
-                <!-- دوگمەیێن گووگڵ و ئەپڵ ئایدی -->
-                <div class="grid grid-cols-2 gap-2">
-                    <button onclick="loginWithGoogle()" class="py-2.5 bg-slate-950 hover:bg-slate-900 border border-slate-800 rounded-2xl flex items-center justify-center gap-1.5 transition text-[11px] font-bold text-slate-300 active:scale-95">
-                        <svg class="w-4 h-4" viewBox="0 0 24 24"><path fill="currentColor" d="M12.24 10.285V13.4h6.887c-.275 1.565-1.88 4.604-6.887 4.604-4.33 0-7.859-3.578-7.859-8s3.53-8 7.859-8c2.46 0 4.105 1.025 5.047 1.926l2.427-2.334C18.155 1.114 15.45 0 12.24 0 5.58 0 0 5.37 0 12s5.58 12 12.24 12c6.96 0 11.57-4.894 11.57-11.79 0-.795-.085-1.4-.195-1.925H12.24z"/></svg>
-                        <span>Google</span>
-                    </button>
-                    <button onclick="loginWithApple()" class="py-2.5 bg-slate-950 hover:bg-slate-900 border border-slate-800 rounded-2xl flex items-center justify-center gap-1.5 transition text-[11px] font-bold text-slate-300 active:scale-95">
-                        <svg class="w-4 h-4" viewBox="0 0 24 24"><path fill="currentColor" d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-.1.01-.1.01-.1 0-1.52 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.07 2.47.3 3.64 2.05-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42.95-1.38 2.81M15.97 4.17c.66-.81 1.11-1.93.99-3.06-1 .05-2.22.67-2.94 1.51-.62.71-1.16 1.85-1.01 2.96 1.1.08 2.27-.58 2.96-1.41z"/></svg>
-                        <span>Apple</span>
-                    </button>
-                </div>
+            <!-- دوگمەیا تەنیا یا گووگڵ (Gmail Login) -->
+            <div class="space-y-4">
+                <button onclick="loginWithGoogle()" class="w-full py-4 bg-white hover:bg-slate-100 text-slate-900 rounded-2xl flex items-center justify-center gap-3 transition text-xs font-black active:scale-95 shadow-lg border border-slate-200">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v3.92h6.69c-.29 1.5-1.14 2.77-2.4 3.61v3h3.84c2.24-2.07 3.61-5.11 3.61-8.46z"/>
+                        <path fill="#34A853" d="M12 24c3.24 0 5.97-1.08 7.96-2.91l-3.84-3c-1.08.72-2.45 1.16-4.12 1.16-3.17 0-5.85-2.15-6.81-5.05H1.18v3.11C3.15 21.24 7.27 24 12 24z"/>
+                        <path fill="#FBBC05" d="M5.19 14.2c-.25-.72-.39-1.5-.39-2.3s.14-1.58.39-2.3V6.49H1.18C.43 8-.02 9.7-.02 11.5s.45 3.5 1.2 5.01l4.01-3.31z"/>
+                        <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.27 0 3.15 2.76 1.18 6.49l4.01 3.31c.96-2.9 3.64-5.05 6.81-5.05z"/>
+                    </svg>
+                    <span>تۆماربوون ب ڕێکا Gmail (Google)</span>
+                </button>
             </div>
         </div>
     </div>
@@ -604,7 +580,7 @@
                     <h3 class="font-bold text-slate-100 text-sm">زانیاریێن هەژمارا تە</h3>
                 </div>
                 <div class="space-y-2 text-xs text-slate-300">
-                    <p>🏢 مەکتەب: <strong id="settings-office-name" class="text-emerald-400">---</strong></p>
+                    <p>🏢 هەژمار: <strong id="settings-office-name" class="text-emerald-400">---</strong></p>
                     <p>🔐 داتایێن تە تەواو د پاراستینە د ناڤ سێرڤەرێ فایەربەیس دا.</p>
                 </div>
 
@@ -656,7 +632,7 @@
                 <button onclick="closeMasterAdminPanelModal()" class="text-slate-400 hover:text-white text-lg">✕</button>
             </div>
 
-            <!-- 💾 پشکا نوی یا پشتگەڕیا داتایان (Backup & Restore Section) -->
+            <!-- 💾 پشکا نوی یا پشتگەڕیا داتایان (Database Backup) -->
             <div class="bg-slate-950 p-3.5 rounded-2xl border border-indigo-900/50 space-y-2.5 mt-2">
                 <h4 class="text-xs font-bold text-indigo-400 flex items-center gap-1.5">
                     💾 پاراستن و زڤڕاندنا کۆپیێ داتایان (Database Backup)
@@ -735,7 +711,7 @@
 
     <script>
         // ----------------------------------------------------
-        // 🔥 فایەربەیس کۆنفیگ (Firebase Configuration)
+        // 🔥 فایەربەیس کۆنفیگێ نوو یێ تایبەت (New Firebase Config)
         // ----------------------------------------------------
         const firebaseConfig = {
             apiKey: "AIzaSyC9AylsMOVtAWUJBK8zHIiHYq7fiCXCu9g",
@@ -743,8 +719,8 @@
             projectId: "aqarattt",
             storageBucket: "aqarattt.firebasestorage.app",
             messagingSenderId: "874140481088",
-            appId: "1:874140481088:web:5dffa7b8e21a5ad303d1a5",
-            measurementId: "G-DYD5T4XYGL"
+            appId: "1:874140481088:web:100ca1cc77dec70003d1a5",
+            measurementId: "G-H4VQH49FYH"
         };
 
         firebase.initializeApp(firebaseConfig);
@@ -932,30 +908,10 @@
             document.getElementById('master-admin-panel-modal').classList.add('hidden');
         }
 
-        function addNewOfficeAccountFromDevPanel() {
-            const nameInput = document.getElementById('new-dev-acc-name').value.trim();
-            const pinInput = document.getElementById('new-dev-acc-pin').value.trim();
-
-            if (!nameInput || !pinInput) {
-                alert('تکایە ناڤێ مەکتەبێ و پاسوۆردێ وێ بنڤیسە!');
-                return;
-            }
-
-            OFFICE_ACCOUNTS.push({ name: nameInput, pin: pinInput });
-            localStorage.setItem('office_accounts_v2', JSON.stringify(OFFICE_ACCOUNTS));
-            populateOfficeOptions();
-            openMasterAdminPanelModal();
-
-            document.getElementById('new-dev-acc-name').value = '';
-            document.getElementById('new-dev-acc-pin').value = '';
-            alert('مەکتەبا نوو ب سەرکەفتیانە زێدە بوو!');
-        }
-
         function deleteOfficeAccountFromDevPanel(idx) {
             if (confirm('تۆ پشت راستی د ژێبرنا ڤێ مەکتەبێ دا؟')) {
                 OFFICE_ACCOUNTS.splice(idx, 1);
                 localStorage.setItem('office_accounts_v2', JSON.stringify(OFFICE_ACCOUNTS));
-                populateOfficeOptions();
                 openMasterAdminPanelModal();
             }
         }
@@ -971,13 +927,8 @@
             });
 
             localStorage.setItem('office_accounts_v2', JSON.stringify(OFFICE_ACCOUNTS));
-            populateOfficeOptions();
             alert('هەمی ناڤ و پاسوۆردێن نوو ب سەرکەفتیانە پاشکەفت بوون!');
             closeMasterAdminPanelModal();
-        }
-
-        function populateOfficeOptions() {
-            // Unused but preserved for structure stability
         }
 
         function showLoginOverlay() {
@@ -988,61 +939,12 @@
             document.getElementById('login-overlay').classList.add('hidden');
         }
 
-        // چوونە ژوور ب ئیمەیڵ و پاسوۆرد
-        function loginWithEmail() {
-            const email = document.getElementById('login-email-input').value.trim();
-            const pass = document.getElementById('login-pin-input').value.trim();
-
-            if (!email || !pass) {
-                alert("تکایە ئیمەیڵ و پاسوۆردی خۆ بنڤیسە!");
-                return;
-            }
-
-            firebase.auth().signInWithEmailAndPassword(email, pass)
-                .catch(error => {
-                    alert("شاشی د چوونەژوورێ دا: " + error.message);
-                });
-        }
-
-        // تۆمارکرنا هەژمارەکا نوو ب ئیمەیڵ و پاسوۆردێ شەخسی
-        function signUpWithEmail() {
-            const email = document.getElementById('login-email-input').value.trim();
-            const pass = document.getElementById('login-pin-input').value.trim();
-
-            if (!email || !pass) {
-                alert("تکایە ئیمەیڵ و پاسوۆردی بۆ دروستکرنێ بنڤیسە!");
-                return;
-            }
-
-            if (pass.length < 6) {
-                alert("پێدڤییە پاسوۆرد ل کێمترین ئاست دا ٦ پیت یان ژمارە بیت!");
-                return;
-            }
-
-            firebase.auth().createUserWithEmailAndPassword(email, pass)
-                .then(() => {
-                    alert("هەژمارا تە ب سەرکەفتیانە دروست بوو!");
-                })
-                .catch(error => {
-                    alert("شاشی د دروستکرنا هەژمارێ دا: " + error.message);
-                });
-        }
-
-        // چوونەژوور ب ڕێکا گووگڵ
+        // چوونەژوور ب ڕێکا گووگڵ (جیمێڵ)
         function loginWithGoogle() {
             const provider = new firebase.auth.GoogleAuthProvider();
             firebase.auth().signInWithPopup(provider)
                 .catch(error => {
                     alert("شاشی د چوونەژوورێ دا ب گووگڵ: " + error.message);
-                });
-        }
-
-        // چوونەژوور ب ڕێکا ئەپڵ
-        function loginWithApple() {
-            const provider = new firebase.auth.OAuthProvider('apple.com');
-            firebase.auth().signInWithPopup(provider)
-                .catch(error => {
-                    alert("شاشی د چوونەژوورێ دا ب ئەپڵ: " + error.message);
                 });
         }
 
@@ -1692,7 +1594,6 @@
                         batch.commit().then(() => {
                             alert(`ب سەرکەفتیانە (${count}) مڵک د فایەربەیسێ دا هاتنە زڤڕاندن و خەزنکرن.`);
                             fetchFromFirebase(); 
-                            closeMasterAdminPanelModal();
                         }).catch(err => {
                             alert("خەلەتەک ڕوویدا د نڤیسینا سەر سێرڤەری دا: " + err.message);
                         });
