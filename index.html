@@ -1,2011 +1,957 @@
- <!DOCTYPE html>
-<html lang="ku" dir="rtl" class="dark">
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aqarat 24</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-        }
-    </script>
-    <!-- Leaflet Map CSS & JS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <!-- Kurdish Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;700&display=swap" rel="stylesheet">
+    <title>سیستەمێ گرێبەستان - 24 House Real Estate</title>
+    
+    <!-- فۆنتێن کوردی یێن فەرمی -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;600;700;900&family=Vazirmatn:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- کتێبخانەیا داگرتنا PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
     <style>
+        :root {
+            --primary: #0f172a;
+            --primary-light: #1e293b;
+            --accent: #c59b27;
+            --accent-hover: #a37f1b;
+            --accent-light: #fef9ed;
+            --border: #cbd5e1;
+            --bg-app: #090d16;
+            --card-bg: #131d31;
+            --text-light: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Vazirmatn', 'Noto Kufi Arabic', Tahoma, sans-serif;
+            letter-spacing: normal !important;
+            word-spacing: normal !important;
+            -webkit-font-smoothing: antialiased;
+        }
+
         body {
-            font-family: 'Vazirmatn', sans-serif;
-            transition: background-color 0.3s, color 0.3s;
+            background-color: var(--bg-app);
+            color: var(--text-light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            direction: rtl;
         }
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
+
+        /* سەرپەرێ سەرەکی یێ بەرنامەی (App Navbar) */
+        .app-navbar {
+            background: rgba(19, 29, 49, 0.95);
+            border-bottom: 1px solid rgba(197, 155, 39, 0.3);
+            padding: 12px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
         }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
+
+        .brand-wrap {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-logo {
+            background: linear-gradient(135deg, var(--accent), #eab308);
+            color: #0f172a;
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 18px;
+            box-shadow: 0 4px 12px rgba(197, 155, 39, 0.3);
+        }
+
+        .brand-text h1 {
+            font-size: 16px;
+            font-weight: 900;
+            color: #fff;
+        }
+
+        .brand-text span {
+            font-size: 11px;
+            color: var(--accent);
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            border: none;
+            padding: 9px 18px;
+            font-size: 13px;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-pdf {
+            background: #e11d48;
+            color: #fff;
+        }
+        .btn-pdf:hover { background: #be123c; transform: translateY(-1px); }
+
+        .btn-print {
+            background: var(--accent);
+            color: #0f172a;
+        }
+        .btn-print:hover { background: #d8aa2e; transform: translateY(-1px); }
+
+        .btn-demo {
+            background: #334155;
+            color: #fff;
+        }
+        .btn-demo:hover { background: #475569; }
+
+        .btn-reset {
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid #334155;
+        }
+        .btn-reset:hover { background: #1e293b; color: #fff; }
+
+        /* بەشێ ناڤین (Main Grid: Form + Live Preview) */
+        .app-main {
+            display: grid;
+            grid-template-columns: 460px 1fr;
+            gap: 25px;
+            padding: 20px 25px;
+            flex: 1;
+            max-width: 1750px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* بەشێ داخڵکرنا زانیاریان (Form Panel) */
+        .form-panel {
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 20px;
+            height: calc(100vh - 105px);
+            overflow-y: auto;
+        }
+
+        .form-panel::-webkit-scrollbar {
+            width: 6px;
+        }
+        .form-panel::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+
+        .form-section-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--accent);
+            margin: 16px 0 10px 0;
+            padding-bottom: 4px;
+            border-bottom: 1px solid rgba(197, 155, 39, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .form-section-title:first-child {
+            margin-top: 0;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-bottom: 8px;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        .form-group label {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .form-control {
+            background: #0b1120;
+            border: 1px solid #28354f;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--accent);
+        }
+
+        /* بەشێ پێشاندانا ڕاستەوخۆ (Preview Panel) */
+        .preview-panel {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            overflow-y: auto;
+            height: calc(100vh - 105px);
+            padding-bottom: 20px;
+        }
+
+        /* ==================== ستایلێ لاپەرێ عەقدی (A4) ==================== */
+        .a4-page {
+            width: 210mm;
+            min-height: 297mm;
+            height: 297mm;
+            background: #ffffff;
+            color: #0f172a;
+            padding: 8mm 12mm 6mm 12mm;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            border-radius: 2px;
+            position: relative;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .contract-header {
+            display: grid;
+            grid-template-columns: 1fr 1.4fr 1fr;
+            align-items: center;
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 4px;
+        }
+
+        .c-contact {
+            font-size: 10.5px;
+            font-weight: 700;
+            line-height: 1.4;
+            color: #0f172a;
+        }
+        .c-contact span { color: #b48516; }
+
+        .c-logo-box {
+            text-align: center;
+        }
+        .c-badge {
+            background: #0f172a;
+            color: #fff;
+            font-size: 8.5px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            display: inline-block;
+            border: 1px solid var(--accent);
+        }
+        .c-title {
+            font-family: 'Noto Kufi Arabic', sans-serif;
+            font-size: 16px;
+            font-weight: 900;
+            color: #0f172a;
+            line-height: 1.2;
+            margin-top: 2px;
+        }
+        .c-subtitle {
+            font-size: 10.5px;
+            color: #b48516;
+            font-weight: 700;
+        }
+
+        .c-meta {
+            text-align: left;
+            font-size: 10.5px;
+            font-weight: 700;
+        }
+
+        .c-title-strip {
+            text-align: center;
+            margin: 4px 0;
+        }
+        .c-main-title {
+            display: inline-block;
+            background: #0f172a;
+            color: #fff;
+            padding: 2px 25px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 800;
+            border: 1.5px solid var(--accent);
+        }
+
+        /* Parties */
+        .c-parties {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+        .c-party-box {
+            border: 1px solid var(--border);
+            border-right: 3.5px solid var(--accent);
+            border-radius: 4px;
+            padding: 4px 8px;
+            background: #fafafa;
+        }
+        .c-party-h {
+            font-size: 10.5px;
+            font-weight: 800;
+            color: #0f172a;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2px;
+        }
+        .c-party-row {
+            display: flex;
+            align-items: center;
+            font-size: 10px;
+            gap: 4px;
+            margin-top: 1px;
+        }
+
+        .dyn-text {
+            color: #004499;
+            font-weight: 700;
+            border-bottom: 1px dashed #64748b;
+            padding: 0 4px;
+            min-height: 15px;
+            display: inline-block;
+        }
+
+        /* Tables */
+        .c-table-wrap {
+            margin-bottom: 4px;
+        }
+        .c-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 9.5px;
+            text-align: center;
+            margin-bottom: 3px;
+        }
+        .c-table th {
+            background: #0f172a;
+            color: #fff;
+            padding: 2.5px 2px;
+            border: 1px solid #334155;
+            font-weight: 700;
+        }
+        .c-table td {
+            border: 1px solid var(--border);
+            padding: 2px;
+            height: 17px;
+            background: #fff;
+            font-weight: 700;
+            color: #004499;
+        }
+
+        /* Clauses */
+        .c-clauses {
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            padding: 5px 7px;
+            font-size: 9.2px;
+            line-height: 1.4;
+            color: #1e293b;
+            background: #fff;
+        }
+        .c-clause-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 4px;
+            margin-bottom: 2.5px;
+            text-align: justify;
+        }
+        .c-cnum {
+            background: var(--accent-light);
+            color: #8c6a11;
+            border: 1px solid #ebd492;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8.5px;
+            font-weight: 800;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+        .c-ctext { flex: 1; }
+
+        /* Notes & Lawyer */
+        .c-note {
+            background: #fffbeb;
+            border: 1px dashed #d97706;
+            border-radius: 4px;
+            padding: 3px 6px;
+            font-size: 9.2px;
+            color: #92400e;
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 3px;
+        }
+
+        /* Signatures */
+        .c-sigs {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 5px;
+            margin-top: 4px;
+        }
+        .c-sig-box {
+            border: 1px solid var(--border);
+            background: #f8fafc;
+            border-radius: 4px;
+            padding: 3px;
+            text-align: center;
+            height: 46px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .c-sig-title {
+            font-size: 9.5px;
+            font-weight: 700;
+            color: #0f172a;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 1px;
+        }
+        .c-sig-sub {
+            font-size: 8px;
+            color: #94a3b8;
+        }
+
+        /* ==================== PRINT SETUP ==================== */
+        @media print {
+            body {
+                background: none;
+                padding: 0;
+                margin: 0;
+            }
+            .app-navbar, .form-panel {
+                display: none !important;
+            }
+            .app-main {
+                display: block;
+                padding: 0;
+                margin: 0;
+                max-width: none;
+            }
+            .preview-panel {
+                height: auto;
+                overflow: visible;
+                padding: 0;
+                margin: 0;
+            }
+            .a4-page {
+                box-shadow: none;
+                padding: 8mm 10mm;
+                width: 210mm;
+                height: 297mm;
+                page-break-inside: avoid;
+                page-break-after: avoid;
+            }
+            @page {
+                size: A4 portrait;
+                margin: 0;
+            }
         }
     </style>
 </head>
-<body class="bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col overflow-x-hidden transition-all duration-300">
+<body>
 
-    <!-- INSTAGRAM STYLE PULL REFRESH INDICATOR -->
-    <div id="pull-refresh-indicator" class="w-full flex items-center justify-center h-0 overflow-hidden transition-all duration-200 bg-slate-100 dark:bg-slate-900/60 shrink-0">
-        <div class="flex items-center gap-2 py-2">
-            <svg class="animate-spin h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            <span class="text-xs text-slate-500 font-bold" data-i18n="lbl_refreshing">نووکرن...</span>
-        </div>
-    </div>
-
-    <!-- TOP NAV BAR -->
-    <header class="sticky top-0 z-40 bg-white/85 dark:bg-slate-950/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-sm transition">
-        <div class="max-w-7xl mx-auto px-4 h-16 flex justify-between items-center">
-            <span class="text-xl font-bold bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent select-none">
-                Aqarat 24
-            </span>
-
-            <div class="flex items-center gap-3">
-                <button onclick="toggleDarkMode()" class="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                    </svg>
-                </button>
-
-                <!-- Profile Auth Badge -->
-                <div id="user-badge" class="flex items-center gap-2">
-                    <button onclick="openAuthModal()" data-i18n="auth_btn" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition shadow">
-                        چوونەژوور / پڕۆفایل
-                    </button>
-                </div>
+    <!-- سەرپەرێ بەرنامەی (Navbar) -->
+    <header class="app-navbar">
+        <div class="brand-wrap">
+            <div class="brand-logo">24</div>
+            <div class="brand-text">
+                <h1>سیستەمێ ئەلیکترۆنی یێ عەقاراتا ٢٤ هاوس</h1>
+                <span>دروستکرن و رێکخستنا گرێبەستان ب شێوەیێ زیندی</span>
             </div>
+        </div>
+
+        <div class="nav-actions">
+            <button class="btn btn-demo" onclick="fillDemoData()">⚡ تژی کرنا نموونەیی</button>
+            <button class="btn btn-reset" onclick="resetForm()">🔄 ڤاڵاکرن</button>
+            <button class="btn btn-pdf" onclick="exportPDF()">📥 داگرتن وەک PDF</button>
+            <button class="btn btn-print" onclick="window.print()">🖨️ چاپکرن (Print)</button>
         </div>
     </header>
 
-    <!-- CONTENT VIEW AREA -->
-    <main class="flex-1 w-full pb-20">
-
-        <!-- SCREEN 1: HOME -->
-        <div id="screen-home" class="screen-tab p-4 max-w-7xl mx-auto space-y-4">
+    <!-- بەشێ ناڤین (Dashboard Main) -->
+    <main class="app-main">
+        
+        <!-- ١. پەنێلێ پسیاران و داخڵکرنێ (Form) -->
+        <div class="form-panel">
             
-            <!-- THIN & COMPACT FILTER TOGGLER -->
-            <div class="space-y-2">
-                <div class="bg-slate-50 dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex justify-between items-center transition-all duration-300">
-                    <span class="text-xs font-bold text-slate-700 dark:text-slate-300" data-i18n="lbl_filter_title">گالەرییا موڵکان فلتەر بکە</span>
-                    <button onclick="toggleFilterCollapse()" class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs flex items-center gap-1 transition">
-                        <span>🔍</span> <span data-i18n="btn_filter_toggle">فلتەر</span>
-                    </button>
-                </div>
+            <div class="form-section-title">📅 ١. مێژوو و رێکەفت</div>
+            <div class="form-group">
+                <label>مێژوویا ئیمزاکرنا گرێبەستێ:</label>
+                <input type="text" id="in_date" class="form-control" placeholder="بۆ نموونە: 15 / 09 / 2024" oninput="updateContract()">
+            </div>
 
-                <!-- COLLAPSED FILTERS container -->
-                <div id="filter-collapse-box" class="hidden bg-slate-50 dark:bg-slate-900 p-4 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-md space-y-3 transition-all duration-300">
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
-                        <div>
-                            <label class="text-[9px] text-slate-500 dark:text-slate-400 block mb-1" data-i18n="lbl_type">جۆرێ مۆڵکی</label>
-                            <select id="filter-type" onchange="applyFilters()" class="w-full p-2 text-[11px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl">
-                                <option value="all" data-i18n="opt_all">هەمی</option>
-                                <option value="ڤێلا" data-i18n="type_villa">ڤێلا</option>
-                                <option value="shqe" data-i18n="type_apt">شوقە</option>
-                                <option value="خانی" data-i18n="type_house">خانی</option>
-                                <option value="ئەرد" data-i18n="type_land">ئەرد</option>
-                                <option value="مەزرەعە" data-i18n="type_farm">مەزرەعە</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="text-[9px] text-slate-500 dark:text-slate-400 block mb-1" data-i18n="lbl_status">بۆچ مۆلکە؟</label>
-                            <select id="filter-status" onchange="applyFilters()" class="w-full p-2 text-[11px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl">
-                                <option value="all" data-i18n="opt_all">هەمی</option>
-                                <option value="sale" data-i18n="opt_status_sale">بۆ فرۆتن</option>
-                                <option value="rent" data-i18n="opt_status_rent">ب کرێ</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="text-[9px] text-slate-500 dark:text-slate-400 block mb-1" data-i18n="lbl_min_price">کەمترین بها ($)</label>
-                            <input id="filter-min-price" type="number" oninput="applyFilters()" placeholder="0" class="w-full p-2 text-[11px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl text-right">
-                        </div>
-                        <div>
-                            <label class="text-[9px] text-slate-500 dark:text-slate-400 block mb-1" data-i18n="lbl_max_price">زۆرترین بها ($)</label>
-                            <input id="filter-max-price" type="number" oninput="applyFilters()" placeholder="500000" class="w-full p-2 text-[11px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl text-right">
-                        </div>
-                    </div>
-                    <div class="flex gap-2">
-                        <div class="flex-1">
-                            <input id="filter-city" type="text" oninput="applyFilters()" placeholder="گەڕەکەک بنڤیسە... (مەسەلا: نەورۆز)" class="w-full p-2 text-xs border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl text-right">
-                        </div>
-                        <button onclick="clearFilters()" class="px-4 py-2 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition">
-                            پاككردنەوە
-                        </button>
-                    </div>
+            <div class="form-section-title">👤 ٢. زانیاریێن فرۆشیار و بکری</div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>ناڤێ فرۆشیاری (سیانی):</label>
+                    <input type="text" id="in_seller_name" class="form-control" placeholder="ناڤێ فرۆشیاری" oninput="updateContract()">
+                </div>
+                <div class="form-group">
+                    <label>تەلەفۆنا فرۆشیاری:</label>
+                    <input type="text" id="in_seller_phone" class="form-control" placeholder="0750 xxx xxxx" oninput="updateContract()">
+                </div>
+                <div class="form-group">
+                    <label>ناڤێ بکری / کڕیاری (سیانی):</label>
+                    <input type="text" id="in_buyer_name" class="form-control" placeholder="ناڤێ کڕیاری" oninput="updateContract()">
+                </div>
+                <div class="form-group">
+                    <label>تەلەفۆنا بکری:</label>
+                    <input type="text" id="in_buyer_phone" class="form-control" placeholder="0750 xxx xxxx" oninput="updateContract()">
                 </div>
             </div>
 
-            <!-- Featured Showcase Slider -->
-            <div class="space-y-3">
-                <h2 class="text-xs font-bold text-slate-500 uppercase tracking-wider" id="txt-slider-title" data-i18n="slider_title">مەزرەعە و ڤێلا</h2>
-                <div id="featured-slider" class="flex gap-3 overflow-x-auto pb-2 no-scrollbar snap-x w-full">
-                    <!-- Dynamic Featured slider items -->
+            <div class="form-section-title">📐 ٣. رووبەر و هوورکاریێن ئاڤاهی</div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>دۆنەم:</label>
+                    <input type="text" id="in_donam" class="form-control" placeholder="-" oninput="updateContract()">
+                </div>
+                <div class="form-group">
+                    <label>ئولک:</label>
+                    <input type="text" id="in_ulk" class="form-control" placeholder="-" oninput="updateContract()">
+                </div>
+                <div class="form-group">
+                    <label>مەتر:</label>
+                    <input type="text" id="in_meter" class="form-control" placeholder="200" oninput="updateContract()">
+                </div>
+                <div class="form-group">
+                    <label>دیسیمەتر:</label>
+                    <input type="text" id="in_dm" class="form-control" placeholder="-" oninput="updateContract()">
+                </div>
+                <div class="form-group">
+                    <label>عیمارە:</label>
+                    <input type="text" id="in_building" class="form-control" placeholder="-" oninput="updateContract()">
+                </div>
+                <div class="form-group">
+                    <label>قات (طابق):</label>
+                    <input type="text" id="in_floor" class="form-control" placeholder="-" oninput="updateContract()">
+                </div>
+                <div class="form-group">
+                    <label>ژمارا شققێ:</label>
+                    <input type="text" id="in_apt_no" class="form-control" placeholder="-" oninput="updateContract()">
+                </div>
+                <div class="form-group">
+                    <label>پڕۆژە:</label>
+                    <input type="text" id="in_project" class="form-control" placeholder="بۆ نموونە: ئاڤرۆ ستی" oninput="updateContract()">
                 </div>
             </div>
 
-            <!-- New Properties List -->
-            <div class="space-y-3">
-                <h2 class="text-xs font-bold text-slate-500 uppercase tracking-wider" id="txt-new-prop-title" data-i18n="new_prop_title">مۆلکێن نوو</h2>
-                <div id="properties-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                    <!-- Square Cards will render here -->
+            <div class="form-section-title">📑 ٤. هوورکاریێن تاپۆیی</div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>جۆرێ ئاڤاهی:</label>
+                    <input type="text" id="in_prop_type" class="form-control" placeholder="خانی / ڤێلا / شققە" oninput="updateContract()">
                 </div>
-                <!-- Load More container -->
-                <div id="load-more-container" class="w-full flex justify-center pt-4 hidden">
-                    <button onclick="loadMoreProperties()" class="px-6 py-2.5 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-2xl text-xs transition" data-i18n="btn_load_more">
-                        مۆری / زێدەتر نیشان بدە
-                    </button>
+                <div class="form-group">
+                    <label>ژمارا خانی:</label>
+                    <input type="text" id="in_house_no" class="form-control" placeholder="12" oninput="updateContract()">
+                </div>
+                <div class="form-group">
+                    <label>زنجیرە:</label>
+                    <input type="text" id="in_chain_no" class="form-control" placeholder="-" oninput="updateContract()">
+                </div>
+                <div class="form-group">
+                    <label>تاخ (گەڕەک):</label>
+                    <input type="text" id="in_neighbor" class="form-control" placeholder="ماسیکێ" oninput="updateContract()">
+                </div>
+                <div class="form-group">
+                    <label>ژمارا پارچێ:</label>
+                    <input type="text" id="in_plot_no" class="form-control" placeholder="145/2" oninput="updateContract()">
+                </div>
+                <div class="form-group">
+                    <label>ژمارا کەرتی:</label>
+                    <input type="text" id="in_sector_no" class="form-control" placeholder="32" oninput="updateContract()">
+                </div>
+                <div class="form-group full-width">
+                    <label>ناڤێ کەرتی:</label>
+                    <input type="text" id="in_sector_name" class="form-control" placeholder="دۆمیز" oninput="updateContract()">
                 </div>
             </div>
+
+            <div class="form-section-title">💰 ٥. بها و مەرجێن دراڤی</div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>بهایێ فرۆتنێ (ب ژمارە):</label>
+                    <input type="text" id="in_price_num" class="form-control" placeholder="85,000 $" oninput="updateContract()">
+                </div>
+                <div class="form-group">
+                    <label>بهایێ فرۆتنێ (ب نڤیسین):</label>
+                    <input type="text" id="in_price_words" class="form-control" placeholder="هەشتێ و پێنج هزار دۆلار" oninput="updateContract()">
+                </div>
+                <div class="form-group">
+                    <label>بڕێ دەسبەعی (عەربوون):</label>
+                    <input type="text" id="in_earnest_money" class="form-control" placeholder="5,000 $" oninput="updateContract()">
+                </div>
+                <div class="form-group">
+                    <label>قەرەبوویا لێڤەبوونا فرۆشیاری:</label>
+                    <input type="text" id="in_seller_penalty" class="form-control" placeholder="5,000 $" oninput="updateContract()">
+                </div>
+                <div class="form-group">
+                    <label>قەرەبوویا لێڤەبوونا بکری:</label>
+                    <input type="text" id="in_buyer_penalty" class="form-control" placeholder="5,000 $" oninput="updateContract()">
+                </div>
+                <div class="form-group">
+                    <label>خەرجیێن دی ل سەر کێ نە:</label>
+                    <input type="text" id="in_expenses_on" class="form-control" placeholder="فرۆشیاری / هەڤپشک" oninput="updateContract()">
+                </div>
+                <div class="form-group">
+                    <label>رێژا دەلالیێ (%):</label>
+                    <input type="text" id="in_broker_fee" class="form-control" placeholder="2" oninput="updateContract()">
+                </div>
+                <div class="form-group">
+                    <label>سزایێ هەیڤانە یێ گیرۆبوونێ:</label>
+                    <input type="text" id="in_delay_fine" class="form-control" placeholder="500 $" oninput="updateContract()">
+                </div>
+                <div class="form-group full-width">
+                    <label>ژڤانێ رادەستکرن و ڤالاکرنێ:</label>
+                    <input type="text" id="in_handover_date" class="form-control" placeholder="01 / 11 / 2024" oninput="updateContract()">
+                </div>
+            </div>
+
+            <div class="form-section-title">⚖️ ٦. پارێزەر و دیدەڤان</div>
+            <div class="form-grid">
+                <div class="form-group full-width">
+                    <label>ناڤ و ژمارا پارێزەری:</label>
+                    <input type="text" id="in_lawyer" class="form-control" placeholder="طالب موسى حامد (0750 459 8521)" oninput="updateContract()">
+                </div>
+                <div class="form-group">
+                    <label>دیدەڤانێ ئێکێ:</label>
+                    <input type="text" id="in_witness1" class="form-control" placeholder="ناڤێ دیدەڤانی" oninput="updateContract()">
+                </div>
+                <div class="form-group">
+                    <label>دیدەڤانێ دووێ:</label>
+                    <input type="text" id="in_witness2" class="form-control" placeholder="ناڤێ دیدەڤانی" oninput="updateContract()">
+                </div>
+            </div>
+
         </div>
 
-        <!-- SCREEN 2: APARTMENTS (Reels layout 9:16) -->
-        <div id="screen-apartment" class="screen-tab p-4 max-w-7xl mx-auto space-y-4 hidden">
-            <h2 class="text-xs font-bold text-slate-500 uppercase tracking-wider" id="txt-apt-title" data-i18n="apt_title">شوقە (شقه)</h2>
-            <div id="apartments-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                <!-- Reels layout with 9:16 aspect ratio -->
-            </div>
-        </div>
-
-        <!-- SCREEN 3: MAP -->
-        <div id="screen-map" class="screen-tab h-[calc(100vh-8.5rem)] w-full flex flex-col hidden relative">
-            <div id="map-container" class="flex-1 w-full"></div>
+        <!-- ٢. پێشاندانا زیندی یا لاپەرێ عەقدی (Live A4 Preview) -->
+        <div class="preview-panel">
             
-            <!-- MODERN COMPASS TARGET FLOATING ACTION BUTTON -->
-            <button onclick="locateOnMap(map, null)" class="absolute bottom-24 right-4 z-[1000] w-12 h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 hover:scale-110" title="Find My Location">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <circle cx="12" cy="12" r="3" fill="currentColor"></circle>
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 2v2m0 16v2m10-10h-2M4 12H2"></path>
-                </svg>
-            </button>
-
-            <div class="bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 px-4 py-3 flex flex-wrap gap-4 justify-center items-center text-[10px] select-none shrink-0 font-bold">
-                <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-[#EF4444]"></span> <span data-i18n="type_villa">ڤێلا</span></span>
-                <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-[#3B82F6]"></span> <span data-i18n="type_apt">شوقە</span></span>
-                <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-[#10B981]"></span> <span data-i18n="type_house">خانی</span></span>
-                <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-[#F59E0B]"></span> <span data-i18n="type_land">ئەرد</span></span>
-                <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-[#8B5CF6]"></span> <span data-i18n="type_farm">مەزرەعە</span></span>
-                <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-[#374151]"></span> <span data-i18n="status_sold">هاتە فرۆتن</span></span>
-            </div>
-
-            <div class="absolute top-4 left-4 z-[1000] bg-white/95 dark:bg-slate-950/95 border border-slate-200 dark:border-slate-800 p-1 rounded-xl shadow-lg flex gap-1">
-                <button onclick="changeMapStyle('standard', this)" class="px-2.5 py-1 text-[11px] font-bold rounded-lg bg-blue-900 text-blue-300" data-i18n="map_std">ڕوون / سافی</button>
-                <button onclick="changeMapStyle('satellite', this)" class="px-2.5 py-1 text-[11px] font-bold rounded-lg text-slate-500 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800" data-i18n="map_sat">سەتەلایت</button>
-                <button onclick="changeMapStyle('dark', this)" class="px-2.5 py-1 text-[11px] font-bold rounded-lg text-slate-500 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800" data-i18n="map_drk">تاری</button>
-            </div>
-        </div>
-
-        <!-- SCREEN 4: ADD PROPERTY -->
-        <div id="screen-add" class="screen-tab p-4 max-w-3xl mx-auto space-y-4 hidden">
-            <h2 class="text-sm font-bold text-slate-400 uppercase tracking-wider" id="txt-add-title" data-i18n="add_title">زێدەکرنا مۆلکی</h2>
-            
-            <div class="bg-slate-50 dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+            <div class="a4-page" id="contract-view">
                 
-                <div class="bg-amber-950/40 border border-amber-900/60 p-3 rounded-xl text-[10px] text-amber-300 font-bold leading-relaxed">
-                    ⚠️ ئاگاداری: مۆلکێ تە ب سەرکەفتی دهێتە ناردن لێ ڕاستەوخۆ ناچیتە بازارێ، بەڵکو دێ بیتە چاوەڕێ هەتا پەسەندکرنا ئەدمینی.
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <div>
-                        <label class="text-[10px] text-slate-500 dark:text-slate-400 block mb-1"><span data-i18n="lbl_price">بها ($)</span> <span class="text-slate-400">(ئارەزوومەندانە)</span></label>
-                        <input id="input-price" type="number" placeholder="50000" class="w-full p-2.5 text-xs border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl text-right">
+                <!-- Header -->
+                <div class="contract-header">
+                    <div class="c-contact">
+                        <div>حازم: <span>0750 454 2800</span></div>
+                        <div>شکری: <span>0750 417 6611</span></div>
                     </div>
-                    <div>
-                        <label class="text-[10px] text-slate-500 dark:text-slate-400 block mb-1"><span data-i18n="lbl_code">کۆدێ مۆلکی</span> <span class="text-slate-400">(ئارەزوومەندانە)</span></label>
-                        <input id="input-code" type="text" placeholder="AQ-109" class="w-full p-2.5 text-xs border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl text-right">
+                    <div class="c-logo-box">
+                        <span class="c-badge">REAL ESTATE • عەقارات</span>
+                        <h1 class="c-title">نڤیسینگەها ٢٤ هاوس</h1>
+                        <div class="c-subtitle">24 HOUSE REAL ESTATE</div>
                     </div>
-                    <div>
-                        <label class="text-[10px] text-slate-500 dark:text-slate-400 block mb-1" data-i18n="lbl_payment">شێوازێ پارەدانێ</label>
-                        <select id="input-payment" class="w-full p-2.5 text-xs border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl text-right">
-                            <option value="کاش" data-i18n="opt_cash">کاش (نەختینە)</option>
-                            <option value="قست" data-i18n="opt_install">ب قست</option>
-                        </select>
+                    <div class="c-meta">
+                        <div>مێژوو: <span id="out_date" class="dyn-text" style="min-width: 70px;">...</span></div>
+                        <div style="font-size: 9px; color: #b48516; margin-top:2px;">📍 دهۆک - بازاڕێ ئەرد و خانیان</div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <div>
-                        <label class="text-[10px] text-slate-500 dark:text-slate-400 block mb-1"><span data-i18n="lbl_location">ناڤونیشان (جهـ)</span> <span class="text-red-500 font-bold">* (ناچاری)</span></label>
-                        <input id="input-location" type="text" placeholder="دهۆك، نەورۆز" class="w-full p-2.5 text-xs border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl text-right">
+                <!-- Title -->
+                <div class="c-title-strip">
+                    <div class="c-main-title">گرێبەستا فرۆتنا مۆلکی (عەقد)</div>
+                </div>
+
+                <!-- Parties -->
+                <div class="c-parties">
+                    <div class="c-party-box">
+                        <div class="c-party-h">
+                            <span>لایەنێ ئێکێ (فرۆشیار)</span>
+                            <span style="font-size: 8.5px; color: #b48516;">SELLER</span>
+                        </div>
+                        <div class="c-party-row">
+                            <span>ناڤێ سیانی:</span>
+                            <span id="out_seller_name" class="dyn-text" style="flex:1;">...........................</span>
+                        </div>
+                        <div class="c-party-row">
+                            <span>ژمارا تەلەفۆنێ:</span>
+                            <span id="out_seller_phone" class="dyn-text" style="flex:1;">...........................</span>
+                        </div>
                     </div>
-                    <div>
-                        <label class="text-[10px] text-slate-500 dark:text-slate-400 block mb-1"><span data-i18n="lbl_city">گەڕەک / باژێڕ</span> <span class="text-slate-400">(ئارەزوومەندانە)</span></label>
-                        <input id="input-city" type="text" placeholder="باشوور" class="w-full p-2.5 text-xs border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl text-right">
-                    </div>
-                    <div>
-                        <label class="text-[10px] text-slate-500 dark:text-slate-400 block mb-1" data-i18n="lbl_deed">جۆرێ سندی (تاپۆ)</label>
-                        <select id="input-deed" class="w-full p-2.5 text-xs border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl text-right">
-                            <option value="تاپۆ مۆلک" data-i18n="opt_deed_own">تاپۆ مۆلک</option>
-                            <option value="سند کارت" data-i18n="opt_deed_card">کارت</option>
-                            <option value="زراعی" data-i18n="opt_deed_agr">زراعی</option>
-                            <option value="سالنامە" data-i18n="opt_deed_year">سالنامە</option>
-                        </select>
+                    <div class="c-party-box">
+                        <div class="c-party-h">
+                            <span>لایەنێ دووێ (بکر)</span>
+                            <span style="font-size: 8.5px; color: #b48516;">BUYER</span>
+                        </div>
+                        <div class="c-party-row">
+                            <span>ناڤێ سیانی:</span>
+                            <span id="out_buyer_name" class="dyn-text" style="flex:1;">...........................</span>
+                        </div>
+                        <div class="c-party-row">
+                            <span>ژمارا تەلەفۆنێ:</span>
+                            <span id="out_buyer_phone" class="dyn-text" style="flex:1;">...........................</span>
+                        </div>
                     </div>
                 </div>
 
-                <!-- 3 PHONE INPUT FIELDS -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 border-t border-b border-slate-200 dark:border-slate-800 py-3 my-2">
-                    <div>
-                        <label class="text-[10px] text-slate-500 dark:text-slate-400 block mb-1">
-                            <span data-i18n="lbl_phone">ژمارا تەلەفۆنێ ١</span> 
-                            <span class="text-red-500 font-bold">* (ناچاری)</span>
-                        </label>
-                        <input id="input-phone-1" type="text" placeholder="0750XXXXXXX" class="w-full p-2.5 text-xs border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl text-left">
+                <!-- Tables -->
+                <div class="c-table-wrap">
+                    <table class="c-table">
+                        <thead>
+                            <tr>
+                                <th colspan="4" style="background:#0f172a;">رووبەرێ مۆلکی (المساحة)</th>
+                                <th colspan="4" style="background:#1e293b;">هوورکاریێن ئاڤاهی / شققە</th>
+                            </tr>
+                            <tr style="background:#334155;">
+                                <th style="width: 12.5%;">دۆنەم</th>
+                                <th style="width: 12.5%;">ئولک</th>
+                                <th style="width: 12.5%;">مەتر</th>
+                                <th style="width: 12.5%;">دیسیمەتر</th>
+                                <th style="width: 12.5%;">عیمارە</th>
+                                <th style="width: 12.5%;">قات</th>
+                                <th style="width: 12.5%;">ژمارا شققێ</th>
+                                <th style="width: 12.5%;">پڕۆژە</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td id="out_donam">-</td>
+                                <td id="out_ulk">-</td>
+                                <td id="out_meter">-</td>
+                                <td id="out_dm">-</td>
+                                <td id="out_building">-</td>
+                                <td id="out_floor">-</td>
+                                <td id="out_apt_no">-</td>
+                                <td id="out_project">-</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <table class="c-table">
+                        <thead>
+                            <tr>
+                                <th>جۆرێ ئاڤاهی</th>
+                                <th>ژمارا خانی</th>
+                                <th>زنجیرە</th>
+                                <th>تاخ (گەڕەک)</th>
+                                <th>ژمارا پارچێ</th>
+                                <th>ژمارا کەرتی</th>
+                                <th>ناڤێ کەرتی</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td id="out_prop_type">-</td>
+                                <td id="out_house_no">-</td>
+                                <td id="out_chain_no">-</td>
+                                <td id="out_neighbor">-</td>
+                                <td id="out_plot_no">-</td>
+                                <td id="out_sector_no">-</td>
+                                <td id="out_sector_name">-</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Clauses -->
+                <div class="c-clauses">
+                    <div class="c-clause-item">
+                        <div class="c-cnum">١</div>
+                        <div class="c-ctext">فرۆشیار دووپات دکەت کو ئەڤ مۆلکێ ساخلەتێن وی ل سەرێ هاتی یێ فرۆتییە بکری ل دویف ڤان مەرجان.</div>
                     </div>
-                    <div>
-                        <label class="text-[10px] text-slate-500 dark:text-slate-400 block mb-1">
-                            <span>ژمارا تەلەفۆنێ ٢</span> 
-                            <span class="text-slate-400">(ئارەزوومەندانە)</span>
-                        </label>
-                        <input id="input-phone-2" type="text" placeholder="0750XXXXXXX" class="w-full p-2.5 text-xs border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl text-left">
+                    <div class="c-clause-item">
+                        <div class="c-cnum">٢</div>
+                        <div class="c-ctext">بهایێ فرۆتنێ پێکهاتییە ل سەر ب کۆژمێ (<span id="out_price_num" class="dyn-text">.........</span>) ب نڤیسین (<span id="out_price_words" class="dyn-text">....................................</span>) کو بڕێ (<span id="out_earnest_money" class="dyn-text">.........</span>) وەک دەسبەع ژ بکری هاتییە وەرگرتن، و پشتی تمامبوونا مامەلەتا تاپۆیی پارێ مای دێ هێتە دان.</div>
                     </div>
-                    <div>
-                        <label class="text-[10px] text-slate-500 dark:text-slate-400 block mb-1">
-                            <span>ژمارا تەلەفۆنێ ٣</span> 
-                            <span class="text-slate-400">(ئارەزوومەندانە)</span>
-                        </label>
-                        <input id="input-phone-3" type="text" placeholder="0750XXXXXXX" class="w-full p-2.5 text-xs border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl text-left">
+                    <div class="c-clause-item">
+                        <div class="c-cnum">٣</div>
+                        <div class="c-ctext">ئەگەر فرۆشیار ژ فرۆتنێ لێڤەبوو یان مامەلە برێڤە نەبر، پێدڤییە دەسبەعی بزڤڕینیت و کۆژمێ (<span id="out_seller_penalty" class="dyn-text">.........</span>) وەک قەرەبوو بدەتە بکری بێی هوشدارییا فەرمی.</div>
+                    </div>
+                    <div class="c-clause-item">
+                        <div class="c-cnum">٤</div>
+                        <div class="c-ctext">ئەگەر بکر ژ کڕینێ لێڤەبوو، مافێ دەسبەعی نینە و دێ سۆزێ دەت کۆژمێ (<span id="out_buyer_penalty" class="dyn-text">.........</span>) بدەتە فرۆشیاری.</div>
+                    </div>
+                    <div class="c-clause-item">
+                        <div class="c-cnum">٥</div>
+                        <div class="c-ctext">مەزاختیێن فرۆتنێ دێ ل سەر (<span id="out_expenses_on" class="dyn-text">.........</span>) بن. باجێن وەرگێڕان، جوداکرن، راستڤەکرن، خویکا مۆلکی و ئاڤ و کارەب دێ ل سەر فرۆشیاری بن، و حەقێ پارێزەری دێ هەڤپشک بیت.</div>
+                    </div>
+                    <div class="c-clause-item">
+                        <div class="c-cnum">٦</div>
+                        <div class="c-ctext">رسوماتێن خانووبەرە (مصاریف طابو و رسوم تحویل) دێ ل سەر لایەنێ <b>بکری</b> بن.</div>
+                    </div>
+                    <div class="c-clause-item">
+                        <div class="c-cnum">٧</div>
+                        <div class="c-ctext">هەردوو لا سۆزێ ددەن حەقێ دەلالیێ ب رێژا (<span id="out_broker_fee" class="dyn-text">...</span> %) بدەنە نڤیسینگەهێ. هەر لایەنێ لێڤەببیت دێ دووجارکی دەلالیا هەردوو لایان دەت.</div>
+                    </div>
+                    <div class="c-clause-item">
+                        <div class="c-cnum">٨</div>
+                        <div class="c-ctext">ژڤانێ رادەستکرن و ڤالاکرنا مۆلکی ل رێکەفتی (<span id="out_handover_date" class="dyn-text">... / ... / ٢٠٢...</span>) دەستنیشانکرى یە.</div>
+                    </div>
+                    <div class="c-clause-item">
+                        <div class="c-cnum">٩</div>
+                        <div class="c-ctext">ئەگەر فرۆشیار ل ژڤانێ دیارکری مۆلکی ڤالا نەکەت، بۆ هەر مەهەکا گیرۆبوونێ دێ کۆژمێ (<span id="out_delay_fine" class="dyn-text">.........</span>) دەتە بکری.</div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <div>
-                        <label class="text-[10px] text-slate-500 dark:text-slate-400 block mb-1"><span data-i18n="lbl_type">جۆرێ مۆلکی</span> <span class="text-red-500 font-bold">* (ناچاری)</span></label>
-                        <select id="input-type" class="w-full p-2.5 text-xs border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl text-right">
-                            <option value="ڤێلا" data-i18n="type_villa">ڤێلا</option>
-                            <option value="shqe" data-i18n="type_apt">شوقە (شقه)</option>
-                            <option value="خانی" data-i18n="type_house">خانی</option>
-                            <option value="ئەرد" data-i18n="type_land">ئەرد (زەڤی)</option>
-                            <option value="مەزرەعە" data-i18n="type_farm">مەزرەعە</option>
-                        </select>
+                <!-- Note & Lawyer -->
+                <div class="c-note">
+                    <div>⚠️ <b>تێبینی:</b> د ماوێ (١٥) رۆژان دا پێدڤییە مامەلە ب دووماهی بهێت، بەروڤاژی وێ نڤیسینگەهـ بەرپرس نینە.</div>
+                    <div style="color:#0f172a;">⚖️ پارێزەر: <span id="out_lawyer" style="font-weight:800;">طالب موسى حامد (0750 459 8521)</span></div>
+                </div>
+
+                <!-- Signatures -->
+                <div class="c-sigs">
+                    <div class="c-sig-box">
+                        <div class="c-sig-title">ناڤ و ئیمزا فرۆشیاری</div>
+                        <div class="c-sig-sub">مۆر و ئیمزا</div>
                     </div>
-                    <div>
-                        <label class="text-[10px] text-slate-500 dark:text-slate-400 block mb-1"><span data-i18n="lbl_floors">ژمارا قاتان</span> <span class="text-slate-400">(ئارەزوومەندانە)</span></label>
-                        <input id="input-floors" type="number" placeholder="2" class="w-full p-2.5 text-xs border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl text-right">
+                    <div class="c-sig-box">
+                        <div class="c-sig-title">دیدەڤانێ ئێکێ</div>
+                        <div class="c-sig-sub" id="out_witness1">ئیمزا</div>
                     </div>
-                    <div>
-                        <label class="text-[10px] text-slate-500 dark:text-slate-400 block mb-1"><span data-i18n="lbl_direction">ئاراستە</span> <span class="text-slate-400">(ئارەزوومەندانە)</span></label>
-                        <input id="input-direction" type="text" placeholder="باشوور" class="w-full p-2.5 text-xs border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl text-right">
+                    <div class="c-sig-box">
+                        <div class="c-sig-title">دیدەڤانێ دووێ</div>
+                        <div class="c-sig-sub" id="out_witness2">ئیمزا</div>
+                    </div>
+                    <div class="c-sig-box">
+                        <div class="c-sig-title">ناڤ و ئیمزا بکری</div>
+                        <div class="c-sig-sub">مۆر و ئیمزا</div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div>
-                        <label class="text-[10px] text-slate-500 dark:text-slate-400 block mb-1"><span data-i18n="lbl_land_number">ژمارا ئەردی (زەڤی)</span> <span class="text-slate-400">(ئارەزوومەندانە)</span></label>
-                        <input id="input-land-number" type="text" placeholder="مەسەلا 120/4 یان 5" class="w-full p-2.5 text-xs border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl text-right">
-                    </div>
-                    <div>
-                        <label class="text-[10px] text-slate-500 dark:text-slate-400 block mb-1" data-i18n="lbl_status">بۆچ مۆلکە؟</label>
-                        <select id="input-status" class="w-full p-2.5 text-xs border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl text-right">
-                            <option value="sale" data-i18n="opt_status_sale">بۆ فرۆتن</option>
-                            <option value="rent" data-i18n="opt_status_rent">ب کرێ</option>
-                            <option value="sold" data-i18n="opt_status_sold">هاتە فرۆتن</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Multiple images selection -->
-                <div class="border-t border-slate-200 dark:border-slate-800 pt-3">
-                    <label class="text-[10px] font-bold text-slate-500 dark:text-slate-400 block mb-1" data-i18n="lbl_images">وێنەیێن موڵکی دەستنیشان بکە (هەتا ٧ وێنە):</label>
-                    <input type="file" id="input-images" multiple accept="image/*" onchange="handleImageSelection(this)" class="w-full p-2 text-xs text-slate-500 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl cursor-pointer">
-                    <div id="image-previews" class="flex gap-2 overflow-x-auto mt-2 pb-1 no-scrollbar"></div>
-                </div>
-
-                <!-- Custom Luxury features -->
-                <div class="border-t border-slate-200 dark:border-slate-800 pt-3">
-                    <span class="text-[10px] font-bold text-slate-500 block mb-2" data-i18n="features_title">تایبەتمەندیێن لۆکس و دەولەمەند</span>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
-                        <label class="flex items-center gap-1.5 text-[10px] text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 p-2 rounded-xl cursor-pointer border border-slate-200 dark:border-slate-700 shadow-sm">
-                            <input type="checkbox" id="check-garage" class="rounded text-blue-600">
-                            <span data-i18n="feat_garage">گەرەجێ تڕۆمبێلێ</span>
-                        </label>
-                        <label class="flex items-center gap-1.5 text-[10px] text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 p-2 rounded-xl cursor-pointer border border-slate-200 dark:border-slate-700 shadow-sm">
-                            <input type="checkbox" id="check-pool" class="rounded text-blue-600">
-                            <span data-i18n="feat_pool">مەسبەح (حەوز)</span>
-                        </label>
-                        <label class="flex items-center gap-1.5 text-[10px] text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 p-2 rounded-xl cursor-pointer border border-slate-200 dark:border-slate-700 shadow-sm">
-                            <input type="checkbox" id="check-furnished" class="rounded text-blue-600">
-                            <span data-i18n="feat_furnished">کەلوپەل تێدانە</span>
-                        </label>
-                        <label class="flex items-center gap-1.5 text-[10px] text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 p-2 rounded-xl cursor-pointer border border-slate-200 dark:border-slate-700 shadow-sm">
-                            <input type="checkbox" id="check-cameras" class="rounded text-blue-600">
-                            <span data-i18n="feat_cameras">کامێرێن چاڤدێریێ</span>
-                        </label>
-                        <label class="flex items-center gap-1.5 text-[10px] text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 p-2 rounded-xl cursor-pointer border border-slate-200 dark:border-slate-700 shadow-sm">
-                            <input type="checkbox" id="check-elevator" class="rounded text-blue-600">
-                            <span data-i18n="feat_lift">لێفت</span>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Picker map -->
-                <div class="border-t border-slate-200 dark:border-slate-800 pt-3 relative">
-                    <div class="flex justify-between items-center mb-1">
-                        <label class="text-[10px] font-bold text-slate-500 dark:text-slate-400 block" data-i18n="map_pick">جهێ مۆلکی ل سەر نەخشەی دەستنیشان بکە:</label>
-                        <button onclick="locateOnMap(pickerMap, pickerMarker)" type="button" class="px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg text-[9px] shadow flex items-center gap-1">
-                            <span>📌</span> <span data-i18n="btn_locate_me">جهێ من دەستنیشان بکە</span>
-                        </button>
-                    </div>
-                    <div id="picker-map-container" class="w-full h-44 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden"></div>
-                </div>
-
-                <button onclick="submitForApproval()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow transition text-xs">
-                    ناردن بۆ پەسەندکرنێ (Admin Submit)
-                </button>
             </div>
-        </div>
 
-        <!-- SCREEN 5: SETTINGS & ACCOUNT -->
-        <div id="screen-settings" class="screen-tab p-4 max-w-4xl mx-auto space-y-6 hidden">
-            <h2 class="text-sm font-bold text-slate-500 uppercase tracking-wider" id="txt-settings-title" data-i18n="settings_title">ڕێکخستن و پڕۆفایل</h2>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="space-y-4">
-                    <!-- PRIVATE USER CARD PROFILE -->
-                    <div class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 rounded-3xl shadow-sm space-y-4">
-                        <h3 class="text-xs font-bold text-slate-500 dark:text-slate-400" data-i18n="profile_card_title">پڕۆفایلێ من یێ تایبەت</h3>
-                        <div id="private-profile-info" class="flex items-center gap-4 border-b border-slate-200 dark:border-slate-800 pb-4">
-                            <!-- Dynamic user info -->
-                        </div>
-                        <div>
-                            <h3 class="text-xs font-bold text-slate-500 dark:text-slate-400 mb-2" data-i18n="my_posts_title">مۆلکێن من یێن بەلاڤکری</h3>
-                            <div id="user-posts-container" class="space-y-2">
-                                <!-- User's posts -->
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- App Info Card (SECRET ADMIN TRIGGER INCLUDED) -->
-                    <div class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 rounded-3xl shadow-sm space-y-3">
-                        <h3 class="text-xs font-bold text-slate-500 dark:text-slate-400" data-i18n="about_app_title">دەربارەی ئەپڵیکەیشنی</h3>
-                        <div class="space-y-2 text-xs">
-                            <div class="flex justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
-                                <span class="text-slate-500 dark:text-slate-400" data-i18n="app_name_lbl">ناڤێ بەرنامەی:</span>
-                                <span class="font-bold text-slate-900 dark:text-white">Aqarat 24</span>
-                            </div>
-                            <div class="flex justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
-                                <span class="text-slate-500 dark:text-slate-400" data-i18n="agent_lbl">بریکاریێ فەرمی:</span>
-                                <span class="text-slate-900 dark:text-white text-right font-bold">ئومێد عبدالواحد (07507100238)</span>
-                            </div>
-                            <div class="flex justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
-                                <span class="text-slate-500 dark:text-slate-400" data-i18n="purpose_lbl">مەبەست:</span>
-                                <span class="text-slate-700 dark:text-slate-300 text-right" data-i18n="purpose_val">پۆستکرن و فرۆتنا نووترین مۆلکان ل دهۆکێ</span>
-                            </div>
-                            <!-- TRIGGER ONCLICK FOR SECRET ADMIN PORTAL -->
-                            <div onclick="triggerAdminTap()" class="flex justify-between pt-1 cursor-pointer select-none">
-                                <span class="text-slate-500 dark:text-slate-400" data-i18n="version_lbl">وەشانێ بەرنامەی:</span>
-                                <span class="text-blue-500 font-mono font-bold">v1.2.4</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="space-y-4">
-                    <!-- Language Selection -->
-                    <div class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 rounded-3xl shadow-sm space-y-3">
-                        <h3 class="text-xs font-bold text-slate-500 dark:text-slate-400" data-i18n="app_lang_lbl">زمانێ ئەپی</h3>
-                        <div class="grid grid-cols-4 gap-1.5">
-                            <button onclick="setLanguage('badini', this)" class="p-1.5 text-[11px] bg-blue-900/30 border border-blue-500 rounded-xl text-blue-300 font-bold">بادینی</button>
-                            <button onclick="setLanguage('sorani', this)" class="p-1.5 text-[11px] bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-700 dark:text-slate-300">سۆرانی</button>
-                            <button onclick="setLanguage('english', this)" class="p-1.5 text-[11px] bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-700 dark:text-slate-300 font-mono">EN</button>
-                            <button onclick="setLanguage('arabic', this)" class="p-1.5 text-[11px] bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-700 dark:text-slate-300">عربي</button>
-                        </div>
-                    </div>
-
-                    <!-- Real Estate Advice -->
-                    <div class="bg-amber-950/20 p-5 rounded-3xl border border-amber-900/50 space-y-3 text-xs">
-                        <h3 class="font-bold text-amber-500 dark:text-amber-400 flex items-center gap-1.5">
-                            <span data-i18n="advice_title">💡 رێنماییێن یاسایی عەقاراتی</span>
-                        </h3>
-                        <div class="space-y-2 text-[11px] text-amber-600 dark:text-amber-300 leading-relaxed">
-                            <p data-i18n="advice_1"><strong>١. پشتڕاستکرنا جۆرێ تاپۆیێ:</strong> بەری کڕینێ، دڤێت سند مۆلکی ل فەرمانگەها تاپۆیێ بهێتە چێکرن دا کو نەبیتە "مەشاع" یان زەڤییا چاندنێ ب کێشە ل گەڵ دەولەتێ.</p>
-                            <p data-i18n="advice_2"><strong>٢. mۆلەت و نەخشەیێن یاسایی:</strong> شوقە و ڤێلا یێن دکەڤنە د پڕۆژان دا، پشتڕاست بە کو ژ لایێ یاسایی یێن وەبەرهێنانێ و باژێرڤانییێ پەسەندکرینە.</p>
-                            <p data-i18n="advice_3"><strong>٣. ئیمزاکرنا گرێبەستان:</strong> ئیمزاکرنا گرێبەستێ بتنێ ل نڤیسینگەهێن فەرمی یێن خودان مۆلەت بکە، دا کو مافێن یاسایی یێن هەر لایەکی پاراستی بن.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
 
     </main>
 
-    <!-- TASKBAR -->
-    <div class="fixed bottom-0 left-0 right-0 w-full bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 shadow-xl py-3 flex justify-around items-center z-[10001] transition">
-        <button onclick="switchTab('map')" id="nav-map" class="flex flex-col items-center gap-1 text-slate-400 group transition">
-            <svg class="h-5 w-5 group-hover:scale-105 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
-                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0z" />
-            </svg>
-            <span class="text-[9px] font-medium" id="nav-lbl-map" data-i18n="nav_map">نەخشە</span>
-        </button>
-        <button onclick="switchTab('apartment')" id="nav-apartment" class="flex flex-col items-center gap-1 text-slate-400 group transition">
-            <svg class="h-5 w-5 group-hover:scale-105 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M21 12h.75m-.75 3h.75m-.75 3h.75" />
-            </svg>
-            <span class="text-[9px] font-medium" id="nav-lbl-apt" data-i18n="nav_apt">شوقە</span>
-        </button>
-        <button onclick="switchTab('home')" id="nav-home" class="flex flex-col items-center gap-1 text-blue-400 group transition">
-            <svg class="h-5 w-5 group-hover:scale-105 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
-            </svg>
-            <span class="text-[9px] font-medium" id="nav-lbl-home" data-i18n="nav_home">مال</span>
-        </button>
-        <button onclick="switchTab('add')" id="nav-add" class="flex flex-col items-center gap-1 text-slate-400 group transition">
-            <svg class="h-5 w-5 group-hover:scale-105 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span class="text-[9px] font-medium" id="nav-lbl-add" data-i18n="nav_add">زێدەکرن</span>
-        </button>
-        <button onclick="switchTab('settings')" id="nav-settings" class="flex flex-col items-center gap-1 text-slate-400 group transition">
-            <svg class="h-5 w-5 group-hover:scale-105 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" />
-            </svg>
-            <span class="text-[9px] font-medium" id="nav-lbl-settings" data-i18n="nav_settings">ڕێکخستن</span>
-        </button>
-    </div>
-
-    <!-- REGISTER & AUTH MODAL -->
-    <div id="auth-modal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4 hidden z-[10000] transition">
-        <div class="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-sm p-6 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-4">
-            <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-2">
-                <span class="font-bold text-slate-900 dark:text-white text-sm" id="auth-title" data-i18n="auth_title_modal">تۆماربوون ل بەرنامەی</span>
-                <button onclick="closeAuthModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs" data-i18n="btn_close">داخستن</button>
-            </div>
-            
-            <div class="grid grid-cols-2 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
-                <button id="tab-login" onclick="setAuthTab('login')" class="py-1.5 text-xs font-bold rounded-lg bg-white dark:bg-slate-700 shadow text-slate-900 dark:text-white" data-i18n="tab_login">چوونەژوور</button>
-                <button id="tab-register" onclick="setAuthTab('register')" class="py-1.5 text-xs font-bold rounded-lg text-slate-500" data-i18n="tab_register">خۆتۆمارکرن</button>
-            </div>
-
-            <div class="space-y-3">
-                <div id="register-fields" class="hidden">
-                    <label class="text-[10px] text-slate-500 block mb-1" data-i18n="lbl_fullname">ناڤێ تە یێ سێجاری</label>
-                    <input type="text" id="auth-name" placeholder="ئومێد عبدالواحد" class="w-full p-2 text-xs border rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white border-slate-200 dark:border-slate-700 text-right">
-                    <label class="text-[10px] text-slate-500 block mb-1 mt-2" data-i18n="lbl_phone">ژمارا تەلەفۆنێ</label>
-                    <input type="text" id="auth-phone" placeholder="07507100238" class="w-full p-2 text-xs border rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white border-slate-200 dark:border-slate-700 text-left">
-                </div>
-                <div>
-                    <label class="text-[10px] text-slate-500 block mb-1" data-i18n="lbl_email">ئیمێل</label>
-                    <input type="email" id="auth-email" placeholder="example@gmail.com" class="w-full p-2 text-xs border rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white border-slate-200 dark:border-slate-700 text-left">
-                </div>
-                <div>
-                    <label class="text-[10px] text-slate-500 block mb-1" data-i18n="lbl_pass">پاسۆرد</label>
-                    <input type="password" id="auth-password" placeholder="••••••••" class="w-full p-2 text-xs border rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white border-slate-200 dark:border-slate-700 text-left">
-                </div>
-                <button onclick="submitAuth()" class="w-full py-2.5 bg-blue-600 text-white rounded-xl text-xs font-bold shadow" data-i18n="btn_approve">پەسەندکرن</button>
-            </div>
-
-            <div class="border-t border-slate-200 dark:border-slate-800 pt-3 space-y-2">
-                <button onclick="loginWithGmail()" class="w-full py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-xl flex items-center justify-center gap-2 hover:bg-slate-100 dark:hover:bg-slate-700/50 transition">
-                    <svg class="h-4 w-4" viewBox="0 0 24 24">
-                        <path fill="#EA4335" d="M12 5.04c1.66 0 3.2.57 4.38 1.69l3.27-3.27C17.67 1.54 14.97 1 12 1 7.35 1 3.4 3.65 1.5 7.5l3.87 3C6.4 7.5 9 5.04 12 5.04z"/>
-                        <path fill="#4285F4" d="M23.49 12.27c0-.81-.07-1.59-.2-2.27H12v4.51h6.47c-.28 1.48-1.12 2.73-2.38 3.58l3.7 2.87c2.16-2 3.7-4.94 3.7-8.69z"/>
-                        <path fill="#FBBC05" d="M5.37 14.5c-.24-.72-.37-1.48-.37-2.5s.13-1.78.37-2.5L1.5 6.5C.54 8.42 0 10.58 0 13s.54 4.58 1.5 6.5l3.87-3z"/>
-                        <path fill="#34A853" d="M12 23c3.24 0 5.97-1.07 7.96-2.9l-3.7-2.87c-1.1.74-2.5 1.18-4.26 1.18-3 0-5.6-2.46-6.63-5.46l-3.87 3C3.4 20.35 7.35 23 12 23z"/>
-                    </svg>
-                    <span class="text-xs font-bold text-slate-700 dark:text-slate-300" data-i18n="btn_gmail_login">چوونەژوور ب ئەکاونتێ Gmail</span>
-                </button>
-                <button onclick="loginAsGuest()" class="w-full py-2 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-400 rounded-xl text-xs font-bold hover:bg-slate-300 dark:hover:bg-slate-700 transition" data-i18n="btn_guest_login">
-                    بەکارهێنانی وەک مێهڤان (Guest Mode)
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- SECRET ADMIN DASHBOARD MODAL (Highly Organized Sections) -->
-    <div id="admin-modal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm flex items-center justify-center p-4 hidden z-[20000] transition">
-        <div class="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-xl p-6 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-4">
-            <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-2">
-                <span class="font-bold text-slate-900 dark:text-white text-sm" data-i18n="admin_panel_title">پەنەلا لێکۆڵینێ و دەستکاریکرنێ</span>
-                <button onclick="closeAdminModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs" data-i18n="btn_close">داخستن</button>
-            </div>
-            
-            <div id="admin-login-view" class="space-y-3">
-                <p class="text-xs text-slate-500" data-i18n="admin_pass_hint">کۆدێ نهێنیێ دروستکەری لێدە دا بچیە پەنەلێ:</p>
-                <input type="password" id="admin-password" placeholder="••••" class="w-full p-2.5 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-white rounded-xl text-center font-mono text-sm tracking-widest">
-                <button onclick="loginAsAdmin()" class="w-full py-2.5 bg-blue-600 text-white rounded-xl text-xs font-bold shadow" data-i18n="btn_login_admin">داخڵبوون</button>
-            </div>
-
-            <div id="admin-dashboard-view" class="hidden space-y-4 max-h-[500px] overflow-y-auto no-scrollbar">
-                
-                <!-- NEW ADMIN SEARCH FILTER INPUT -->
-                <div class="bg-slate-100 dark:bg-slate-950 p-2.5 rounded-2xl border border-slate-200 dark:border-slate-800 flex gap-2 items-center">
-                    <span class="text-xs text-slate-400">🔍</span>
-                    <input id="admin-search-input" type="text" oninput="applyAdminSearch()" placeholder="گەڕیان د موڵک، کۆد یان ئەندامان دا..." class="w-full bg-transparent text-xs text-slate-900 dark:text-white placeholder-slate-500 outline-none text-right">
-                    <button onclick="clearAdminSearch()" class="text-[9px] bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-2 py-1 rounded-xl">پاقژکرن</button>
-                </div>
-
-                <!-- ADMIN QUICK STATISTICS GRID (SECTION 1) -->
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 border-b border-slate-200 dark:border-slate-800 pb-3">
-                    <div class="p-3 bg-blue-50 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900/50 rounded-2xl text-center">
-                        <span class="text-[9px] text-slate-500 dark:text-slate-400 font-bold block">موڵکێن چالاک</span>
-                        <span id="stat-active-count" class="text-base font-black text-blue-600 dark:text-blue-400">0</span>
-                    </div>
-                    <div class="p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-100 dark:border-amber-900/50 rounded-2xl text-center">
-                        <span class="text-[9px] text-slate-500 dark:text-slate-400 font-bold block">چاوەڕێی پەسەندێ</span>
-                        <span id="stat-pending-count" class="text-base font-black text-amber-600 dark:text-amber-400">0</span>
-                    </div>
-                    <div class="p-3 bg-purple-50 dark:bg-purple-950/30 border border-purple-100 dark:border-purple-900/50 rounded-2xl text-center">
-                        <span class="text-[9px] text-slate-500 dark:text-slate-400 font-bold block">ئەرشیفکری</span>
-                        <span id="stat-archived-count" class="text-base font-black text-purple-600 dark:text-purple-400">0</span>
-                    </div>
-                    <div class="p-3 bg-green-50 dark:bg-green-950/30 border border-green-100 dark:border-green-900/50 rounded-2xl text-center">
-                        <span class="text-[9px] text-slate-500 dark:text-slate-400 font-bold block">ئەندامێن تۆمارکری</span>
-                        <span id="stat-users-count" class="text-base font-black text-green-600 dark:text-green-400">0</span>
-                    </div>
-                </div>
-
-                <!-- REGISTERED MEMBERS DIRECTORY (SECTION 5) -->
-                <div class="border-b border-slate-200 dark:border-slate-800 pb-3">
-                    <p class="text-[10px] text-green-500 font-bold mb-2" data-i18n="admin_users_title">لیستا ئەندامێن تۆمارکری (Users Directory):</p>
-                    <div id="admin-users-container" class="space-y-2 max-h-36 overflow-y-auto no-scrollbar"></div>
-                </div>
-
-                <!-- PENDING APPROVALS LIST (SECTION 2 with MAP review targets) -->
-                <div>
-                    <p class="text-[10px] text-amber-500 uppercase font-bold mb-2" data-i18n="admin_pending_title">مۆلەکێن چاوەڕێی پەسەندکرنێ (Pending Approvals):</p>
-                    <div id="pending-posts-container" class="space-y-2"></div>
-                </div>
-
-                <!-- LIVE ACTIVE LISTINGS (SECTION 3) -->
-                <div class="border-t border-slate-200 dark:border-slate-800 pt-3">
-                    <p class="text-[10px] text-blue-500 uppercase font-bold mb-2" data-i18n="admin_active_title">دەستکاریکرنا مۆڵکێن کارا (Live Listings):</p>
-                    <div id="admin-active-posts-container" class="space-y-2"></div>
-                </div>
-
-                <!-- ARCHIVED LISTINGS (SECTION 4) -->
-                <div class="border-t border-slate-200 dark:border-slate-800 pt-3">
-                    <p class="text-[10px] text-purple-500 uppercase font-bold mb-2" data-i18n="admin_archived_title">مۆڵکێن ئەرشیفکری (Archive Panel):</p>
-                    <div id="admin-archived-posts-container" class="space-y-2"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- DETAIL DISPLAY MODAL -->
-    <div id="details-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center p-4 hidden z-[20010] transition">
-        <div class="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-lg max-h-[90vh] overflow-y-auto no-scrollbar p-6 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-4">
-            <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-2">
-                <span id="details-header-title" class="font-bold text-slate-900 dark:text-white text-sm">مۆڵکێ تەمام</span>
-                <button onclick="closeDetailsModal()" class="text-slate-400 hover:text-slate-655 dark:hover:text-slate-200 text-xs" data-i18n="btn_close">داخستن</button>
-            </div>
-
-            <!-- Carousel 1:1 -->
-            <div class="relative w-full aspect-square bg-slate-100 dark:bg-slate-950 rounded-2xl overflow-hidden group border border-slate-200 dark:border-slate-800">
-                <img id="details-carousel-img" src="" class="w-full h-full object-cover">
-                <button onclick="prevDetailImg()" class="absolute left-3 top-1/2 -translate-y-1/2 p-2 rounded-full bg-slate-900/80 text-white hover:bg-slate-800 shadow-lg">&larr;</button>
-                <button onclick="nextDetailImg()" class="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-full bg-slate-900/80 text-white hover:bg-slate-800 shadow-lg">&rarr;</button>
-                <span id="details-carousel-counter" class="absolute bottom-3 right-3 bg-slate-950/80 text-[10px] text-white px-2 py-0.5 rounded-full">1/1</span>
-            </div>
-
-            <div class="flex flex-wrap items-center justify-between gap-2">
-                <div>
-                    <h2 id="details-title" class="text-base font-bold text-slate-900 dark:text-white">ناڤێ مۆلکی</h2>
-                    <p id="details-sub" class="text-xs text-slate-500">کۆد: AQ-100</p>
-                </div>
-                <div class="text-right">
-                    <p id="details-price" class="text-lg font-bold text-blue-500">$100,000</p>
-                    <span id="details-status" class="bg-blue-600 text-[10px] font-bold px-2.5 py-0.5 rounded-full text-white inline-block">فرۆتن</span>
-                </div>
-            </div>
-
-            <!-- Specs Grid -->
-            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 text-xs">
-                <div class="space-y-1"><span class="text-slate-400" data-i18n="lbl_location">جەهـ:</span> <p id="details-loc" class="font-bold text-slate-700 dark:text-slate-200">-</p></div>
-                <div class="space-y-1"><span class="text-slate-400" data-i18n="lbl_city">گەڕەک:</span> <p id="details-city" class="font-bold text-slate-700 dark:text-slate-200">-</p></div>
-                <div class="space-y-1"><span class="text-slate-400" data-i18n="lbl_area">ڕووبەر:</span> <p id="details-area" class="font-bold text-slate-700 dark:text-slate-200">-</p></div>
-                <div class="space-y-1"><span class="text-slate-400" data-i18n="lbl_rooms">ژوور:</span> <p id="details-rooms" class="font-bold text-slate-700 dark:text-slate-200">-</p></div>
-                <div class="space-y-1"><span class="text-slate-400" data-i18n="lbl_floors">قاتان:</span> <p id="details-floors" class="font-bold text-slate-700 dark:text-slate-200">-</p></div>
-                <div class="space-y-1"><span class="text-slate-400" data-i18n="lbl_age">ژیێ ئاڤاهی:</span> <p id="details-age" class="font-bold text-slate-700 dark:text-slate-200">-</p></div>
-                <div class="space-y-1"><span class="text-slate-400" data-i18n="lbl_payment">شێوازێ دانێ:</span> <p id="details-pay" class="font-bold text-slate-700 dark:text-slate-200">-</p></div>
-                <div class="space-y-1"><span class="text-slate-400" data-i18n="lbl_direction">ئاراستە:</span> <p id="details-dir" class="font-bold text-slate-700 dark:text-slate-200">-</p></div>
-            </div>
-
-            <!-- Multiple Phone Actions -->
-            <div class="space-y-2">
-                <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">ژمارەیێن پەیوەندیێ (Contacts):</span>
-                <div id="details-contacts-container" class="space-y-2"></div>
-            </div>
-
-            <div class="space-y-2">
-                <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider" data-i18n="features_title">تایبەتمەندیێن لۆکس</span>
-                <div id="details-features-container" class="flex flex-wrap gap-1.5"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- EDIT PROPERTY MODAL -->
-    <div id="edit-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-6 hidden z-[20000]">
-        <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-sm p-4 space-y-4 shadow-2xl border border-slate-200 dark:border-slate-800">
-            <div class="flex justify-between items-center border-b pb-2 border-slate-200 dark:border-slate-800">
-                <span class="font-bold text-slate-900 dark:text-white text-xs" data-i18n="edit_prop_title">دەستکاریکرنا مۆلکی</span>
-                <button onclick="closeEditModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs" data-i18n="btn_cancel">پەشیمانبوون</button>
-            </div>
-            <div class="space-y-3">
-                <input type="hidden" id="edit-id">
-                <div>
-                    <label class="text-[10px] text-slate-500 block mb-1" data-i18n="lbl_price">بها ($)</label>
-                    <input id="edit-price" type="number" class="w-full p-2 text-xs border rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white border-slate-200 dark:border-slate-700">
-                </div>
-                <div>
-                    <label class="text-[10px] text-slate-500 block mb-1" data-i18n="lbl_location">ناڤونیشان (جهـ)</label>
-                    <input id="edit-location" type="text" class="w-full p-2 text-xs border rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white border-slate-200 dark:border-slate-700">
-                </div>
-                <button onclick="savePropertyEdit()" class="w-full py-2 bg-blue-600 text-white rounded-xl text-xs font-bold" data-i18n="btn_save">پاشکەوتکرن</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- JavaScript Application Logic -->
+    <!-- JavaScript بۆ گوهۆڕینا ڕاستەوخۆ و چێکرنا PDF -->
     <script>
-        // DEFAULT TO DARK MODE
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'light') {
-            document.documentElement.classList.remove('dark');
-        } else {
-            document.documentElement.classList.add('dark');
-            localStorage.setItem('theme', 'dark');
-        }
+        // لیستا هەمی خانەیێن نڤیسینێ
+        const fields = [
+            'date', 'seller_name', 'seller_phone', 'buyer_name', 'buyer_phone',
+            'donam', 'ulk', 'meter', 'dm', 'building', 'floor', 'apt_no', 'project',
+            'prop_type', 'house_no', 'chain_no', 'neighbor', 'plot_no', 'sector_no', 'sector_name',
+            'price_num', 'price_words', 'earnest_money', 'seller_penalty', 'buyer_penalty',
+            'expenses_on', 'broker_fee', 'delay_fine', 'handover_date', 'lawyer',
+            'witness1', 'witness2'
+        ];
 
-        // TRANSLATION DICTIONARY
-        const translations = {
-            badini: {
-                app_title: "عەقارات ٢٤",
-                slider_title: "مەزرەعە و ڤێلا",
-                new_prop_title: "مۆلکێن نوو",
-                apt_title: "شوقە (شقه)",
-                add_title: "زێدەکرنا مۆلکی",
-                settings_title: "ڕێکخستن و پڕۆفایل",
-                nav_map: "نەخشە",
-                nav_apt: "شوقە",
-                nav_home: "مال",
-                nav_add: "زێدەکرن",
-                nav_settings: "ڕێکخستن",
-                auth_btn: "چوونەژوور / پڕۆفایل",
-                type_villa: "ڤێلا",
-                type_apt: "شوقە",
-                type_house: "خانی",
-                type_land: "ئەرد",
-                type_farm: "مەزرەعە",
-                status_sold: "هاتە فرۆتن",
-                map_std: "ڕوون / سافی",
-                map_sat: "سەتەلایت",
-                map_drk: "تاری",
-                lbl_price: "بها ($)",
-                lbl_code: "کۆدێ مۆلکی",
-                lbl_payment: "شێوازێ پارەدانێ",
-                opt_cash: "کاش (نەختینە)",
-                opt_install: "ب قست",
-                lbl_location: "ناڤونیشان (جهـ)",
-                lbl_city: "گەڕەک / باژێڕ",
-                lbl_deed: "جۆرێ سندی (تاپۆ)",
-                opt_deed_own: "تاپۆ مۆلک",
-                opt_deed_card: "کارت",
-                opt_deed_agr: "زراعی",
-                opt_deed_year: "سالنامە",
-                lbl_area: "ڕووبەر (مەتر)",
-                lbl_rooms: "چەند ژوورن",
-                lbl_age: "ژیێ ئاڤاهی",
-                opt_age_new: "نوو - سفر",
-                opt_age_15: "١ - ٥ سال",
-                opt_age_10: "زێدەتر ژ ١٠ سالان",
-                lbl_phone: "ژمارا تەلەفۆنێ",
-                lbl_type: "جۆرێ مۆلکی",
-                lbl_floors: "ژمارا قاتان",
-                lbl_direction: "ئاراستە",
-                lbl_status: "بۆچ مۆلکە؟",
-                opt_status_sale: "بۆ فرۆتن",
-                opt_status_rent: "ب کرێ",
-                lbl_images: "وێنەیێن موڵکی دەستنیشان بکە (هەتا ٧ وێنە):",
-                lbl_land_number: "ژمارا ئەردی (زەڤی)",
-                features_title: "تایبەتمەندیێن لۆکس و دەولەمەند",
-                feat_garage: "گەرەجێ تڕۆمبێلێ",
-                feat_pool: "مەسبەح (حەوز)",
-                feat_furnished: "کەلوپەل تێدانە",
-                feat_cameras: "کامێرێن چاڤدێریێ",
-                feat_lift: "لێفت",
-                map_pick: "جهێ مۆلکی ل سەر نەخشەی دەستنیشان بکە:",
-                btn_submit: "بەلاڤکرنا موڵکی (Publish Property)",
-                profile_card_title: "پڕۆفایلێ من یێ تایبەت",
-                my_posts_title: "مۆلکێن من یێن بەلاڤکری",
-                about_app_title: "دەربارەی ئەپڵیکەیشنی",
-                app_name_lbl: "ناڤێ بەرنامەی:",
-                agent_lbl: "بریکاریێ فەرمی:",
-                purpose_lbl: "مەبەست:",
-                purpose_val: "پۆستکرن و فرۆتنا نووترین مۆلکان ل دهۆکێ",
-                version_lbl: "وەشانێ بەرنامەی:",
-                app_lang_lbl: "زمانێ ئەپی",
-                advice_title: "💡 رێنماییێن یاسایی عەقاراتی",
-                advice_1: "١. پشتڕاستکرنا جۆرێ تاپۆیێ: بەری کڕینێ، دڤێت سند مۆلکی ل فەرمانگەها تاپۆیێ بهێتە چێکرن دا کو نەبیتە 'مەشاع' یان زەڤییا چاندنێ ب کێشە ل گەڵ دەولەتێ.",
-                advice_2: "٢. mۆلەت و نەخشەیێن یاسایی: شوقە و ڤێلا یێن دکەڤنە د پڕۆژان دا، پشتڕاست بە کو ژ لایێ یاسایی یێن وەبەرهێنانێ و باژێرڤانییێ پەسەندکرینە.",
-                advice_3: "٣. ئیمزاکرنا گرێبەستان: ئیمزاکرنا گرێبەستێ بتنێ ل نڤیسینگەهێن فەرمی یێن خودان مۆلەت بکە، دا کو مافێن یاسایی یێن هەر لایەکی پاراستی بن.",
-                auth_title_modal: "تۆماربوون ل بەرنامەی",
-                btn_close: "داخستن",
-                tab_login: "چوونەژوور",
-                tab_register: "خۆتۆمارکرن",
-                lbl_fullname: "ناڤێ تە یێ سێجاری",
-                lbl_email: "ئیمێل",
-                lbl_pass: "پاسۆرد",
-                btn_approve: "پەسەندکرن",
-                btn_gmail_login: "چوونەژوور ب ئەکاونتێ Gmail",
-                btn_guest_login: "بەکارهێنانی وەک مێهڤان (Guest Mode)",
-                admin_panel_title: "پەنەلا لێکۆڵینێ و دەستکاریکرنێ",
-                admin_pass_hint: "کۆدێ نهێنیێ دروستکەری لێدە دا بچیە پەنەلێ:",
-                btn_login_admin: "داخڵبوون",
-                admin_users_title: "لیستا ئەندامێن تۆمارکری (Users Directory):",
-                admin_pending_title: "موڵکێن چاوەڕێی پەسەندکرنێ (Pending):",
-                admin_active_title: "دەستکاریکردنی موڵکە چالاکەکان (Active):",
-                admin_archived_title: "موڵکە ئەرشیفکراوەکان (Archive):",
-                edit_prop_title: "دەستکاریکرنا مۆلکی",
-                btn_cancel: "پەشیمانبوون",
-                btn_save: "پاشکەوتکرن",
-                btn_call_now: "پەیوەندی بکە",
-                btn_whatsapp: "واتسئاپ",
-                guest_name: "مێهڤان",
-                no_posts: "تە چ مۆلک بەلاڤ نەکرینە.",
-                select_files: "تکایە هندەک فایلان هەڵبژێرە",
-                btn_locate_me: "📌 جهێ من",
-                lbl_refreshing: "نووکرن..."
-            }
-        };
-
-        // SECURE PERSISTED DATABASE (Using LocalStorage with startup defaults)
-        let properties = JSON.parse(localStorage.getItem('properties_db'));
-        let registeredUsers = JSON.parse(localStorage.getItem('users_db'));
-        let pendingProperties = JSON.parse(localStorage.getItem('pending_db')) || [];
-
-        // If local database is empty, generate initial high fidelity test dataset
-        if (!properties) {
-            properties = [
-                {
-                    id: 1,
-                    title: "ڤێلا لۆکس ل دهۆکێ",
-                    code: "AQ-101",
-                    type: "ڤێلا",
-                    location: "دهۆك، نەورۆز",
-                    city: "باشوور",
-                    price: 140000,
-                    area: 250,
-                    rooms: 4,
-                    phones: ["07507100238", "07501112233"],
-                    lat: 36.858,
-                    lng: 42.990,
-                    status: "sale",
-                    deed: "تاپۆ مۆلک",
-                    payment: "کاش",
-                    age: "١-٥ سال",
-                    floors: 2,
-                    direction: "باشوور",
-                    landNumber: "120/4",
-                    features: ["گەرەجێ تڕۆمبێلێ", "مەسبەح (حەوز)", "کامێرێن چاڤدێریێ"],
-                    images: [
-                        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=600&h=400&q=80",
-                        "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=600&h=400&q=80"
-                    ],
-                    isFeatured: true,
-                    isPrivate: false,
-                    isArchived: false,
-                    ownerId: 1
-                },
-                {
-                    id: 2,
-                    title: "شوقەکا فەرمی ل دهۆکێ",
-                    code: "AQ-102",
-                    type: "شقه",
-                    location: "دهۆك، قۆل سەرێ",
-                    city: "سەنتەر",
-                    price: 95000,
-                    area: 160,
-                    rooms: 3,
-                    phones: ["07504455221"],
-                    lat: 36.865,
-                    lng: 43.002,
-                    status: "sale",
-                    deed: "سند کارت",
-                    payment: "کاش",
-                    age: "١-٥ سال",
-                    floors: 1,
-                    direction: "ڕۆژهەڵات",
-                    landNumber: "99/1",
-                    features: ["لێفت", "کەلوپەل تێدانە"],
-                    images: [
-                        "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=600&h=400&q=80",
-                        "https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=600&h=400&q=80"
-                    ],
-                    isFeatured: false,
-                    isPrivate: false,
-                    isArchived: false,
-                    ownerId: 2
-                }
-            ];
-
-            // Auto expansion for Load More pagination preview
-            for (let i = 3; i <= 25; i++) {
-                properties.push({
-                    id: i,
-                    title: i % 2 === 0 ? `شوقەکا لۆکس ل باژێڕێ دهۆکێ #${i}` : `ڤێلا شاهانە ل نێزیک دهۆکێ #${i}`,
-                    code: `AQ-20${i}`,
-                    type: i % 2 === 0 ? "شقه" : "ڤێلا",
-                    location: "دهۆك، نەورۆز",
-                    city: "باشوور",
-                    price: 70000 + (i * 2000),
-                    area: 120 + (i * 5),
-                    rooms: 3,
-                    phones: ["07507100238"],
-                    lat: 36.858 + (i * 0.001),
-                    lng: 42.990 - (i * 0.001),
-                    status: "sale",
-                    deed: "تاپۆ مۆلک",
-                    payment: "کاش",
-                    age: "١-٥ سال",
-                    floors: i % 3 || 1,
-                    direction: "باشوور",
-                    landNumber: `Land-${i}`,
-                    features: ["گەراجێ تڕۆمبێلێ"],
-                    images: ["https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=600&h=400&q=80"],
-                    isFeatured: i === 3 || i === 5,
-                    isPrivate: false,
-                    isArchived: false,
-                    ownerId: 1
-                });
-            }
-            localStorage.setItem('properties_db', JSON.stringify(properties));
-        }
-
-        if (!registeredUsers) {
-            registeredUsers = [
-                { id: 1, name: "ئومێد عبدالواحد", email: "omed.abdulwahid@gmail.com", phone: "07507100238", avatar: "👤" },
-                { id: 2, name: "کاروان دهۆکی (تێست)", email: "karwan@gmail.com", phone: "07504455221", avatar: "👤" }
-            ];
-            localStorage.setItem('users_db', JSON.stringify(registeredUsers));
-        }
-
-        let currentUser = null;
-        let currentAuthTab = "login";
-        let adminTapCount = 0;
-        let currentLanguage = "badini";
-        
-        let map;
-        let mapMarkers = [];
-        let activeTileLayer;
-
-        let pickerMap;
-        let pickerMarker;
-        let pickedCoords = { lat: 36.868, lng: 42.997 };
-
-        let selectedBase64Images = [];
-
-        let detailActiveImgIdx = 0;
-        let detailImgList = [];
-
-        // PAGINATION & VIEW LIMIT STATE
-        let propertiesLimit = 20;
-        let isFilteringActive = false;
-        let activeTab = "home"; 
-
-        // ADMIN SEARCH QUERY STATE
-        let adminSearchQuery = "";
-
-        // UPGRADED MAP STYLE (Carto Positron vector format)
-        const mapStyles = {
-            standard: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", 
-            satellite: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-            dark: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-        };
-
-        // DYNAMIC FILTER PROPERTIES HOLDER
-        let activeFilters = {
-            type: 'all',
-            status: 'all',
-            minPrice: 0,
-            maxPrice: 5000000,
-            city: ''
-        };
-
-        // INSTAGRAM PULL TO REFRESH
-        let startY = 0;
-        let isPulling = false;
-        const pullIndicator = document.getElementById('pull-refresh-indicator');
-
-        window.addEventListener('touchstart', (e) => {
-            if (activeTab === 'home' && window.scrollY === 0) {
-                startY = e.touches[0].pageY;
-                isPulling = true;
-            }
-        });
-
-        window.addEventListener('touchmove', (e) => {
-            if (activeTab !== 'home') return; 
-            if (!isPulling) return;
-            const currentY = e.touches[0].pageY;
-            const diff = currentY - startY;
-
-            if (diff > 0 && window.scrollY === 0) {
-                const height = Math.min(diff * 0.4, 70);
-                pullIndicator.style.height = `${height}px`;
-                e.preventDefault();
-            }
-        }, { passive: false });
-
-        window.addEventListener('touchend', () => {
-            if (activeTab !== 'home') return;
-            if (!isPulling) return;
-            isPulling = false;
-            const height = parseInt(pullIndicator.style.height) || 0;
-            if (height >= 50) {
-                pullIndicator.style.height = '50px';
-                simulateReload();
-            } else {
-                pullIndicator.style.height = '0px';
-            }
-        });
-
-        function simulateReload() {
-            setTimeout(() => {
-                pullIndicator.style.height = '0px';
-                propertiesLimit = 20; 
-                refreshAllGrids();
-            }, 1200);
-        }
-
-        // UNIFIED STATE MANAGEMENT REFRESH FUNCTION
-        function refreshAllGrids() {
-            localStorage.setItem('properties_db', JSON.stringify(properties));
-            localStorage.setItem('users_db', JSON.stringify(registeredUsers));
-            localStorage.setItem('pending_db', JSON.stringify(pendingProperties));
-
-            if (isFilteringActive) {
-                renderFilteredProperties();
-            } else {
-                renderProperties();
-            }
-            renderMapMarkers();
-            renderPendingPosts();
-            renderAdminActivePosts();
-            renderAdminArchivedPosts();
-            renderAdminUsers();
-            updateAdminStats(); // Auto update stats card
-        }
-
-        // UPDATE QUICK ADMIN STATISTICS PANEL
-        function updateAdminStats() {
-            if (document.getElementById('stat-active-count')) {
-                document.getElementById('stat-active-count').innerText = properties.filter(p => !p.isArchived).length;
-                document.getElementById('stat-pending-count').innerText = pendingProperties.length;
-                document.getElementById('stat-archived-count').innerText = properties.filter(p => p.isArchived).length;
-                document.getElementById('stat-users-count').innerText = registeredUsers.length;
-            }
-        }
-
-        // Toggle Filter Box Collapse
-        function toggleFilterCollapse() {
-            const el = document.getElementById('filter-collapse-box');
-            el.classList.toggle('hidden');
-        }
-
-        // Apply filters directly to standard view
-        function applyFilters() {
-            isFilteringActive = true;
-            activeFilters.type = document.getElementById('filter-type').value;
-            activeFilters.status = document.getElementById('filter-status').value;
-            activeFilters.minPrice = parseFloat(document.getElementById('filter-min-price').value) || 0;
-            activeFilters.maxPrice = parseFloat(document.getElementById('filter-max-price').value) || 5000000;
-            activeFilters.city = document.getElementById('filter-city').value.toLowerCase().trim();
-
-            renderFilteredProperties();
-        }
-
-        function clearFilters() {
-            document.getElementById('filter-type').value = 'all';
-            document.getElementById('filter-status').value = 'all';
-            document.getElementById('filter-min-price').value = '';
-            document.getElementById('filter-max-price').value = '';
-            document.getElementById('filter-city').value = '';
-
-            isFilteringActive = false;
-            propertiesLimit = 20;
-            activeFilters = {
-                type: 'all',
-                status: 'all',
-                minPrice: 0,
-                maxPrice: 5000000,
-                city: ''
-            };
-            refreshAllGrids();
-        }
-
-        // Load More properties
-        function loadMoreProperties() {
-            propertiesLimit += 20;
-            if (isFilteringActive) {
-                renderFilteredProperties();
-            } else {
-                renderProperties();
-            }
-        }
-
-        // Tab switching
-        function switchTab(tabId) {
-            activeTab = tabId; 
-            document.querySelectorAll('.screen-tab').forEach(screen => screen.classList.add('hidden'));
-            document.querySelectorAll('div.fixed button').forEach(btn => {
-                btn.classList.remove('text-blue-400');
-                btn.classList.add('text-slate-400');
-            });
-
-            document.getElementById(`screen-${tabId}`).classList.remove('hidden');
-            document.getElementById(`nav-${tabId}`).classList.add('text-blue-400');
-            document.getElementById(`nav-${tabId}`).classList.remove('text-slate-400');
-
-            if (tabId === 'map') {
-                setTimeout(initMap, 100);
-            }
-            if (tabId === 'add') {
-                setTimeout(initPickerMap, 100);
-            }
-        }
-
-        // Initialize Map
-        function initMap() {
-            if (!map) {
-                map = L.map('map-container', { zoomControl: false }).setView([36.868, 42.997], 13);
-                activeTileLayer = L.tileLayer(mapStyles.standard).addTo(map);
-            }
-            map.invalidateSize();
-            renderMapMarkers();
-        }
-
-        // Initialize Location Map Picker inside Add screen
-        function initPickerMap() {
-            if (!pickerMap) {
-                pickerMap = L.map('picker-map-container', { zoomControl: false }).setView([36.868, 42.997], 12);
-                L.tileLayer(mapStyles.standard).addTo(pickerMap);
-
-                pickerMarker = L.marker([36.868, 42.997], { draggable: true }).addTo(pickerMap);
-                pickerMarker.on('dragend', function () {
-                    pickedCoords = pickerMarker.getLatLng();
-                });
-
-                pickerMap.on('click', function (e) {
-                    pickedCoords = e.latlng;
-                    pickerMarker.setLatLng(pickedCoords);
-                });
-            }
-            pickerMap.invalidateSize();
-        }
-
-        // Locate Me action (GPS tracker)
-        function locateOnMap(mapInstance, markerInstance) {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function (position) {
-                    const lat = position.coords.latitude;
-                    const lng = position.coords.longitude;
-                    mapInstance.setView([lat, lng], 15);
-                    
-                    if (markerInstance) {
-                        markerInstance.setLatLng([lat, lng]);
-                        pickedCoords = { lat: lat, lng: lng };
+        // دەمێ پیتەک د فۆرمێ دا دهێتە نڤیسین، ئێکسەر دکەڤیتە سەر عەقدی
+        function updateContract() {
+            fields.forEach(field => {
+                const inputEl = document.getElementById('in_' + field);
+                const outputEl = document.getElementById('out_' + field);
+                if (inputEl && outputEl) {
+                    if (inputEl.value.trim() !== '') {
+                        outputEl.textContent = inputEl.value;
+                    } else {
+                        // ئەگەر بەتاڵ بیت، هێلەکا دەستپێکی دانە
+                        outputEl.textContent = outputEl.dataset.default || '.........';
                     }
-                }, function () {
-                    alert("نەخێر! ڕێگە نەدرا بە دۆزینەوەی شوێن یان هێڵی تەلەفۆنت کێشەی هەیە.");
-                });
-            } else {
-                alert("وێبگەڕەکەت پشتگیری دۆزینەوەی شوێن ناکات.");
-            }
-        }
-
-        function changeMapStyle(styleName, element) {
-            if (map && activeTileLayer) {
-                map.removeLayer(activeTileLayer);
-                activeTileLayer = L.tileLayer(mapStyles[styleName]).addTo(map);
-            }
-            element.parentNode.querySelectorAll('button').forEach(btn => {
-                btn.className = "px-2.5 py-1 text-[11px] font-bold rounded-lg text-slate-500 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800";
-            });
-            element.className = "px-2.5 py-1 text-[11px] font-bold rounded-lg bg-blue-900 text-blue-300";
-        }
-
-        function renderFilteredProperties() {
-            const grid = document.getElementById('properties-grid');
-            grid.innerHTML = '';
-
-            const visibleProperties = properties.filter(p => !p.isPrivate && !p.isArchived);
-
-            const filtered = visibleProperties.filter(p => {
-                const matchesType = activeFilters.type === 'all' || p.type === activeFilters.type;
-                const matchesStatus = activeFilters.status === 'all' || p.status === activeFilters.status;
-                const matchesMinPrice = p.price >= activeFilters.minPrice;
-                const matchesMaxPrice = p.price <= activeFilters.maxPrice;
-                const matchesCity = activeFilters.city === '' || p.location.toLowerCase().includes(activeFilters.city) || p.city.toLowerCase().includes(activeFilters.city);
-
-                return matchesType && matchesStatus && matchesMinPrice && matchesMaxPrice && matchesCity;
-            });
-
-            if (filtered.length === 0) {
-                grid.innerHTML = `<p class="col-span-2 sm:col-span-3 lg:col-span-4 text-center text-xs text-slate-500 py-6">چ مۆڵک نەهاتنە دیتن ب ڤان فلتەران.</p>`;
-                document.getElementById('load-more-container').classList.add('hidden');
-                return;
-            }
-
-            const paginatedFiltered = filtered.slice(0, propertiesLimit);
-
-            paginatedFiltered.forEach(p => {
-                const soldHtml = p.status === 'sold' ? `<span class="absolute top-1.5 left-1.5 bg-red-600 text-white text-[8px] px-1.5 py-0.5 rounded font-bold">هاتە فرۆتن</span>` : '';
-                const featuresBadgeHtml = p.features.map(f => `<span class="bg-slate-100 dark:bg-slate-800 text-blue-500 dark:text-blue-300 text-[8px] px-1 py-0.5 rounded-md">${f}</span>`).join(' ');
-
-                const cardHtml = `
-                    <div onclick="openDetailsModal(${p.id})" class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col justify-between relative group cursor-pointer shadow hover:shadow-lg transition">
-                        <div class="relative aspect-square bg-slate-100 dark:bg-slate-800 shrink-0 overflow-hidden">
-                            <img src="${p.images[0]}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                            <span class="absolute top-1.5 right-1.5 bg-blue-600 text-white text-[8px] px-2.5 py-0.5 rounded-full font-bold shadow">
-                                ${p.status === 'sale' ? 'فرۆتن' : p.status === 'rent' ? 'ب کرێ' : 'هاتە فرۆتن'}
-                            </span>
-                            ${soldHtml}
-                        </div>
-                        <div class="p-3 flex-1 flex flex-col justify-between">
-                            <div>
-                                <h3 class="text-xs font-bold text-slate-800 dark:text-white line-clamp-1">${p.title}</h3>
-                                <p class="text-[9px] text-slate-500">کۆد: ${p.code} | ${p.deed}</p>
-                                <div class="flex flex-wrap gap-1 mt-1">${featuresBadgeHtml}</div>
-                            </div>
-                            <div class="border-t border-slate-100 dark:border-slate-800 pt-1.5 flex justify-between items-center mt-2">
-                                <span class="text-xs font-bold text-blue-400">${p.price.toLocaleString()}$</span>
-                                <span class="text-[9px] text-slate-500 dark:text-slate-400">${p.area}م²</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                grid.insertAdjacentHTML('beforeend', cardHtml);
-            });
-
-            if (filtered.length > propertiesLimit) {
-                document.getElementById('load-more-container').classList.remove('hidden');
-            } else {
-                document.getElementById('load-more-container').classList.add('hidden');
-            }
-        }
-
-        // Render approved properties
-        function renderProperties() {
-            const grid = document.getElementById('properties-grid');
-            const aptGrid = document.getElementById('apartments-grid');
-            const slider = document.getElementById('featured-slider');
-            
-            grid.innerHTML = '';
-            aptGrid.innerHTML = '';
-            slider.innerHTML = '';
-
-            const visibleProperties = properties.filter(p => !p.isPrivate && !p.isArchived);
-
-            // 1. Horizontal Slider
-            const featuredProperties = visibleProperties.filter(p => p.isFeatured);
-            if (featuredProperties.length === 0) {
-                slider.innerHTML = `<p class="text-[10px] text-slate-500 py-4 text-center w-full">هیچ موڵکێکی سلایدەر نییە.</p>`;
-            } else {
-                featuredProperties.forEach(p => {
-                    const itemHtml = `
-                        <div onclick="openDetailsModal(${p.id})" class="snap-start shrink-0 w-72 aspect-[16/9] rounded-2xl overflow-hidden relative shadow-md group border border-slate-200 dark:border-slate-800 cursor-pointer">
-                            <img src="${p.images[0]}" class="w-full h-full object-cover">
-                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 p-4 flex flex-col justify-end text-white">
-                                <span class="bg-blue-600 text-[9px] font-bold px-2 py-0.5 rounded-full w-max mb-1">سلایدەر</span>
-                                <h3 class="text-xs font-bold">${p.title}</h3>
-                                <p class="text-[10px] text-slate-300">$${p.price.toLocaleString()} | کۆد: ${p.code}</p>
-                            </div>
-                        </div>
-                    `;
-                    slider.insertAdjacentHTML('beforeend', itemHtml);
-                });
-            }
-
-            // PAGINATE visible list for home screen (Main Feed Grid)
-            const paginatedProperties = visibleProperties.slice(0, propertiesLimit);
-
-            paginatedProperties.forEach(p => {
-                const soldHtml = p.status === 'sold' ? `<span class="absolute top-1.5 left-1.5 bg-red-600 text-white text-[8px] px-1.5 py-0.5 rounded font-bold">هاتە فرۆتن</span>` : '';
-                const featuresBadgeHtml = p.features.map(f => `<span class="bg-slate-100 dark:bg-slate-800 text-blue-500 dark:text-blue-300 text-[8px] px-1 py-0.5 rounded-md">${f}</span>`).join(' ');
-
-                const homeCardHtml = `
-                    <div onclick="openDetailsModal(${p.id})" class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col justify-between relative group cursor-pointer shadow hover:shadow-lg transition">
-                        <div class="relative aspect-square bg-slate-100 dark:bg-slate-800 shrink-0 overflow-hidden">
-                            <img src="${p.images[0]}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                            <span class="absolute top-1.5 right-1.5 bg-blue-600 text-white text-[8px] px-2.5 py-0.5 rounded-full font-bold shadow">
-                                ${p.status === 'sale' ? 'فرۆتن' : p.status === 'rent' ? 'ب کرێ' : 'هاتە فرۆتن'}
-                            </span>
-                            ${soldHtml}
-                        </div>
-                        <div class="p-3 flex-1 flex flex-col justify-between">
-                            <div>
-                                <h3 class="text-xs font-bold text-slate-800 dark:text-white line-clamp-1">${p.title}</h3>
-                                <p class="text-[9px] text-slate-500">کۆد: ${p.code} | ${p.deed}</p>
-                                <div class="flex flex-wrap gap-1 mt-1">${featuresBadgeHtml}</div>
-                            </div>
-                            <div class="border-t border-slate-100 dark:border-slate-800 pt-1.5 flex justify-between items-center mt-2">
-                                <span class="text-xs font-bold text-blue-400">${p.price.toLocaleString()}$</span>
-                                <span class="text-[9px] text-slate-500 dark:text-slate-400">${p.area}م²</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
-
-                grid.insertAdjacentHTML('beforeend', homeCardHtml);
-            });
-
-            // Separate Apartments Screen (Render all apartments)
-            const apartmentProperties = visibleProperties.filter(p => p.type === 'shقه' || p.type === 'شقه');
-            apartmentProperties.forEach(p => {
-                const soldHtml = p.status === 'sold' ? `<span class="absolute top-1.5 left-1.5 bg-red-600 text-white text-[8px] px-1.5 py-0.5 rounded font-bold">هاتە فرۆتن</span>` : '';
-                
-                const reelsCardHtml = `
-                    <div onclick="openDetailsModal(${p.id})" class="relative aspect-[9/16] bg-slate-900 rounded-3xl overflow-hidden border border-slate-800 group cursor-pointer shadow-lg hover:shadow-xl transition flex flex-col justify-end">
-                        <img src="${p.images[0]}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-700">
-                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent"></div>
-                        
-                        <div class="absolute top-3 left-3 right-3 flex justify-between z-10">
-                            <span class="bg-blue-600/90 backdrop-blur-md text-white text-[8px] px-2.5 py-0.5 rounded-full font-bold shadow-md">
-                                ${p.status === 'sale' ? 'فرۆتن' : p.status === 'rent' ? 'ب کرێ' : 'فرۆترا'}
-                            </span>
-                            ${p.status === 'sold' ? '<span class="bg-red-600/90 backdrop-blur-md text-white text-[8px] px-2 py-0.5 rounded-md font-bold">هاتە فرۆتن</span>' : ''}
-                        </div>
-
-                        <div class="p-3.5 z-10 space-y-1.5 text-white">
-                            <h3 class="text-xs font-bold leading-snug drop-shadow-md line-clamp-2">${p.title}</h3>
-                            <div class="flex items-center gap-1.5 text-[9px] text-slate-300">
-                                <span>📐 ${p.area}م²</span>
-                                <span>•</span>
-                                <span>🏢 ${p.floors}ق</span>
-                            </div>
-                            <p class="text-[9px] text-slate-400 font-mono">کۆد: ${p.code}</p>
-                            <div class="flex justify-between items-center border-t border-slate-800/60 pt-2 mt-1">
-                                <span class="text-xs font-black text-blue-400">${p.price.toLocaleString()}$</span>
-                                <span class="text-[8px] bg-slate-800/80 backdrop-blur-md px-1.5 py-0.5 rounded text-slate-300 font-bold">${p.payment}</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
-
-                aptGrid.insertAdjacentHTML('beforeend', reelsCardHtml);
-            });
-
-            if (visibleProperties.length > propertiesLimit) {
-                document.getElementById('load-more-container').classList.remove('hidden');
-            } else {
-                document.getElementById('load-more-container').classList.add('hidden');
-            }
-
-            renderUserPosts();
-        }
-
-        // Render user personal private profile card and posts
-        function renderUserPosts() {
-            const userContainer = document.getElementById('user-posts-container');
-            const profileInfo = document.getElementById('private-profile-info');
-            userContainer.innerHTML = '';
-            profileInfo.innerHTML = '';
-
-            if (!currentUser) {
-                profileInfo.innerHTML = `
-                    <p class="text-xs text-slate-500 py-3" data-i18n="lbl_guest_login">تکایە خۆتۆماربکە بۆ دیتنا پڕۆفایلی</p>
-                `;
-                userContainer.innerHTML = `<p class="text-xs text-slate-500 text-center py-6" data-i18n="lbl_guest_login">پێدڤی ب چوونەژوورێ هەیە بۆ دیتنا مۆلکان.</p>`;
-                return;
-            }
-
-            profileInfo.innerHTML = `
-                <div class="w-12 h-12 rounded-full bg-blue-600/20 border border-blue-500 flex items-center justify-center text-xl text-blue-400 font-bold">
-                    ${currentUser.name.substring(0, 1)}
-                </div>
-                <div class="flex-1 text-slate-850 dark:text-white">
-                    <p class="text-xs font-bold text-slate-800 dark:text-white">${currentUser.name}</p>
-                    <p class="text-[10px] text-slate-500 dark:text-slate-400">${currentUser.email}</p>
-                    <p class="text-[9px] text-slate-500 font-bold mt-1">📱 ${currentUser.phone || 'GUEST-PHONE'}</p>
-                </div>
-            `;
-
-            const userPosts = properties.filter(p => p.ownerId == currentUser.id);
-            if (userPosts.length === 0) {
-                userContainer.innerHTML = `<p class="text-xs text-slate-500 text-center py-4" data-i18n="no_posts">تە چ مۆلک بەلاڤ نەکرینە.</p>`;
-                return;
-            }
-
-            userPosts.forEach(p => {
-                const userPostHtml = `
-                    <div class="bg-slate-100 dark:bg-slate-800 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 flex justify-between items-center text-xs">
-                        <div>
-                            <p class="font-bold text-slate-800 dark:text-white cursor-pointer hover:text-blue-500 transition" onclick="openDetailsModal(${p.id})">${p.title} (${p.code})</p>
-                            <p class="text-[9px] text-slate-500 dark:text-slate-400">${p.price.toLocaleString()}$ - ${p.status === 'sold' ? 'فرۆتراوە' : 'کارایە'}</p>
-                        </div>
-                        <div class="flex gap-1">
-                            <button onclick="toggleSold(${p.id})" class="px-2 py-1 bg-green-600 text-white rounded-lg text-[9px] font-bold">فرۆترا</button>
-                            <button onclick="openEditModal(${p.id}, ${p.price}, '${p.location}')" class="px-2 py-1 bg-amber-600 text-white rounded-lg text-[9px]">دەستکاری</button>
-                            <button onclick="deleteProperty(${p.id})" class="px-2 py-1 bg-red-600 text-white rounded-lg text-[9px]">ژێبرن</button>
-                        </div>
-                    </div>
-                `;
-                userContainer.insertAdjacentHTML('beforeend', userPostHtml);
-            });
-        }
-
-        // Open detailed view modal
-        function openDetailsModal(id) {
-            const p = properties.find(prop => prop.id == id);
-            if (!p) return;
-
-            detailImgList = p.images || [p.image];
-            detailActiveImgIdx = 0;
-
-            document.getElementById('details-header-title').innerText = p.title;
-            document.getElementById('details-title').innerText = p.title;
-            document.getElementById('details-sub').innerText = `کۆد: ${p.code} | جۆرێ سندی: ${p.deed}`;
-            document.getElementById('details-price').innerText = `$${p.price.toLocaleString()}`;
-            document.getElementById('details-status').innerText = p.status === 'sale' ? 'فرۆتن' : p.status === 'rent' ? 'کرێ' : 'فرۆترا';
-            
-            document.getElementById('details-loc').innerText = p.location;
-            document.getElementById('details-city').innerText = p.city || '-';
-            document.getElementById('details-area').innerText = p.area ? `${p.area} m²` : '-';
-            document.getElementById('details-rooms').innerText = p.rooms || '-';
-            document.getElementById('details-floors').innerText = p.floors || '-';
-            document.getElementById('details-age').innerText = p.age || '-';
-            document.getElementById('details-pay').innerText = p.payment;
-            document.getElementById('details-dir').innerText = p.direction || '-';
-
-            // Generate Contact rows
-            const contactsContainer = document.getElementById('details-contacts-container');
-            contactsContainer.innerHTML = '';
-            
-            const phoneList = p.phones || [p.phone];
-            phoneList.forEach((phoneNum, idx) => {
-                if (!phoneNum || phoneNum.trim() === '') return;
-                const cleanPhoneNum = phoneNum.replace(/[\s\+\-]/g, '').replace(/^0/, '964');
-
-                contactsContainer.insertAdjacentHTML('beforeend', `
-                    <div class="flex items-center justify-between p-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200">
-                        <span class="text-xs font-bold font-mono">📞 تەلەفۆنێ ${idx + 1}: ${phoneNum}</span>
-                        <div class="flex gap-1.5">
-                            <a href="tel:${phoneNum}" class="px-2.5 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-bold transition">تەلەفۆن</a>
-                            <a href="https://wa.me/${cleanPhoneNum}" target="_blank" class="px-2.5 py-1.5 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-xs font-bold transition">واتسئاپ</a>
-                        </div>
-                    </div>
-                `);
-            });
-
-            // Features lists rendering
-            const featuresContainer = document.getElementById('details-features-container');
-            featuresContainer.innerHTML = '';
-            if (p.features && p.features.length > 0) {
-                p.features.forEach(f => {
-                    featuresContainer.insertAdjacentHTML('beforeend', `<span class="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 text-blue-500 dark:text-blue-300 text-[10px] px-2.5 py-1 rounded-lg font-bold">${f}</span>`);
-                });
-            } else {
-                featuresContainer.innerHTML = `<span class="text-slate-500 text-[10px]">هیچ تایبەتمەندیەک نییە</span>`;
-            }
-
-            updateDetailImage();
-            document.getElementById('details-modal').classList.remove('hidden');
-        }
-
-        function closeDetailsModal() {
-            document.getElementById('details-modal').classList.add('hidden');
-        }
-
-        function updateDetailImage() {
-            document.getElementById('details-carousel-img').src = detailImgList[detailActiveImgIdx];
-            document.getElementById('details-carousel-counter').innerText = `${detailActiveImgIdx + 1}/${detailImgList.length}`;
-        }
-
-        function nextDetailImg() {
-            if (detailActiveImgIdx < detailImgList.length - 1) {
-                detailActiveImgIdx++;
-                updateDetailImage();
-            } else {
-                detailActiveImgIdx = 0;
-                updateDetailImage();
-            }
-        }
-
-        function prevDetailImg() {
-            if (detailActiveImgIdx > 0) {
-                detailActiveImgIdx--;
-                updateDetailImage();
-            } else {
-                detailActiveImgIdx = detailImgList.length - 1;
-                updateDetailImage();
-            }
-        }
-
-        function handleImageSelection(input) {
-            const files = Array.from(input.files).slice(0, 7);
-            const container = document.getElementById('image-previews');
-            container.innerHTML = '';
-            selectedBase64Images = [];
-
-            if (files.length === 0) return;
-
-            files.forEach(file => {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    selectedBase64Images.push(e.target.result);
-                    container.insertAdjacentHTML('beforeend', `
-                        <div class="relative w-16 h-16 rounded-xl border border-slate-300 dark:border-slate-700 overflow-hidden shrink-0">
-                            <img src="${e.target.result}" class="w-full h-full object-cover">
-                        </div>
-                    `);
-                };
-                reader.readAsDataURL(file);
-            });
-        }
-
-        // Auth Modal controls
-        function openAuthModal() {
-            document.getElementById('auth-modal').classList.remove('hidden');
-        }
-
-        function closeAuthModal() {
-            document.getElementById('auth-modal').classList.add('hidden');
-        }
-
-        function setAuthTab(tab) {
-            currentAuthTab = tab;
-            const btnLogin = document.getElementById('tab-login');
-            const btnRegister = document.getElementById('tab-register');
-            const registerFields = document.getElementById('register-fields');
-
-            if (tab === "login") {
-                btnLogin.className = "py-1.5 text-xs font-bold rounded-lg bg-white dark:bg-slate-700 shadow text-slate-900 dark:text-white";
-                btnRegister.className = "py-1.5 text-xs font-bold rounded-lg text-slate-500";
-                registerFields.classList.add('hidden');
-                document.getElementById('auth-title').innerText = translations[currentLanguage].tab_login;
-            } else {
-                btnRegister.className = "py-1.5 text-xs font-bold rounded-lg bg-white dark:bg-slate-700 shadow text-slate-900 dark:text-white";
-                btnLogin.className = "py-1.5 text-xs font-bold rounded-lg text-slate-500";
-                registerFields.classList.remove('hidden');
-                document.getElementById('auth-title').innerText = translations[currentLanguage].tab_register;
-            }
-        }
-
-        function submitAuth() {
-            const email = document.getElementById('auth-email').value;
-            const name = document.getElementById('auth-name').value || translations[currentLanguage].guest_name;
-            const phone = document.getElementById('auth-phone').value || "07500000000";
-            
-            if (!email) {
-                alert("پێدڤیە ئیمێلی بنڤیسی!");
-                return;
-            }
-
-            const newId = registeredUsers.length + 1;
-            currentUser = { id: newId, name: name, email: email, phone: phone, avatar: "👤" };
-            registeredUsers.push(currentUser);
-
-            updateAuthUI();
-            closeAuthModal();
-            renderAdminUsers();
-        }
-
-        function loginWithGmail() {
-            currentUser = registeredUsers[0]; // Admin Omêd
-            updateAuthUI();
-            closeAuthModal();
-            alert("ب سەرکەفتی ل سەر جیمێڵێ داخڵبووی!");
-        }
-
-        function loginAsGuest() {
-            currentUser = { id: 99, name: translations[currentLanguage].guest_name, email: "guest@aqarat24.com", phone: "0750-guest", avatar: "👤" };
-            updateAuthUI();
-            closeAuthModal();
-        }
-
-        function logout() {
-            currentUser = null;
-            updateAuthUI();
-            refreshAllGrids();
-        }
-
-        function updateAuthUI() {
-            const badge = document.getElementById('user-badge');
-            if (currentUser) {
-                badge.innerHTML = `
-                    <div class="flex items-center gap-2">
-                        <span class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 flex items-center justify-center text-sm">${currentUser.avatar}</span>
-                        <div class="hidden sm:block text-right">
-                            <p class="text-xs font-bold text-slate-700 dark:text-white">${currentUser.name}</p>
-                        </div>
-                        <button onclick="logout()" class="p-1 px-2.5 bg-red-950/30 text-red-400 text-[10px] font-bold rounded-lg">چوونە دەر</button>
-                    </div>
-                `;
-            } else {
-                badge.innerHTML = `
-                    <button onclick="openAuthModal()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition shadow" data-i18n="auth_btn">
-                        چوونەژوور / پڕۆفایل
-                    </button>
-                `;
-            }
-            refreshAllGrids();
-        }
-
-        function toggleDarkMode() {
-            const isDark = document.documentElement.classList.toggle('dark');
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
-        }
-
-        // Switching between system languages
-        function setLanguage(lang, element) {
-            currentLanguage = lang;
-            
-            if (lang === 'english') {
-                document.documentElement.setAttribute('dir', 'ltr');
-                document.documentElement.setAttribute('lang', 'en');
-            } else {
-                document.documentElement.setAttribute('dir', 'rtl');
-                document.documentElement.setAttribute('lang', 'ku');
-            }
-
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                const key = el.getAttribute('data-i18n');
-                if (translations[lang] && translations[lang][key]) {
-                    el.innerText = translations[lang][key];
                 }
             });
-
-            element.parentNode.querySelectorAll('button').forEach(btn => {
-                btn.className = "p-1.5 text-[11px] bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-700 dark:text-slate-300";
-            });
-            element.className = "p-1.5 text-[11px] bg-blue-900/30 border border-blue-500 rounded-xl text-blue-300 font-bold";
-
-            refreshAllGrids();
         }
 
-        // Sold status switch
-        function toggleSold(id) {
-            const idx = properties.findIndex(p => p.id == id);
-            if (idx !== -1) {
-                properties[idx].status = properties[idx].status === 'sold' ? 'sale' : 'sold';
-                refreshAllGrids();
-            }
-        }
-
-        function deleteProperty(id) {
-            if (confirm("تۆ پشتڕاستی ژ ژێبرنا ڤی پۆستی؟")) {
-                properties = properties.filter(p => p.id != id);
-                refreshAllGrids();
-            }
-        }
-
-        // Edit property controls
-        function openEditModal(id, price, location) {
-            document.getElementById('edit-id').value = id;
-            document.getElementById('edit-price').value = price;
-            document.getElementById('edit-location').value = location;
-            document.getElementById('edit-modal').classList.remove('hidden');
-        }
-
-        function closeEditModal() {
-            document.getElementById('edit-modal').classList.add('hidden');
-        }
-
-        function savePropertyEdit() {
-            const id = parseInt(document.getElementById('edit-id').value);
-            const price = parseFloat(document.getElementById('edit-price').value);
-            const location = document.getElementById('edit-location').value;
-
-            const idx = properties.findIndex(p => p.id == id);
-            if (idx !== -1) {
-                properties[idx].price = price;
-                properties[idx].location = location;
-                refreshAllGrids();
-            }
-            closeEditModal();
-        }
-
-        // Stealthy Secret Admin Dashboard trigger
-        function triggerAdminTap() {
-            adminTapCount++;
-            if (adminTapCount >= 10) {
-                adminTapCount = 0;
-                openAdminModal();
-            }
-        }
-
-        function openAdminModal() {
-            document.getElementById('admin-modal').classList.remove('hidden');
-            document.getElementById('admin-login-view').classList.remove('hidden');
-            document.getElementById('admin-dashboard-view').classList.add('hidden');
-            document.getElementById('admin-password').value = '';
-        }
-
-        function closeAdminModal() {
-            document.getElementById('admin-modal').classList.add('hidden');
-        }
-
-        // AUTHORIZE ADMIN MODE
-        function loginAsAdmin() {
-            const pass = document.getElementById('admin-password').value;
-            if (pass === 'omed24') {
-                document.getElementById('admin-login-view').classList.add('hidden');
-                document.getElementById('admin-dashboard-view').classList.remove('hidden');
-                refreshAllGrids();
-            } else {
-                alert("کۆد خەلەتە!");
-            }
-        }
-
-        // DYNAMIC ADMIN SEARCH FILTER TRIGGERS
-        function applyAdminSearch() {
-            adminSearchQuery = document.getElementById('admin-search-input').value.toLowerCase().trim();
-            renderPendingPosts();
-            renderAdminActivePosts();
-            renderAdminArchivedPosts();
-            renderAdminUsers();
-        }
-
-        function clearAdminSearch() {
-            document.getElementById('admin-search-input').value = "";
-            adminSearchQuery = "";
-            applyAdminSearch();
-        }
-
-        // VERIFY ON MAP (Centering & previewing pending properties on the leaflet map)
-        function locatePendingOnMap(id) {
-            const p = pendingProperties.find(item => item.id == id);
-            if (p) {
-                closeAdminModal();
-                switchTab('map');
-                
-                // Centering map
-                setTimeout(() => {
-                    map.setView([p.lat, p.lng], 15);
-                    
-                    // Temp review pin addition
-                    const tempMarker = L.marker([p.lat, p.lng]).addTo(map)
-                        .bindPopup(`<div class="text-right font-sans text-xs"><b>Reviewing: ${p.title}</b><br>کۆد: ${p.code}</div>`)
-                        .openPopup();
-                }, 300);
-            }
-        }
-
-        // Render pending approvals in admin dashboard (Loose ID equality)
-        function renderPendingPosts() {
-            const container = document.getElementById('pending-posts-container');
-            container.innerHTML = '';
-
-            let list = pendingProperties;
-            if (adminSearchQuery !== "") {
-                list = list.filter(p => 
-                    p.title.toLowerCase().includes(adminSearchQuery) || 
-                    p.code.toLowerCase().includes(adminSearchQuery) || 
-                    p.location.toLowerCase().includes(adminSearchQuery)
-                );
-            }
-
-            if (list.length === 0) {
-                container.innerHTML = `<p class="text-[10px] text-slate-500 text-center py-2">هیچ پۆستێکی گونجاو نەدۆزرایەوە.</p>`;
-                return;
-            }
-
-            list.forEach(p => {
-                const owner = registeredUsers.find(u => u.id == p.ownerId);
-                const ownerName = owner ? owner.name : "Guest User";
-
-                container.insertAdjacentHTML('beforeend', `
-                    <div class="p-3 border border-slate-200 dark:border-slate-800 rounded-xl flex flex-col gap-2 bg-slate-50 dark:bg-slate-950 text-xs">
-                        <div class="flex justify-between items-center">
-                            <div>
-                                <p class="font-bold text-slate-800 dark:text-white">${p.title} (${p.code})</p>
-                                <p class="text-[9px] text-slate-500">ناردن ل لایێ: <span class="text-blue-500 font-bold">${ownerName}</span></p>
-                                <p class="text-[9px] text-slate-500">بها: ${p.price.toLocaleString()}$ | جهـ: ${p.location}</p>
-                                <p class="text-[9px] text-red-500 font-bold">ژمارا ئەردی: ${p.landNumber}</p>
-                            </div>
-                            <div class="flex flex-wrap gap-1 justify-end">
-                                <button onclick="locatePendingOnMap(${p.id})" class="px-2 py-1 bg-blue-900/30 text-blue-300 rounded text-[9px] font-bold">📍 نیشاندان ل نەخشەی</button>
-                                <button onclick="approvePost(${p.id})" class="px-3 py-1 bg-green-600 text-white rounded-lg font-bold text-[10px]">پەسەند</button>
-                                <button onclick="rejectPost(${p.id})" class="px-3 py-1 bg-red-600 text-white rounded-lg font-bold text-[10px]">ڕەتکرن</button>
-                            </div>
-                        </div>
-                    </div>
-                `);
-            });
-        }
-
-        // Render active posts in admin dashboard (Loose ID equality)
-        function renderAdminActivePosts() {
-            const container = document.getElementById('admin-active-posts-container');
-            container.innerHTML = '';
-
-            let list = properties.filter(p => !p.isArchived);
-            if (adminSearchQuery !== "") {
-                list = list.filter(p => 
-                    p.title.toLowerCase().includes(adminSearchQuery) || 
-                    p.code.toLowerCase().includes(adminSearchQuery) || 
-                    p.location.toLowerCase().includes(adminSearchQuery)
-                );
-            }
-
-            if (list.length === 0) {
-                container.innerHTML = `<p class="text-[10px] text-slate-500 text-center py-2">هیچ مۆڵکێکی چالاک نەدۆزرایەوە.</p>`;
-                return;
-            }
-
-            list.forEach(p => {
-                const isFeaturedBadge = p.isFeatured ? 'bg-yellow-600 text-white' : 'bg-slate-800 text-slate-400';
-                const isPrivateBadge = p.isPrivate ? 'bg-red-600 text-white' : 'bg-slate-800 text-slate-400';
-                
-                const owner = registeredUsers.find(u => u.id == p.ownerId);
-                const ownerName = owner ? owner.name : "System Agent";
-
-                container.insertAdjacentHTML('beforeend', `
-                    <div class="p-3 border border-slate-200 dark:border-slate-800 rounded-xl flex flex-col gap-2.5 bg-slate-50 dark:bg-slate-950 text-xs">
-                        <div class="flex justify-between items-center">
-                            <div>
-                                <p class="font-bold text-slate-800 dark:text-white">${p.title} (${p.code})</p>
-                                <p class="text-[9px] text-slate-400">خودانێ مۆڵکێ: <span class="text-blue-500 font-bold">${ownerName}</span></p>
-                                <p class="text-[9px] text-slate-500">بها: ${p.price.toLocaleString()}$ | جهـ: ${p.location}</p>
-                                <p class="text-[9px] text-red-500 font-bold">ژمارا ئەردی: ${p.landNumber || '-'}</p>
-                            </div>
-                            <div class="flex gap-1.5">
-                                <button onclick="openEditModal(${p.id}, ${p.price}, '${p.location}')" class="px-2 py-0.5 bg-amber-600 text-white rounded text-[9px] font-bold">دەستکاری</button>
-                                <button onclick="archiveProperty(${p.id})" class="px-2 py-0.5 bg-purple-600 text-white rounded text-[9px] font-bold">ئەرشیف</button>
-                            </div>
-                        </div>
-                        <div class="flex gap-2 border-t border-slate-200 dark:border-slate-800 pt-2 text-[10px]">
-                            <button onclick="toggleFeatured(${p.id})" class="px-2 py-1 rounded-md text-[9px] font-bold ${isFeaturedBadge} transition">
-                                🌟 ${p.isFeatured ? 'د سلایدەری دایە' : 'بکە سلایدەر'}
-                            </button>
-                            <button onclick="togglePrivate(${p.id})" class="px-2 py-1 rounded-md text-[9px] font-bold ${isPrivateBadge} transition">
-                                🔒 ${p.isPrivate ? 'تایبەت (Private)' : 'بکە تایبەت'}
-                            </button>
-                        </div>
-                    </div>
-                `);
-            });
-        }
-
-        // Render archived posts in admin dashboard (Loose ID equality)
-        function renderAdminArchivedPosts() {
-            const container = document.getElementById('admin-archived-posts-container');
-            container.innerHTML = '';
-
-            let list = properties.filter(p => p.isArchived);
-            if (adminSearchQuery !== "") {
-                list = list.filter(p => 
-                    p.title.toLowerCase().includes(adminSearchQuery) || 
-                    p.code.toLowerCase().includes(adminSearchQuery) || 
-                    p.location.toLowerCase().includes(adminSearchQuery)
-                );
-            }
-
-            if (list.length === 0) {
-                container.innerHTML = `<p class="text-[10px] text-slate-500 text-center py-2">هیچ مۆڵکێکی ئەرشیفکراو نەدۆزرایەوە.</p>`;
-                return;
-            }
-
-            list.forEach(p => {
-                container.insertAdjacentHTML('beforeend', `
-                    <div class="p-3 border border-slate-200 dark:border-slate-800 rounded-xl flex justify-between items-center bg-slate-50 dark:bg-slate-950 text-xs">
-                        <div>
-                            <p class="font-bold text-slate-800 dark:text-white">${p.title} (${p.code})</p>
-                            <p class="text-[9px] text-purple-400 font-bold">ئەرشیفکری | بها: ${p.price.toLocaleString()}$</p>
-                        </div>
-                        <div class="flex gap-1.5">
-                            <button onclick="restoreProperty(${p.id})" class="px-2 py-1 bg-green-600 text-white rounded-lg text-[9px] font-bold">ڤەگەڕاندن</button>
-                            <button onclick="permanentlyDelete(${p.id})" class="px-2 py-1 bg-red-600 text-white rounded-lg text-[9px] font-bold">ژێبرنا ئێکجاری</button>
-                        </div>
-                    </div>
-                `);
-            });
-        }
-
-        // Render registered users in admin panel
-        function renderAdminUsers() {
-            const container = document.getElementById('admin-users-container');
-            container.innerHTML = '';
-
-            let list = registeredUsers;
-            if (adminSearchQuery !== "") {
-                list = list.filter(u => 
-                    u.name.toLowerCase().includes(adminSearchQuery) || 
-                    u.email.toLowerCase().includes(adminSearchQuery) || 
-                    u.phone.toLowerCase().includes(adminSearchQuery)
-                );
-            }
-
-            list.forEach(u => {
-                const userPostsCount = properties.filter(p => p.ownerId == u.id).length;
-                container.insertAdjacentHTML('beforeend', `
-                    <div class="p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl flex justify-between items-center text-[11px]">
-                        <div>
-                            <p class="font-bold text-slate-800 dark:text-slate-100">${u.name}</p>
-                            <p class="text-[9px] text-slate-500">${u.email} | 📞 ${u.phone}</p>
-                        </div>
-                        <span class="bg-blue-900/30 text-blue-300 px-2 py-0.5 rounded font-mono font-bold text-[9px]">${userPostsCount} Posts</span>
-                    </div>
-                `);
-            });
-        }
-
-        function toggleFeatured(id) {
-            const idx = properties.findIndex(p => p.id == id);
-            if (idx !== -1) {
-                properties[idx].isFeatured = !properties[idx].isFeatured;
-                refreshAllGrids();
-            }
-        }
-
-        function togglePrivate(id) {
-            const idx = properties.findIndex(p => p.id == id);
-            if (idx !== -1) {
-                properties[idx].isPrivate = !properties[idx].isPrivate;
-                refreshAllGrids();
-            }
-        }
-
-        function archiveProperty(id) {
-            const idx = properties.findIndex(p => p.id == id);
-            if (idx !== -1) {
-                properties[idx].isArchived = true;
-                refreshAllGrids();
-                alert("مۆڵک بۆ پشکا ئەرشیفی هاتە ڤەگوهاستن!");
-            }
-        }
-
-        function restoreProperty(id) {
-            const idx = properties.findIndex(p => p.id == id);
-            if (idx !== -1) {
-                properties[idx].isArchived = false;
-                refreshAllGrids();
-                alert("مۆڵک دیسانەوە ل بازاڕی چاکبوویەوە!");
-            }
-        }
-
-        function permanentlyDelete(id) {
-            if (confirm("تۆ پشتڕاستی ژ ژێبرنا ئێکجاری یا ڤی مۆڵکی ل داتابەیسی؟")) {
-                properties = properties.filter(p => p.id != id);
-                refreshAllGrids();
-            }
-        }
-
-        function approvePost(id) {
-            const post = pendingProperties.find(p => p.id == id);
-            if (post) {
-                properties.unshift(post);
-                pendingProperties = pendingProperties.filter(p => p.id != id);
-                refreshAllGrids();
-                alert("موڵک بە سەرکەوتوویی پەسەندکرا!");
-            }
-        }
-
-        function rejectPost(id) {
-            pendingProperties = pendingProperties.filter(p => p.id != id);
-            refreshAllGrids();
-            alert("پۆست هاتە ڕەتکرن.");
-        }
-
-        // SUBMIT AND SEND TO PENDING FOR APPROVAL (Routing back as standard flow)
-        function submitForApproval() {
-            if (!currentUser) {
-                alert("تکایە خۆتۆماربکە یان ب مێهڤانی داخل ببە بۆ زیادکردنا مۆلکان!");
-                openAuthModal();
-                return;
-            }
-
-            const phone1 = document.getElementById('input-phone-1').value;
-            const location = document.getElementById('input-location').value;
-            const type = document.getElementById('input-type').value;
-
-            if (!phone1 || !location || !type) {
-                alert("تکایە خانەیێن ناچاری پڕ بکە (تەلەفۆنێ ١، ناڤونیشان، جۆرێ موڵکی)!");
-                return;
-            }
-
-            const phone2 = document.getElementById('input-phone-2').value;
-            const phone3 = document.getElementById('input-phone-3').value;
-            const phonesArray = [phone1];
-            if (phone2 && phone2.trim() !== '') phonesArray.push(phone2);
-            if (phone3 && phone3.trim() !== '') phonesArray.push(phone3);
-
-            const price = parseFloat(document.getElementById('input-price').value) || 0;
-            const code = document.getElementById('input-code').value || "AQ-NEW";
-            const payment = document.getElementById('input-payment').value;
-            const city = document.getElementById('input-city').value || "-";
-            const deed = document.getElementById('input-deed').value;
-            const area = document.getElementById('input-area').value || "";
-            const rooms = document.getElementById('input-rooms').value || "";
-            const age = document.getElementById('input-age').value;
-            const floors = document.getElementById('input-floors').value || "";
-            const direction = document.getElementById('input-direction').value || "-";
-            const status = document.getElementById('input-status').value;
-            const landNumber = document.getElementById('input-land-number').value || "-";
-
-            const features = [];
-            if (document.getElementById('check-garage').checked) features.push("گەراجێ تڕۆمبێلێ");
-            if (document.getElementById('check-pool').checked) features.push("مەسبەح (حەوز)");
-            if (document.getElementById('check-furnished').checked) features.push("کەلوپەل تێدانە");
-            if (document.getElementById('check-cameras').checked) features.push("کامێرێن چاڤدێریێ");
-            if (document.getElementById('check-elevator').checked) features.push("لێفت");
-
-            const lat = pickedCoords.lat;
-            const lng = pickedCoords.lng;
-
-            let propertyImgList = [...selectedBase64Images];
-            if (propertyImgList.length === 0) {
-                propertyImgList = [
-                    type === 'مەزرەعە' 
-                    ? "https://images.unsplash.com/photo-1592595896551-12b371d546d5?auto=format&fit=crop&w=600&h=400&q=80"
-                    : "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=600&h=400&q=80"
-                ];
-            }
-
-            const isFeaturedFlag = (type === 'ڤێلا'); 
-
-            // Pushed as pending for admin approval
-            const newPendingPost = {
-                id: Date.now(),
-                title: `${type} نوو ل دهۆکێ`,
-                code: code,
-                type: type,
-                location: location,
-                city: city,
-                price: price,
-                area: area,
-                rooms: rooms,
-                phones: phonesArray,
-                lat: lat,
-                lng: lng,
-                status: status,
-                deed: deed,
-                payment: payment,
-                age: age,
-                floors: floors,
-                direction: direction,
-                landNumber: landNumber,
-                features: features,
-                images: propertyImgList,
-                isFeatured: isFeaturedFlag,
-                isPrivate: false,
-                isArchived: false,
-                ownerId: currentUser.id
+        // داتایێن نموونەیی بۆ تاقیکرنێ ب ئێک کلیک
+        function fillDemoData() {
+            const demo = {
+                date: '20 / 09 / 2024',
+                seller_name: 'ئەحمەد سەعید مەحمود',
+                seller_phone: '0750 123 4567',
+                buyer_name: 'رێبوار عەلی حەسەن',
+                buyer_phone: '0750 987 6543',
+                donam: '-',
+                ulk: '-',
+                meter: '240',
+                dm: '-',
+                building: 'A',
+                floor: '3',
+                apt_no: '12',
+                project: 'ئاڤرۆ ستی',
+                prop_type: 'شققە',
+                house_no: '12/B',
+                chain_no: '104',
+                neighbor: 'ماسیکێ',
+                plot_no: '345/12',
+                sector_no: '45',
+                sector_name: 'دۆمیز',
+                price_num: '115,000 $',
+                price_words: 'سەد و پازدە هزار دۆلارێن ئەمریکی',
+                earnest_money: '10,000 $',
+                seller_penalty: '10,000 $',
+                buyer_penalty: '10,000 $',
+                expenses_on: 'فرۆشیاری',
+                broker_fee: '2',
+                delay_fine: '500 $',
+                handover_date: '01 / 11 / 2024',
+                lawyer: 'طالب موسى حامد (0750 459 8521)',
+                witness1: 'سەردار خالد',
+                witness2: 'هەڤال یاسین'
             };
 
-            pendingProperties.push(newPendingPost);
-            refreshAllGrids();
-            
-            alert("مۆڵک ب سەرکەفتی هاتە ناردن! ل هیڤیا پەسەندکرنا ئەدمینی بمینە.");
-            resetAddForm();
-            switchTab('home');
+            for (const key in demo) {
+                const el = document.getElementById('in_' + key);
+                if (el) el.value = demo[key];
+            }
+            updateContract();
         }
 
-        function resetAddForm() {
-            document.getElementById('input-price').value = '';
-            document.getElementById('input-code').value = '';
-            document.getElementById('input-location').value = '';
-            document.getElementById('input-city').value = '';
-            document.getElementById('input-area').value = '';
-            document.getElementById('input-rooms').value = '';
-            document.getElementById('input-phone-1').value = '';
-            document.getElementById('input-phone-2').value = '';
-            document.getElementById('input-phone-3').value = '';
-            document.getElementById('input-floors').value = '';
-            document.getElementById('input-direction').value = '';
-            document.getElementById('input-images').value = '';
-            document.getElementById('image-previews').innerHTML = '';
-            selectedBase64Images = [];
-
-            document.getElementById('check-garage').checked = false;
-            document.getElementById('check-pool').checked = false;
-            document.getElementById('check-furnished').checked = false;
-            document.getElementById('check-cameras').checked = false;
-            document.getElementById('check-elevator').checked = false;
+        // ڤاڵاکرنا فۆرمێ
+        function resetForm() {
+            fields.forEach(field => {
+                const el = document.getElementById('in_' + field);
+                if (el) el.value = '';
+            });
+            updateContract();
         }
 
-        // Render initially on load
-        refreshAllGrids();
+        // داگرتنا PDF ب کوالێتییا بەرز
+        function exportPDF() {
+            const element = document.getElementById('contract-view');
+            const opt = {
+                margin: 0,
+                filename: 'Grebasta_24_House_' + (document.getElementById('in_buyer_name').value || 'molk') + '.pdf',
+                image: { type: 'jpeg', quality: 0.99 },
+                html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
+        }
     </script>
+
 </body>
 </html>
