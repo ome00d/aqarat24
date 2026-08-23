@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>سیستەمێ گرێبەستان - نڤیسینگەها ٢٤</title>
+    <title>سیستەمێ گرێبەستان - عەقارات دهۆک</title>
     
-    <!-- فۆنتێن فەرمی یێن کوردی -->
+    <!-- فۆنتێن فەرمی -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;600;700;900&family=Vazirmatn:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -25,6 +25,8 @@
             --card-bg: #131d31;
             --text-light: #f8fafc;
             --text-muted: #94a3b8;
+            --success: #10b981;
+            --danger: #e11d48;
         }
 
         * {
@@ -55,6 +57,8 @@
             position: sticky;
             top: 0;
             z-index: 1000;
+            gap: 10px;
+            flex-wrap: wrap;
         }
 
         .brand-wrap {
@@ -66,20 +70,25 @@
         .brand-logo {
             background: linear-gradient(135deg, var(--accent), #eab308);
             color: #0f172a;
-            width: 38px;
-            height: 38px;
+            padding: 6px 12px;
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 900;
-            font-size: 16px;
+            font-size: 14px;
         }
 
         .brand-text h1 { font-size: 15px; font-weight: 900; color: #fff; }
         .brand-text span { font-size: 10.5px; color: var(--accent); }
 
-        .tab-switcher {
+        .center-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tab-switcher, .lang-switcher {
             display: flex;
             background: #090d16;
             padding: 4px;
@@ -88,38 +97,42 @@
             gap: 4px;
         }
 
-        .tab-btn {
+        .tab-btn, .lang-btn {
             background: transparent;
             color: var(--text-muted);
             border: none;
-            padding: 6px 18px;
+            padding: 6px 14px;
             border-radius: 20px;
-            font-size: 12.5px;
+            font-size: 12px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.2s ease;
         }
 
-        .tab-btn.active {
+        .tab-btn.active, .lang-btn.active {
             background: var(--accent);
             color: #0f172a;
         }
 
-        .nav-actions { display: flex; gap: 8px; }
+        .nav-actions { display: flex; gap: 6px; align-items: center; }
 
         .btn {
             border: none;
-            padding: 8px 16px;
-            font-size: 12.5px;
+            padding: 7px 12px;
+            font-size: 11.5px;
             font-weight: 700;
             border-radius: 6px;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
             transition: all 0.2s ease;
         }
-        .btn-pdf { background: #e11d48; color: #fff; }
+        .btn-save { background: var(--success); color: #fff; }
+        .btn-save:hover { background: #059669; }
+        .btn-archive { background: #6366f1; color: #fff; }
+        .btn-archive:hover { background: #4f46e5; }
+        .btn-pdf { background: var(--danger); color: #fff; }
         .btn-pdf:hover { background: #be123c; }
         .btn-print { background: var(--accent); color: #0f172a; }
         .btn-print:hover { background: #c59b27; }
@@ -186,7 +199,6 @@
         /* ==================== A4 EXACT CONTRACT STYLES ==================== */
         .a4-page {
             width: 210mm;
-            /* قوفل کرنا قەبارەیێ لاپەری داکو نەچیتە سەر لاپەرەکێ دی */
             height: 296mm; 
             max-height: 296mm;
             min-height: 296mm;
@@ -200,7 +212,6 @@
             flex-direction: column;
             justify-content: flex-start;
             gap: 6px;
-            /* نەهێلانا شۆڕبوونا تێکستی بۆ دەرڤەی لاپەری */
             overflow: hidden; 
         }
 
@@ -231,14 +242,14 @@
         }
         .c-title {
             font-family: 'Noto Kufi Arabic', sans-serif;
-            font-size: 17px;
+            font-size: 18px;
             font-weight: 900;
             color: #0f172a;
             line-height: 1.2;
             margin-top: 2px;
         }
         .c-subtitle { font-size: 10.5px; color: #b48516; font-weight: 700; letter-spacing: 0.5px; }
-        .c-meta { text-align: left; font-size: 11px; font-weight: 700; }
+        .c-meta { text-align: left; font-size: 10.5px; font-weight: 700; }
 
         /* Title */
         .c-title-strip { text-align: center; margin: 2px 0; }
@@ -287,7 +298,6 @@
             padding: 0 4px;
             min-height: 16px;
             display: inline-block;
-            /* قوفل کرنا تێکستێ درێژ */
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -377,16 +387,15 @@
         }
         .c-ctext { flex: 1; }
 
-        /* بەشێ تێبینیێ ل ژێر خالا ٨ */
+        /* بەشێ تێبینیێ */
         .c-custom-note-wrap {
-            margin-top: 5px;
+            margin-top: 4px;
             border-top: 1px dashed #cbd5e1;
             padding-top: 4px;
             font-size: 10px;
-            line-height: 1.5;
+            line-height: 1.4;
             color: #1e293b;
-            /* قوفلکرنا تێبینیێ دا تێکست نەچیتە خوارێ و لاپەر نەبیتە دوو */
-            height: 38px;
+            height: 32px;
             overflow: hidden;
         }
         .c-custom-note-title {
@@ -402,25 +411,27 @@
             word-break: break-word;
         }
 
-        /* بەشێ خوارێ (Footers & Signatures) */
-        .c-footer-wrap {
-            margin-top: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .c-note {
+        /* قوتییا ئاگەهداری و ناڤێ پارێزەری (ل ژێر تێبینیێ) */
+        .c-note-box-lawyer {
             background: #fffbeb;
             border: 1px dashed #d97706;
             border-radius: 5px;
-            padding: 5px 10px;
-            font-size: 10px;
+            padding: 4px 8px;
+            font-size: 9.8px;
             color: #92400e;
             font-weight: 700;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-top: 4px;
+        }
+
+        /* بەشێ خوارێ (Signatures) */
+        .c-footer-wrap {
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
         }
 
         /* Signatures */
@@ -433,9 +444,9 @@
             border: 1px solid var(--border);
             background: #f8fafc;
             border-radius: 5px;
-            padding: 5px 4px;
+            padding: 6px 4px;
             text-align: center;
-            height: 52px;
+            height: 56px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -449,10 +460,101 @@
         }
         .c-sig-sub { font-size: 9px; color: #64748b; font-weight: 600; }
 
-        /* PRINT STYLES - گەرەنتی کرنا ١ لاپەری ل دەمێ پرینتکرنێ */
+        /* Modal ئەرشیفێ عەقدان */
+        .modal-backdrop {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.75);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            backdrop-filter: blur(4px);
+        }
+        .modal-box {
+            background: var(--card-bg);
+            border: 1px solid var(--accent);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 780px;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+        }
+        .modal-header {
+            padding: 14px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-header h3 { font-size: 15px; color: var(--accent); }
+        .modal-close { background: none; border: none; color: #fff; font-size: 18px; cursor: pointer; }
+        .modal-body {
+            padding: 16px;
+            overflow-y: auto;
+            flex: 1;
+        }
+        .archive-search {
+            width: 100%;
+            padding: 8px 12px;
+            background: #090d16;
+            border: 1px solid #28354f;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 12px;
+            margin-bottom: 12px;
+            outline: none;
+        }
+        .archive-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            text-align: right;
+        }
+        .archive-table th {
+            background: #090d16;
+            padding: 8px;
+            color: var(--accent);
+            border-bottom: 1px solid #28354f;
+        }
+        .archive-table td {
+            padding: 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            color: #e2e8f0;
+        }
+        .btn-act {
+            padding: 4px 8px;
+            font-size: 11px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+        }
+        .btn-act-load { background: #3b82f6; color: #fff; }
+        .btn-act-del { background: #ef4444; color: #fff; margin-right: 4px; }
+
+        /* Notification Toast */
+        #toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #10b981;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 13px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            display: none;
+            z-index: 3000;
+        }
+
+        /* PRINT STYLES */
         @media print {
             body { background: none; padding: 0; margin: 0; }
-            .app-navbar, .form-panel { display: none !important; }
+            .app-navbar, .form-panel, .modal-backdrop, #toast { display: none !important; }
             .app-main { display: block; padding: 0; margin: 0; max-width: none; }
             .preview-panel { height: auto; overflow: hidden; padding: 0; margin: 0; }
             .a4-page {
@@ -476,22 +578,33 @@
     <!-- Header Navigation -->
     <header class="app-navbar">
         <div class="brand-wrap">
-            <div class="brand-logo">24</div>
+            <div class="brand-logo" id="ui_logo_text">دهۆک</div>
             <div class="brand-text">
-                <h1>سیستەمێ ئەلیکترۆنی یێ نڤیسینگەها ٢٤</h1>
-                <span>گرێبەستێن فەرمی یێن فرۆتن و کرێدانێ</span>
+                <h1 id="ui_nav_title">سیستەمێ ئەلیکترۆنی یێ عەقارات دهۆک</h1>
+                <span id="ui_nav_subtitle">گرێبەستێن فەرمی یێن فرۆتن و کرێدانێ</span>
             </div>
         </div>
 
-        <div class="tab-switcher">
-            <button class="tab-btn active" id="tab_btn_sales" onclick="switchContract('sales')">📑 گرێبەستا فرۆتنێ</button>
-            <button class="tab-btn" id="tab_btn_rent" onclick="switchContract('rent')">🔑 گرێبەستا کرێدانێ (ئیجار)</button>
+        <div class="center-controls">
+            <!-- زمان Switcher -->
+            <div class="lang-switcher">
+                <button class="lang-btn active" id="lang_btn_ku" onclick="setLanguage('ku')">کوردی</button>
+                <button class="lang-btn" id="lang_btn_ar" onclick="setLanguage('ar')">عربي</button>
+            </div>
+
+            <!-- جۆرێ گرێبەستێ -->
+            <div class="tab-switcher">
+                <button class="tab-btn active" id="tab_btn_sales" onclick="switchContract('sales')">📑 <span id="ui_tab_sales">گرێبەستا فرۆتنێ</span></button>
+                <button class="tab-btn" id="tab_btn_rent" onclick="switchContract('rent')">🔑 <span id="ui_tab_rent">گرێبەستا کرێدانێ (ئیجار)</span></button>
+            </div>
         </div>
 
         <div class="nav-actions">
-            <button class="btn btn-demo" onclick="fillDemoData()">⚡ تژی کرنا نموونەیی</button>
-            <button class="btn btn-pdf" onclick="exportPDF()">📥 داگرتن وەک PDF</button>
-            <button class="btn btn-print" onclick="window.print()">🖨️ چاپکرن (Print A4)</button>
+            <button class="btn btn-save" onclick="saveCurrentContract()"><span id="ui_btn_save">💾 خەزنکرن</span></button>
+            <button class="btn btn-archive" onclick="openArchiveModal()">📂 <span id="ui_btn_archive">ئەرشیف</span> (<span id="archive_count">0</span>)</button>
+            <button class="btn btn-demo" onclick="fillDemoData()">⚡ <span id="ui_btn_demo">نموونە</span></button>
+            <button class="btn btn-pdf" onclick="exportPDF()">📥 PDF</button>
+            <button class="btn btn-print" onclick="window.print()">🖨️ <span id="ui_btn_print">چاپ (Print)</span></button>
         </div>
     </header>
 
@@ -503,127 +616,137 @@
             
             <!-- ====== فۆرمێ فرۆتنێ ====== -->
             <div id="form_sales_wrap">
-                <div class="form-section-title">📅 ١. مێژوو و رێکەفت</div>
-                <div class="form-group">
-                    <label>مێژوویا ئیمزاکرنێ:</label>
-                    <input type="text" id="in_date" class="form-control" maxlength="25" placeholder="2024 / 09 / 20" oninput="updateContracts()">
-                </div>
-
-                <div class="form-section-title">👤 ٢. فرۆشیار و بکر</div>
+                <div class="form-section-title" id="lbl_s_sec1">📅 ١. ژمارا عەقدی و رێکەفت</div>
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>ناڤێ فرۆشیاری (سیانی):</label>
+                        <label id="lbl_s_contract_no">ژمارا گرێبەستێ (عەقدی):</label>
+                        <input type="text" id="in_contract_no" class="form-control" maxlength="20" placeholder="2024/001" oninput="updateContracts()">
+                    </div>
+                    <div class="form-group">
+                        <label id="lbl_s_date">مێژوویا ئیمزاکرنێ:</label>
+                        <input type="text" id="in_date" class="form-control" maxlength="25" placeholder="2024 / 09 / 20" oninput="updateContracts()">
+                    </div>
+                </div>
+
+                <div class="form-section-title" id="lbl_s_sec2">👤 ٢. فرۆشیار و بکر</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label id="lbl_s_seller_name">ناڤێ فرۆشیاری (سیانی):</label>
                         <input type="text" id="in_seller_name" class="form-control" maxlength="40" placeholder="ناڤێ فرۆشیاری" oninput="updateContracts()">
                     </div>
                     <div class="form-group">
-                        <label>تەلەفۆنا فرۆشیاری:</label>
+                        <label id="lbl_s_seller_phone">تەلەفۆنا فرۆشیاری:</label>
                         <input type="text" id="in_seller_phone" class="form-control" maxlength="20" placeholder="0750 123 4567" oninput="updateContracts()">
                     </div>
                     <div class="form-group">
-                        <label>ناڤێ کڕیاری (سیانی):</label>
+                        <label id="lbl_s_buyer_name">ناڤێ کڕیاری (سیانی):</label>
                         <input type="text" id="in_buyer_name" class="form-control" maxlength="40" placeholder="ناڤێ کڕیاری" oninput="updateContracts()">
                     </div>
                     <div class="form-group">
-                        <label>تەلەفۆنا کڕیاری:</label>
+                        <label id="lbl_s_buyer_phone">تەلەفۆنا کڕیاری:</label>
                         <input type="text" id="in_buyer_phone" class="form-control" maxlength="20" placeholder="0750 987 6543" oninput="updateContracts()">
                     </div>
                 </div>
 
-                <div class="form-section-title">📐 ٣. رووبەر و هوورکاریێن ئاڤاهی</div>
+                <div class="form-section-title" id="lbl_s_sec3">📐 ٣. رووبەر و هوورکاریێن ئاڤاهی</div>
                 <div class="form-grid">
-                    <div class="form-group"><label>دۆنەم:</label><input type="text" id="in_donam" class="form-control" maxlength="10" placeholder="-" oninput="updateContracts()"></div>
-                    <div class="form-group"><label>ئولک:</label><input type="text" id="in_ulk" class="form-control" maxlength="10" placeholder="-" oninput="updateContracts()"></div>
-                    <div class="form-group"><label>مەتر:</label><input type="text" id="in_meter" class="form-control" maxlength="10" placeholder="240" oninput="updateContracts()"></div>
-                    <div class="form-group"><label>دیسیمەتر:</label><input type="text" id="in_dm" class="form-control" maxlength="10" placeholder="-" oninput="updateContracts()"></div>
-                    <div class="form-group"><label>عیمارە:</label><input type="text" id="in_building" class="form-control" maxlength="10" placeholder="A" oninput="updateContracts()"></div>
-                    <div class="form-group"><label>قات:</label><input type="text" id="in_floor" class="form-control" maxlength="10" placeholder="3" oninput="updateContracts()"></div>
-                    <div class="form-group"><label>ژمارا شققێ:</label><input type="text" id="in_apt_no" class="form-control" maxlength="10" placeholder="12" oninput="updateContracts()"></div>
-                    <div class="form-group"><label>پڕۆژە:</label><input type="text" id="in_project" class="form-control" maxlength="25" placeholder="ئاڤرۆ ستی" oninput="updateContracts()"></div>
+                    <div class="form-group"><label id="lbl_s_donam">دۆنەم:</label><input type="text" id="in_donam" class="form-control" maxlength="10" placeholder="-" oninput="updateContracts()"></div>
+                    <div class="form-group"><label id="lbl_s_ulk">ئولک:</label><input type="text" id="in_ulk" class="form-control" maxlength="10" placeholder="-" oninput="updateContracts()"></div>
+                    <div class="form-group"><label id="lbl_s_meter">مەتر:</label><input type="text" id="in_meter" class="form-control" maxlength="10" placeholder="240" oninput="updateContracts()"></div>
+                    <div class="form-group"><label id="lbl_s_dm">دیسیمەتر:</label><input type="text" id="in_dm" class="form-control" maxlength="10" placeholder="-" oninput="updateContracts()"></div>
+                    <div class="form-group"><label id="lbl_s_building">عیمارە:</label><input type="text" id="in_building" class="form-control" maxlength="10" placeholder="A" oninput="updateContracts()"></div>
+                    <div class="form-group"><label id="lbl_s_floor">قات:</label><input type="text" id="in_floor" class="form-control" maxlength="10" placeholder="3" oninput="updateContracts()"></div>
+                    <div class="form-group"><label id="lbl_s_apt_no">ژمارا شققێ:</label><input type="text" id="in_apt_no" class="form-control" maxlength="10" placeholder="12" oninput="updateContracts()"></div>
+                    <div class="form-group"><label id="lbl_s_project">پڕۆژە:</label><input type="text" id="in_project" class="form-control" maxlength="25" placeholder="ئاڤرۆ ستی" oninput="updateContracts()"></div>
                 </div>
 
-                <div class="form-section-title">📑 ٤. زانیاریێن تاپۆیی</div>
+                <div class="form-section-title" id="lbl_s_sec4">📑 ٤. زانیاریێن تاپۆیی</div>
                 <div class="form-grid">
-                    <div class="form-group"><label>جۆرێ ئاڤاهی:</label><input type="text" id="in_prop_type" class="form-control" maxlength="20" placeholder="شققە" oninput="updateContracts()"></div>
-                    <div class="form-group"><label>ژمارا خانی:</label><input type="text" id="in_house_no" class="form-control" maxlength="20" placeholder="B12" oninput="updateContracts()"></div>
-                    <div class="form-group"><label>زنجیرە:</label><input type="text" id="in_chain_no" class="form-control" maxlength="20" placeholder="104" oninput="updateContracts()"></div>
-                    <div class="form-group"><label>تاخ (گەڕەک):</label><input type="text" id="in_neighbor" class="form-control" maxlength="20" placeholder="ماسیکێ" oninput="updateContracts()"></div>
-                    <div class="form-group"><label>ژمارا پارچێ:</label><input type="text" id="in_plot_no" class="form-control" maxlength="20" placeholder="345/12" oninput="updateContracts()"></div>
-                    <div class="form-group"><label>ژمارا کەرتی:</label><input type="text" id="in_sector_no" class="form-control" maxlength="20" placeholder="45" oninput="updateContracts()"></div>
-                    <div class="form-group full-width"><label>ناڤێ کەرتی:</label><input type="text" id="in_sector_name" class="form-control" maxlength="40" placeholder="دۆمیز" oninput="updateContracts()"></div>
+                    <div class="form-group"><label id="lbl_s_prop_type">جۆرێ ئاڤاهی:</label><input type="text" id="in_prop_type" class="form-control" maxlength="20" placeholder="شققە" oninput="updateContracts()"></div>
+                    <div class="form-group"><label id="lbl_s_house_no">ژمارا خانی:</label><input type="text" id="in_house_no" class="form-control" maxlength="20" placeholder="B12" oninput="updateContracts()"></div>
+                    <div class="form-group"><label id="lbl_s_chain_no">زنجیرە:</label><input type="text" id="in_chain_no" class="form-control" maxlength="20" placeholder="104" oninput="updateContracts()"></div>
+                    <div class="form-group"><label id="lbl_s_neighbor">تاخ (گەڕەک):</label><input type="text" id="in_neighbor" class="form-control" maxlength="20" placeholder="ماسیکێ" oninput="updateContracts()"></div>
+                    <div class="form-group"><label id="lbl_s_plot_no">ژمارا پارچێ:</label><input type="text" id="in_plot_no" class="form-control" maxlength="20" placeholder="345/12" oninput="updateContracts()"></div>
+                    <div class="form-group"><label id="lbl_s_sector_no">ژمارا کەرتی:</label><input type="text" id="in_sector_no" class="form-control" maxlength="20" placeholder="45" oninput="updateContracts()"></div>
+                    <div class="form-group full-width"><label id="lbl_s_sector_name">ناڤێ کەرتی:</label><input type="text" id="in_sector_name" class="form-control" maxlength="40" placeholder="دۆمیز" oninput="updateContracts()"></div>
                 </div>
 
-                <div class="form-section-title">💰 ٥. بها و مەرجێن دراڤی</div>
+                <div class="form-section-title" id="lbl_s_sec5">💰 ٥. بها و مەرجێن دراڤی</div>
                 <div class="form-grid">
-                    <div class="form-group"><label>بهایێ فرۆتنێ (ژمارە):</label><input type="text" id="in_price_num" class="form-control" maxlength="25" placeholder="115,000 $" oninput="updateContracts()"></div>
-                    <div class="form-group"><label>بهایێ فرۆتنێ (نڤیسین):</label><input type="text" id="in_price_words" class="form-control" maxlength="50" placeholder="سەد و پازدە هزار دۆلارێن ئەمریکی" oninput="updateContracts()"></div>
-                    <div class="form-group"><label>بڕێ دەسبەعی:</label><input type="text" id="in_earnest_money" class="form-control" maxlength="25" placeholder="10,000 $" oninput="updateContracts()"></div>
-                    <div class="form-group"><label>سزایێ لێڤەبوونێ:</label><input type="text" id="in_seller_penalty" class="form-control" maxlength="25" placeholder="10,000 $" oninput="updateContracts()"></div>
-                    <div class="form-group"><label>رێژا دەلالیێ (%):</label><input type="text" id="in_broker_fee" class="form-control" maxlength="10" placeholder="2" oninput="updateContracts()"></div>
-                    <div class="form-group"><label>ژڤانێ رادەستکرنێ:</label><input type="text" id="in_handover_date" class="form-control" maxlength="25" placeholder="2024 / 11 / 01" oninput="updateContracts()"></div>
+                    <div class="form-group"><label id="lbl_s_price_num">بهایێ فرۆتنێ (ژمارە):</label><input type="text" id="in_price_num" class="form-control" maxlength="25" placeholder="115,000 $" oninput="updateContracts()"></div>
+                    <div class="form-group"><label id="lbl_s_price_words">بهایێ فرۆتنێ (نڤیسین):</label><input type="text" id="in_price_words" class="form-control" maxlength="50" placeholder="سەد و پازدە هزار دۆلار" oninput="updateContracts()"></div>
+                    <div class="form-group"><label id="lbl_s_earnest_money">بڕێ دەسبەعی:</label><input type="text" id="in_earnest_money" class="form-control" maxlength="25" placeholder="10,000 $" oninput="updateContracts()"></div>
+                    <div class="form-group"><label id="lbl_s_seller_penalty">سزایێ لێڤەبوونێ:</label><input type="text" id="in_seller_penalty" class="form-control" maxlength="25" placeholder="10,000 $" oninput="updateContracts()"></div>
+                    <div class="form-group"><label id="lbl_s_broker_fee">رێژا دەلالیێ (%):</label><input type="text" id="in_broker_fee" class="form-control" maxlength="10" placeholder="2" oninput="updateContracts()"></div>
+                    <div class="form-group"><label id="lbl_s_handover_date">ژڤانێ رادەستکرنێ:</label><input type="text" id="in_handover_date" class="form-control" maxlength="25" placeholder="2024 / 11 / 01" oninput="updateContracts()"></div>
                     <div class="form-group full-width">
-                        <label>تێبینیێن زێدە (ئەگەر هەبن):</label>
-                        <!-- سنوردارکرن ب 180 پیتان دا قەبارەیێ لاپەری تێک نەدەت -->
-                        <input type="text" id="in_custom_note" class="form-control" maxlength="180" placeholder="هەر تێبینیەکا زێدە ل ڤێرە بنڤیسە..." oninput="updateContracts()">
+                        <label id="lbl_s_custom_note">تێبینیێن زێدە (ئەگەر هەبن):</label>
+                        <input type="text" id="in_custom_note" class="form-control" maxlength="180" placeholder="هەر تێبینیەکا زێدە..." oninput="updateContracts()">
                     </div>
                 </div>
             </div>
 
             <!-- ====== فۆرمێ ئیجارێ ====== -->
             <div id="form_rent_wrap" style="display: none;">
-                <div class="form-section-title">📅 ١. رێکەفت و مێژوو</div>
-                <div class="form-group">
-                    <label>مێژوویا ئیمزاکرنێ:</label>
-                    <input type="text" id="in_r_date" class="form-control" maxlength="25" placeholder="2024 / 09 / 20" oninput="updateContracts()">
-                </div>
-
-                <div class="form-section-title">👤 ٢. خودانێ ئاڤاهی و کرێچی</div>
+                <div class="form-section-title" id="lbl_r_sec1">📅 ١. ژمارا عەقدی و رێکەفت</div>
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>خودانێ ئاڤاهی (مؤجر):</label>
+                        <label id="lbl_r_contract_no">ژمارا گرێبەستێ (عەقدی):</label>
+                        <input type="text" id="in_r_contract_no" class="form-control" maxlength="20" placeholder="2024/001" oninput="updateContracts()">
+                    </div>
+                    <div class="form-group">
+                        <label id="lbl_r_date">مێژوویا ئیمزاکرنێ:</label>
+                        <input type="text" id="in_r_date" class="form-control" maxlength="25" placeholder="2024 / 09 / 20" oninput="updateContracts()">
+                    </div>
+                </div>
+
+                <div class="form-section-title" id="lbl_r_sec2">👤 ٢. خودانێ ئاڤاهی و کرێچی</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label id="lbl_r_owner">خودانێ ئاڤاهی (مؤجر):</label>
                         <input type="text" id="in_r_owner" class="form-control" maxlength="40" placeholder="ناڤێ خودانی" oninput="updateContracts()">
                     </div>
                     <div class="form-group">
-                        <label>تەلەفۆنا خودانی:</label>
+                        <label id="lbl_r_owner_phone">تەلەفۆنا خودانی:</label>
                         <input type="text" id="in_r_owner_phone" class="form-control" maxlength="20" placeholder="0750 450 1122" oninput="updateContracts()">
                     </div>
                     <div class="form-group">
-                        <label>ئەوێ ب کرێ کری (کرێچی):</label>
+                        <label id="lbl_r_tenant">ئەوێ ب کرێ کری (کرێچی):</label>
                         <input type="text" id="in_r_tenant" class="form-control" maxlength="40" placeholder="ناڤێ کرێچی" oninput="updateContracts()">
                     </div>
                     <div class="form-group">
-                        <label>تەلەفۆنا کرێچی:</label>
+                        <label id="lbl_r_tenant_phone">تەلەفۆنا کرێچی:</label>
                         <input type="text" id="in_r_tenant_phone" class="form-control" maxlength="20" placeholder="0750 780 3344" oninput="updateContracts()">
                     </div>
                 </div>
 
-                <div class="form-section-title">🏢 ٣. زانیاری و جهێ ئاڤاهی</div>
+                <div class="form-section-title" id="lbl_r_sec3">🏢 ٣. زانیاری و جهێ ئاڤاهی</div>
                 <div class="form-grid">
-                    <div class="form-group"><label>جۆرێ ئاڤاهی:</label><input type="text" id="in_r_type" class="form-control" maxlength="25" placeholder="خانی / شققە" oninput="updateContracts()"></div>
-                    <div class="form-group"><label>باژێڕ:</label><input type="text" id="in_r_city" class="form-control" maxlength="25" placeholder="دهۆک" oninput="updateContracts()"></div>
-                    <div class="form-group"><label>تاخ (گەڕەک):</label><input type="text" id="in_r_neighbor" class="form-control" maxlength="25" placeholder="نەورۆز" oninput="updateContracts()"></div>
-                    <div class="form-group"><label>جادە:</label><input type="text" id="in_r_street" class="form-control" maxlength="25" placeholder="جادا سەرەکی" oninput="updateContracts()"></div>
+                    <div class="form-group"><label id="lbl_r_type">جۆرێ ئاڤاهی:</label><input type="text" id="in_r_type" class="form-control" maxlength="25" placeholder="خانی / شققە" oninput="updateContracts()"></div>
+                    <div class="form-group"><label id="lbl_r_city">باژێڕ:</label><input type="text" id="in_r_city" class="form-control" maxlength="25" placeholder="دهۆک" oninput="updateContracts()"></div>
+                    <div class="form-group"><label id="lbl_r_neighbor">تاخ (گەڕەک):</label><input type="text" id="in_r_neighbor" class="form-control" maxlength="25" placeholder="نەورۆز" oninput="updateContracts()"></div>
+                    <div class="form-group"><label id="lbl_r_street">جادە:</label><input type="text" id="in_r_street" class="form-control" maxlength="25" placeholder="جادا سەرەکی" oninput="updateContracts()"></div>
                 </div>
 
-                <div class="form-section-title">💵 ٤. ماوە و مەرجێن دراڤی</div>
+                <div class="form-section-title" id="lbl_r_sec4">💵 ٤. ماوە و مەرجێن دراڤی</div>
                 <div class="form-grid">
-                    <div class="form-group"><label>ماوێ کرێکرنێ (ژ رۆژا):</label><input type="text" id="in_r_start_date" class="form-control" maxlength="25" placeholder="2024 / 10 / 01" oninput="updateContracts()"></div>
-                    <div class="form-group"><label>هەتا رۆژا:</label><input type="text" id="in_r_end_date" class="form-control" maxlength="25" placeholder="2025 / 10 / 01" oninput="updateContracts()"></div>
-                    <div class="form-group"><label>کرێیا هەیڤانە:</label><input type="text" id="in_r_rent_amount" class="form-control" maxlength="30" placeholder="500 $" oninput="updateContracts()"></div>
-                    <div class="form-group"><label>تامینات / دەسبەع:</label><input type="text" id="in_r_deposit" class="form-control" maxlength="30" placeholder="500 $" oninput="updateContracts()"></div>
-                    <div class="form-group full-width"><label>مەرجێ بکارئینانێ (مەبەستا ئیجارێ):</label><input type="text" id="in_r_usage" class="form-control" maxlength="40" placeholder="تنێ بۆ ئاکنجیبوونێ (سکن)" oninput="updateContracts()"></div>
+                    <div class="form-group"><label id="lbl_r_start_date">ماوێ کرێکرنێ (ژ رۆژا):</label><input type="text" id="in_r_start_date" class="form-control" maxlength="25" placeholder="2024 / 10 / 01" oninput="updateContracts()"></div>
+                    <div class="form-group"><label id="lbl_r_end_date">هەتا رۆژا:</label><input type="text" id="in_r_end_date" class="form-control" maxlength="25" placeholder="2025 / 10 / 01" oninput="updateContracts()"></div>
+                    <div class="form-group"><label id="lbl_r_rent_amount">کرێیا هەیڤانە:</label><input type="text" id="in_r_rent_amount" class="form-control" maxlength="30" placeholder="500 $" oninput="updateContracts()"></div>
+                    <div class="form-group"><label id="lbl_r_deposit">تامینات / دەسبەع:</label><input type="text" id="in_r_deposit" class="form-control" maxlength="30" placeholder="500 $" oninput="updateContracts()"></div>
+                    <div class="form-group full-width"><label id="lbl_r_usage">مەرجێ بکارئینانێ (مەبەست):</label><input type="text" id="in_r_usage" class="form-control" maxlength="40" placeholder="تنێ بۆ ئاکنجیبوونێ" oninput="updateContracts()"></div>
                     <div class="form-group full-width">
-                        <label>تێبینیێن زێدە (ئەگەر هەبن):</label>
-                        <!-- سنوردارکرن ب 180 پیتان -->
-                        <input type="text" id="in_r_custom_note" class="form-control" maxlength="180" placeholder="هەر تێبینیەکا زێدە ل ڤێرە بنڤیسە..." oninput="updateContracts()">
+                        <label id="lbl_r_custom_note">تێبینیێن زێدە (ئەگەر هەبن):</label>
+                        <input type="text" id="in_r_custom_note" class="form-control" maxlength="180" placeholder="هەر تێبینیەکا زێدە..." oninput="updateContracts()">
                     </div>
                 </div>
             </div>
 
             <!-- بەشێ دیدەڤانان -->
-            <div class="form-section-title">👥 دیدەڤان (Witnesses)</div>
+            <div class="form-section-title" id="lbl_w_sec">👥 دیدەڤان (الشهود)</div>
             <div class="form-grid">
-                <div class="form-group"><label>دیدەڤانێ ئێکێ:</label><input type="text" id="in_witness1" class="form-control" maxlength="30" placeholder="ناڤێ دیدەڤانی" oninput="updateContracts()"></div>
-                <div class="form-group"><label>دیدەڤانێ دووێ:</label><input type="text" id="in_witness2" class="form-control" maxlength="30" placeholder="ناڤێ دیدەڤانی" oninput="updateContracts()"></div>
+                <div class="form-group"><label id="lbl_witness1">دیدەڤانێ ئێکێ (الشاهد الأول):</label><input type="text" id="in_witness1" class="form-control" maxlength="30" placeholder="ناڤێ دیدەڤانی" oninput="updateContracts()"></div>
+                <div class="form-group"><label id="lbl_witness2">دیدەڤانێ دووێ (الشاهد الثاني):</label><input type="text" id="in_witness2" class="form-control" maxlength="30" placeholder="ناڤێ دیدەڤانی" oninput="updateContracts()"></div>
             </div>
 
         </div>
@@ -636,36 +759,37 @@
                 <!-- Header -->
                 <div class="c-header">
                     <div class="c-contact">
-                        <div>حازم: <span>0750 454 2800</span></div>
-                        <div>شکری: <span>0750 417 6611</span></div>
+                        <div><span id="txt_s_mob">مۆبایل</span>: <span>0750 710 0238</span></div>
+                        <div style="font-size: 9.5px; color: #64748b; margin-top:2px;" id="txt_s_header_sub">پەیوەندی و خزمەتگوزاری</div>
                     </div>
                     <div class="c-logo-box">
                         <span class="c-badge">REAL ESTATE • عەقارات</span>
-                        <h1 class="c-title">نڤیسینگەها ٢٤</h1>
-                        <div class="c-subtitle">24 REAL ESTATE</div>
+                        <h1 class="c-title" id="txt_s_office_name">عەقارات دهۆک</h1>
+                        <div class="c-subtitle">DUHOK REAL ESTATE</div>
                     </div>
                     <div class="c-meta">
-                        <div>مێژوو: <span id="out_date" class="dyn-text" style="width: 80px;">...</span></div>
-                        <div style="font-size: 9.5px; color: #b48516; margin-top:2px;">📍 دهۆک - بازاڕێ ئەرد و خانیان</div>
+                        <div><span id="txt_s_cno_lbl">ژمارا عەقدی</span>: <span id="out_contract_no" class="dyn-text" style="width: 60px;">...</span></div>
+                        <div style="margin-top:2px;"><span id="txt_s_date_lbl">مێژوو</span>: <span id="out_date" class="dyn-text" style="width: 75px;">...</span></div>
+                        <div style="font-size: 9.5px; color: #b48516; margin-top:2px;" id="txt_s_loc">📍 دهۆک - بازاڕێ ئەرد و خانیان</div>
                     </div>
                 </div>
 
                 <!-- Title -->
                 <div class="c-title-strip">
-                    <div class="c-main-title">گرێبەستا فرۆتنا مۆلکی (عەقد)</div>
+                    <div class="c-main-title" id="txt_s_main_title">گرێبەستا فرۆتنا مۆلکی (عەقد)</div>
                 </div>
 
                 <!-- Parties -->
                 <div class="c-parties">
                     <div class="c-party-box">
-                        <div class="c-party-h"><span>لایەنێ ئێکێ (فرۆشیار)</span><span style="font-size: 8.5px; color: #b48516;">SELLER</span></div>
-                        <div class="c-party-row"><span>ناڤ:</span><span id="out_seller_name" class="dyn-text" style="flex:1;">...........................</span></div>
-                        <div class="c-party-row"><span>تەلەفۆن:</span><span id="out_seller_phone" class="dyn-text phone-text" style="flex:1;">...........................</span></div>
+                        <div class="c-party-h"><span id="txt_s_seller_header">لایەنێ ئێکێ (فرۆشیار)</span><span style="font-size: 8.5px; color: #b48516;">SELLER</span></div>
+                        <div class="c-party-row"><span id="txt_s_p1_name">ناڤ:</span><span id="out_seller_name" class="dyn-text" style="flex:1;">...........................</span></div>
+                        <div class="c-party-row"><span id="txt_s_p1_phone">تەلەفۆن:</span><span id="out_seller_phone" class="dyn-text phone-text" style="flex:1;">...........................</span></div>
                     </div>
                     <div class="c-party-box">
-                        <div class="c-party-h"><span>لایەنێ دووێ (بکر)</span><span style="font-size: 8.5px; color: #b48516;">BUYER</span></div>
-                        <div class="c-party-row"><span>ناڤ:</span><span id="out_buyer_name" class="dyn-text" style="flex:1;">...........................</span></div>
-                        <div class="c-party-row"><span>تەلەفۆن:</span><span id="out_buyer_phone" class="dyn-text phone-text" style="flex:1;">...........................</span></div>
+                        <div class="c-party-h"><span id="txt_s_buyer_header">لایەنێ دووێ (بکر)</span><span style="font-size: 8.5px; color: #b48516;">BUYER</span></div>
+                        <div class="c-party-row"><span id="txt_s_p2_name">ناڤ:</span><span id="out_buyer_name" class="dyn-text" style="flex:1;">...........................</span></div>
+                        <div class="c-party-row"><span id="txt_s_p2_phone">تەلەفۆن:</span><span id="out_buyer_phone" class="dyn-text phone-text" style="flex:1;">...........................</span></div>
                     </div>
                 </div>
 
@@ -674,12 +798,12 @@
                     <table class="c-table">
                         <thead>
                             <tr>
-                                <th colspan="4" style="background:#0f172a;">رووبەرێ مۆلکی (المساحة)</th>
-                                <th colspan="4" style="background:#1e293b;">هوورکاریێن ئاڤاهی / شققە</th>
+                                <th colspan="4" style="background:#0f172a;" id="tbl_s_th_area">رووبەرێ مۆلکی (المساحة)</th>
+                                <th colspan="4" style="background:#1e293b;" id="tbl_s_th_bldg">هوورکاریێن ئاڤاهی / شققە</th>
                             </tr>
                             <tr style="background:#334155;">
-                                <th>دۆنەم</th><th>ئولک</th><th>مەتر</th><th>دیسیمەتر</th>
-                                <th>عیمارە</th><th>قات</th><th>ژماراشققێ</th><th>پڕۆژە</th>
+                                <th id="th_donam">دۆنەم</th><th id="th_ulk">ئولک</th><th id="th_meter">مەتر</th><th id="th_dm">دیسیمەتر</th>
+                                <th id="th_building">عیمارە</th><th id="th_floor">قات</th><th id="th_apt_no">ژماراشققێ</th><th id="th_project">پڕۆژە</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -693,8 +817,8 @@
                     <table class="c-table">
                         <thead>
                             <tr>
-                                <th>جۆرێ ئاڤاهی</th><th>ژمارا خانی</th><th>زنجیرە</th><th>تاخ (گەڕەک)</th>
-                                <th>ژمارا پارچێ</th><th>ژمارا کەرتی</th><th>ناڤێ کەرتی</th>
+                                <th id="th_prop_type">جۆرێ ئاڤاهی</th><th id="th_house_no">ژمارا خانی</th><th id="th_chain_no">زنجیرە</th><th id="th_neighbor">تاخ (گەڕەک)</th>
+                                <th id="th_plot_no">ژمارا پارچێ</th><th id="th_sector_no">ژمارا کەرتی</th><th id="th_sector_name">ناڤێ کەرتی</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -706,36 +830,18 @@
                     </table>
                 </div>
 
-                <!-- Clauses -->
-                <div class="c-clauses">
-                    <div class="c-clause-item"><div class="c-cnum">١</div><div class="c-ctext">فرۆشیار دووپات دکەت کو ئەڤ مۆلکێ ساخلەتێن وی ل سەرێ هاتی یێ فرۆتییە بکری ل دویف ڤان مەرجان.</div></div>
-                    <div class="c-clause-item"><div class="c-cnum">٢</div><div class="c-ctext">بهایێ فرۆتنێ پێکهاتییە ل سەر ب کۆژمێ (<span id="out_price_num" class="dyn-text">.........</span>) ب نڤیسین (<span id="out_price_words" class="dyn-text">....................................</span>) کو بڕێ (<span id="out_earnest_money" class="dyn-text">.........</span>) وەک دەسبەع هاتییە وەرگرتن و یێ مای پشتی تاپۆیی دێ هێتە دان.</div></div>
-                    <div class="c-clause-item"><div class="c-cnum">٣</div><div class="c-ctext">ئەگەر فرۆشیار لێڤەبوو پێدڤییە دەسبەعی بزڤڕینیت و کۆژمێ (<span id="out_seller_penalty" class="dyn-text">.........</span>) بدەتە بکری بێی هوشدارییا فەرمی.</div></div>
-                    <div class="c-clause-item"><div class="c-cnum">٤</div><div class="c-ctext">ئەگەر بکر ژ کڕینێ لێڤەبوو مافێ دەسبەعی نینە و دێ کۆژمێ سزایی دەتە فرۆشیاری.</div></div>
-                    <div class="c-clause-item"><div class="c-cnum">٥</div><div class="c-ctext">باجێن وەرگێڕان، جوداکرن، راستڤەکرن، خویکا مۆلکی و ئاڤ و کارەب ل سەر فرۆشیاری بن، و حەقێ پارێزەری دێ هەڤپشک بیت.</div></div>
-                    <div class="c-clause-item"><div class="c-cnum">٦</div><div class="c-ctext">رسوماتێن خانووبەرە (مصاریف طابو و تحویل) ل سەر لایەنێ <b>بکری</b> نە.</div></div>
-                    <div class="c-clause-item"><div class="c-cnum">٧</div><div class="c-ctext">حەقێ دەلالیێ ب رێژا (<span id="out_broker_fee" class="dyn-text" style="width:25px; text-align:center;">2</span> %) دێ هێتە دان بۆ نڤیسینگەهێ.</div></div>
-                    <div class="c-clause-item"><div class="c-cnum">٨</div><div class="c-ctext">ژڤانێ رادەستکرن و ڤالاکرنا مۆلکی ل رێکەفتی (<span id="out_handover_date" class="dyn-text">... / ... / ٢٠٢...</span>) دەستنیشانکری یە.</div></div>
-                    
-                    <!-- بەشێ تێبینیێ -->
-                    <div class="c-custom-note-wrap">
-                        <span class="c-custom-note-title">تێبینی:</span>
-                        <span id="out_custom_note" class="c-custom-note-content">.............................................................................................................................................................................................................</span>
-                    </div>
+                <!-- Clauses (بەندێن فرۆتنێ) -->
+                <div class="c-clauses" id="sales_clauses_container">
+                    <!-- Dynamic Clauses Rendered in JS -->
                 </div>
 
-                <!-- Footer -->
+                <!-- Footer (Signatures) -->
                 <div class="c-footer-wrap">
-                    <div class="c-note">
-                        <div>⚠️ <b>تێبینی:</b> د ماوێ (١٥) رۆژان دا پێدڤییە مامەلە ب دووماهی بهێت، بەروڤاژی وێ نڤیسینگەهـ نە یا بەرپرسە.</div>
-                        <div>⚖️ پارێزەر: طالب موسى حامد (<span dir="ltr">0750 459 8521</span>)</div>
-                    </div>
-
                     <div class="c-sigs">
-                        <div class="c-sig-box"><div class="c-sig-title">ناڤ و ئیمزا فرۆشیاری</div><div class="c-sig-sub">مۆر و ئیمزا</div></div>
-                        <div class="c-sig-box"><div class="c-sig-title">دیدەڤانێ ئێکێ</div><div class="c-sig-sub" id="out_witness1">ئیمزا</div></div>
-                        <div class="c-sig-box"><div class="c-sig-title">دیدەڤانێ دووێ</div><div class="c-sig-sub" id="out_witness2">ئیمزا</div></div>
-                        <div class="c-sig-box"><div class="c-sig-title">ناڤ و ئیمزا بکری</div><div class="c-sig-sub">مۆر و ئیمزا</div></div>
+                        <div class="c-sig-box"><div class="c-sig-title" id="sig_s_seller">ناڤ و ئیمزا فرۆشیاری</div><div class="c-sig-sub" id="sig_sub1">مۆر و ئیمزا</div></div>
+                        <div class="c-sig-box"><div class="c-sig-title" id="sig_s_w1">دیدەڤانێ ئێکێ</div><div class="c-sig-sub" id="out_witness1">ئیمزا</div></div>
+                        <div class="c-sig-box"><div class="c-sig-title" id="sig_s_w2">دیدەڤانێ دووێ</div><div class="c-sig-sub" id="out_witness2">ئیمزا</div></div>
+                        <div class="c-sig-box"><div class="c-sig-title" id="sig_s_buyer">ناڤ و ئیمزا بکری</div><div class="c-sig-sub" id="sig_sub2">مۆر و ئیمزا</div></div>
                     </div>
                 </div>
             </div>
@@ -745,48 +851,444 @@
                 <!-- Header -->
                 <div class="c-header">
                     <div class="c-contact">
-                        <div>حازم: <span>0750 454 2800</span></div>
-                        <div>شکری: <span>0750 417 6611</span></div>
+                        <div><span id="txt_r_mob">مۆبایل</span>: <span>0750 710 0238</span></div>
+                        <div style="font-size: 9.5px; color: #64748b; margin-top:2px;" id="txt_r_header_sub">پەیوەندی و خزمەتگوزاری</div>
                     </div>
                     <div class="c-logo-box">
                         <span class="c-badge">REAL ESTATE • عەقارات</span>
-                        <h1 class="c-title">نڤیسینگەها ٢٤</h1>
-                        <div class="c-subtitle">24 REAL ESTATE</div>
+                        <h1 class="c-title" id="txt_r_office_name">عەقارات دهۆک</h1>
+                        <div class="c-subtitle">DUHOK REAL ESTATE</div>
                     </div>
                     <div class="c-meta">
-                        <div>مێژوو: <span id="out_r_date" class="dyn-text" style="width: 80px;">...</span></div>
-                        <div style="font-size: 9.5px; color: #b48516; margin-top:2px;">📍 دهۆک - بازاڕێ ئەرد و خانیان</div>
+                        <div><span id="txt_r_cno_lbl">ژمارا عەقدی</span>: <span id="out_r_contract_no" class="dyn-text" style="width: 60px;">...</span></div>
+                        <div style="margin-top:2px;"><span id="txt_r_date_lbl">مێژوو</span>: <span id="out_r_date" class="dyn-text" style="width: 75px;">...</span></div>
+                        <div style="font-size: 9.5px; color: #b48516; margin-top:2px;" id="txt_r_loc">📍 دهۆک - بازاڕێ ئەرد و خانیان</div>
                     </div>
                 </div>
 
                 <!-- Title -->
                 <div class="c-title-strip">
-                    <div class="c-main-title">هەڤبەستا کرێکرن و ب کرێدانێ (عەقدا ئیجارێ)</div>
+                    <div class="c-main-title" id="txt_r_main_title">هەڤبەستا کرێکرن و ب کرێدانێ (عەقدا ئیجارێ)</div>
                 </div>
 
                 <!-- جهێ ئاڤاهی -->
                 <div class="rent-prop-box">
-                    <div><b>جۆرێ ئاڤاهی:</b> <span id="out_r_type" class="dyn-text">..........</span></div>
-                    <div><b>جهێ ئاڤاهی:</b> دهۆک - <span id="out_r_neighbor" class="dyn-text">..........</span></div>
-                    <div><b>جادە / تاخ:</b> <span id="out_r_street" class="dyn-text">..........</span></div>
+                    <div><b id="lbl_r_box_type">جۆرێ ئاڤاهی:</b> <span id="out_r_type" class="dyn-text">..........</span></div>
+                    <div><b id="lbl_r_box_loc">جهێ ئاڤاهی:</b> <span id="out_r_city_txt">دهۆک</span> - <span id="out_r_neighbor" class="dyn-text">..........</span></div>
+                    <div><b id="lbl_r_box_street">جادە / تاخ:</b> <span id="out_r_street" class="dyn-text">..........</span></div>
                 </div>
 
                 <!-- Parties -->
                 <div class="c-parties">
                     <div class="c-party-box">
-                        <div class="c-party-h"><span>خودانێ ئاڤاهی (مؤجر)</span><span style="font-size: 8.5px; color: #b48516;">LANDLORD</span></div>
-                        <div class="c-party-row"><span>ناڤێ سیانی:</span><span id="out_r_owner" class="dyn-text" style="flex:1;">...........................</span></div>
-                        <div class="c-party-row"><span>ژمارا مۆبایلێ:</span><span id="out_r_owner_phone" class="dyn-text phone-text" style="flex:1;">...........................</span></div>
+                        <div class="c-party-h"><span id="txt_r_owner_header">خودانێ ئاڤاهی (مؤجر)</span><span style="font-size: 8.5px; color: #b48516;">LANDLORD</span></div>
+                        <div class="c-party-row"><span id="txt_r_p1_name">ناڤێ سیانی:</span><span id="out_r_owner" class="dyn-text" style="flex:1;">...........................</span></div>
+                        <div class="c-party-row"><span id="txt_r_p1_phone">ژمارا مۆبایلێ:</span><span id="out_r_owner_phone" class="dyn-text phone-text" style="flex:1;">...........................</span></div>
                     </div>
                     <div class="c-party-box">
-                        <div class="c-party-h"><span>ئەوێ ئاڤاهی ب کرێ کری (کرێچی)</span><span style="font-size: 8.5px; color: #b48516;">TENANT</span></div>
-                        <div class="c-party-row"><span>ناڤێ سیانی:</span><span id="out_r_tenant" class="dyn-text" style="flex:1;">...........................</span></div>
-                        <div class="c-party-row"><span>ژمارا مۆبایلێ:</span><span id="out_r_tenant_phone" class="dyn-text phone-text" style="flex:1;">...........................</span></div>
+                        <div class="c-party-h"><span id="txt_r_tenant_header">ئەوێ ئاڤاهی ب کرێ کری (کرێچی)</span><span style="font-size: 8.5px; color: #b48516;">TENANT</span></div>
+                        <div class="c-party-row"><span id="txt_r_p2_name">ناڤێ سیانی:</span><span id="out_r_tenant" class="dyn-text" style="flex:1;">...........................</span></div>
+                        <div class="c-party-row"><span id="txt_r_p2_phone">ژمارا مۆبایلێ:</span><span id="out_r_tenant_phone" class="dyn-text phone-text" style="flex:1;">...........................</span></div>
                     </div>
                 </div>
 
-                <!-- Clauses -->
-                <div class="c-clauses">
+                <!-- Clauses (بەندێن ئیجارێ) -->
+                <div class="c-clauses" id="rent_clauses_container">
+                    <!-- Dynamic Clauses Rendered in JS -->
+                </div>
+
+                <!-- Footer Section (Rent) -->
+                <div class="c-footer-wrap">
+                    <div class="c-sigs">
+                        <div class="c-sig-box"><div class="c-sig-title" id="sig_r_owner">خودانێ ئاڤاهی (مؤجر)</div><div class="c-sig-sub" id="sig_sub3">مۆر و ئیمزا</div></div>
+                        <div class="c-sig-box"><div class="c-sig-title" id="sig_r_w1">دیدەڤانێ ئێکێ</div><div class="c-sig-sub" id="out_r_witness1">ئیمزا</div></div>
+                        <div class="c-sig-box"><div class="c-sig-title" id="sig_r_w2">دیدەڤانێ دووێ</div><div class="c-sig-sub" id="out_r_witness2">ئیمزا</div></div>
+                        <div class="c-sig-box"><div class="c-sig-title" id="sig_r_tenant">ئەوێ ب کرێ کری (کرێچی)</div><div class="c-sig-sub" id="sig_sub4">مۆر و ئیمزا</div></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Archive Modal -->
+    <div class="modal-backdrop" id="archiveModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 id="txt_modal_title">📂 ئەرشیفێ عەقدێن خەزنکری (عەقارات دهۆک)</h3>
+                <button class="modal-close" onclick="closeArchiveModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="archiveSearchInput" class="archive-search" placeholder="🔍 لێگەڕیان..." oninput="renderArchiveTable()">
+                <table class="archive-table">
+                    <thead>
+                        <tr>
+                            <th id="th_arc_cno">ژمارا عەقدی</th>
+                            <th id="th_arc_type">جۆر</th>
+                            <th id="th_arc_parties">لایەنێن گرێبەستێ</th>
+                            <th id="th_arc_date">مێژوو</th>
+                            <th style="text-align:center;" id="th_arc_act">کردار</th>
+                        </tr>
+                    </thead>
+                    <tbody id="archiveTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast">✅ عەقد ب سەرکەفتی هاتە خەزنکرن!</div>
+
+    <!-- JavaScript Translations & Interactions -->
+    <script>
+        let currentTab = 'sales';
+        let currentLang = 'ku'; // 'ku' or 'ar'
+
+        const i18n = {
+            ku: {
+                brand_title: "سیستەمێ ئەلیکترۆنی یێ عەقارات دهۆک",
+                brand_sub: "گرێبەستێن فەرمی یێن فرۆتن و کرێدانێ",
+                tab_sales: "گرێبەستا فرۆتنێ",
+                tab_rent: "گرێبەستا کرێدانێ (ئیجار)",
+                btn_save: "💾 خەزنکرن",
+                btn_archive: "ئەرشیف",
+                btn_demo: "نموونە",
+                btn_print: "چاپ (Print)",
+                
+                // Form Sales Labels
+                s_sec1: "📅 ١. ژمارا عەقدی و رێکەفت",
+                s_cno: "ژمارا گرێبەستێ (عەقدی):",
+                s_date: "مێژوویا ئیمزاکرنێ:",
+                s_sec2: "👤 ٢. فرۆشیار و بکر",
+                s_sname: "ناڤێ فرۆشیاری (سیانی):",
+                s_sphone: "تەلەفۆنا فرۆشیاری:",
+                s_bname: "ناڤێ کڕیاری (سیانی):",
+                s_bphone: "تەلەفۆنا کڕیاری:",
+                s_sec3: "📐 ٣. رووبەر و هوورکاریێن ئاڤاهی",
+                s_donam: "دۆنەم:", s_ulk: "ئولک:", s_meter: "مەتر:", s_dm: "دیسیمەتر:",
+                s_building: "عیمارە:", s_floor: "قات:", s_apt: "ژمارا شققێ:", s_project: "پڕۆژە:",
+                s_sec4: "📑 ٤. زانیاریێن تاپۆیی",
+                s_ptype: "جۆرێ ئاڤاهی:", s_hno: "ژمارا خانی:", s_chain: "زنجیرە:",
+                s_neigh: "تاخ (گەڕەک):", s_plot: "ژمارا پارچێ:", s_secno: "ژمارا کەرتی:", s_secname: "ناڤێ کەرتی:",
+                s_sec5: "💰 ٥. بها و مەرجێن دراڤی",
+                s_pnum: "بهایێ فرۆتنێ (ژمارە):", s_pwords: "بهایێ فرۆتنێ (نڤیسین):",
+                s_earnest: "بڕێ دەسبەعی:", s_penalty: "سزایێ لێڤەبوونێ:", s_fee: "رێژا دەلالیێ (%):",
+                s_handover: "ژڤانێ رادەستکرنێ:", s_note: "تێبینیێن زێدە (ئەگەر هەبن):",
+
+                // Form Rent Labels
+                r_sec1: "📅 ١. ژمارا عەقدی و رێکەفت",
+                r_cno: "ژمارا گرێبەستێ (عەقدی):",
+                r_date: "مێژوویا ئیمزاکرنێ:",
+                r_sec2: "👤 ٢. خودانێ ئاڤاهی و کرێچی",
+                r_owner: "خودانێ ئاڤاهی (مؤجر):",
+                r_ophone: "تەلەفۆنا خودانی:",
+                r_tenant: "ئەوێ ب کرێ کری (کرێچی):",
+                r_tphone: "تەلەفۆنا کرێچی:",
+                r_sec3: "🏢 ٣. زانیاری و جهێ ئاڤاهی",
+                r_type: "جۆرێ ئاڤاهی:", r_city: "باژێڕ:", r_neigh: "تاخ (گەڕەک):", r_street: "جادە:",
+                r_sec4: "💵 ٤. ماوە و مەرجێن دراڤی",
+                r_sdate: "ماوێ کرێکرنێ (ژ رۆژا):", r_edate: "هەتا رۆژا:",
+                r_rent: "کرێیا هەیڤانە:", r_dep: "تامینات / دەسبەع:", r_usage: "مەرجێ بکارئینانێ (مەبەست):",
+                r_note: "تێبینیێن زێدە (ئەگەر هەبن):",
+
+                w_sec: "👥 دیدەڤان (الشهود)",
+                w1: "دیدەڤانێ ئێکێ:", w2: "دیدەڤانێ دووێ:",
+
+                // Contracts Preview (Sales)
+                s_main_title: "گرێبەستا فرۆتنا مۆلکی (عەقد)",
+                s_mob: "مۆبایل", s_sub: "پەیوەندی و خزمەتگوزاری", s_loc: "📍 دهۆک - بازاڕێ ئەرد و خانیان",
+                s_cno_lbl: "ژمارا عەقدی", s_date_lbl: "مێژوو",
+                s_seller_h: "لایەنێ ئێکێ (فرۆشیار)", s_buyer_h: "لایەنێ دووێ (بکر)",
+                name_lbl: "ناڤ:", phone_lbl: "تەلەفۆن:",
+                th_area: "رووبەرێ مۆلکی (المساحة)", th_bldg: "هوورکاریێن ئاڤاهی / شققە",
+                th_donam: "دۆنەم", th_ulk: "ئولک", th_meter: "مەتر", th_dm: "دیسیمەتر",
+                th_building: "عیمارە", th_floor: "قات", th_apt: "ژماراشققێ", th_proj: "پڕۆژە",
+                th_ptype: "جۆرێ ئاڤاهی", th_hno: "ژمارا خانی", th_chain: "زنجیرە", th_neigh: "تاخ (گەڕەک)",
+                th_plot: "ژمارا پارچێ", th_secno: "ژمارا کەرتی", th_secname: "ناڤێ کەرتی",
+                sig_seller: "ناڤ و ئیمزا فرۆشیاری", sig_buyer: "ناڤ و ئیمزا بکری",
+                sig_w1: "دیدەڤانێ ئێکێ", sig_w2: "دیدەڤانێ دووێ",
+                sig_sub: "مۆر و ئیمزا",
+
+                // Contracts Preview (Rent)
+                r_main_title: "هەڤبەستا کرێکرن و ب کرێدانێ (عەقدا ئیجارێ)",
+                r_box_type: "جۆرێ ئاڤاهی:", r_box_loc: "جهێ ئاڤاهی:", r_box_street: "جادە / تاخ:",
+                r_owner_h: "خودانێ ئاڤاهی (مؤجر)", r_tenant_h: "ئەوێ ئاڤاهی ب کرێ کری (کرێچی)",
+                r_name_lbl: "ناڤێ سیانی:", r_phone_lbl: "ژمارا مۆبایلێ:",
+                sig_owner: "خودانێ ئاڤاهی (مؤجر)", sig_tenant: "ئەوێ ب کرێ کری (کرێچی)",
+
+                // Modal Archive
+                modal_title: "📂 ئەرشیفێ عەقدێن خەزنکری (عەقارات دهۆک)",
+                modal_search: "🔍 لێگەڕیان ل دویف ژمارا عەقدی، ناڤ، یان بەروار...",
+                th_cno: "ژمارا عەقدی", th_type: "جۆر", th_parties: "لایەنێن گرێبەستێ", th_date: "مێژوو", th_act: "کردار",
+                act_open: "ڤەکرن", act_del: "ژێبرن",
+                confirm_del: "ئەرێ تو پشتڕاستی تە دڤێت ئەڤێ گرێبەستێ ژێببەی؟",
+                toast_saved: "✅ گرێبەست ب سەرکەفتی هاتە خەزنکرن!",
+                toast_loaded: "📄 گرێبەست هاتە ڤەکرن!",
+                toast_deleted: "🗑️ گرێبەست هاتە ژێبرن."
+            },
+            ar: {
+                brand_title: "النظام الإلكتروني - عقارات دهوك",
+                brand_sub: "عقود البيع والإيجار الرسمية للعقارات",
+                tab_sales: "عقد بيع عقار",
+                tab_rent: "عقد إيجار عقار",
+                btn_save: "💾 حفظ العقد",
+                btn_archive: "الأرشيف",
+                btn_demo: "بيانات تجريبية",
+                btn_print: "طباعة (Print)",
+                
+                // Form Sales Labels
+                s_sec1: "📅 ١. رقم العقد والتاريخ",
+                s_cno: "رقم العقد:",
+                s_date: "تاريخ التوقيع:",
+                s_sec2: "👤 ٢. طرفا العقد (البائع والمشتري)",
+                s_sname: "اسم البائع (الثلاثي):",
+                s_sphone: "هاتف البائع:",
+                s_bname: "اسم المشتري (الثلاثي):",
+                s_bphone: "هاتف المشتري:",
+                s_sec3: "📐 ٣. المساحة وتفاصيل العقار",
+                s_donam: "دونم:", s_ulk: "أولك:", s_meter: "متر:", s_dm: "دسم:",
+                s_building: "عمارة:", s_floor: "طابق:", s_apt: "رقم الشقة:", s_project: "المشروع:",
+                s_sec4: "📑 ٤. بيانات التسجيل العقاري (الطابو)",
+                s_ptype: "نوع العقار:", s_hno: "رقم الدار:", s_chain: "التسلسل:",
+                s_neigh: "المحلة / الحي:", s_plot: "رقم القطعة:", s_secno: "رقم المقاطعة:", s_secname: "اسم المقاطعة:",
+                s_sec5: "💰 ٥. المبلغ والشروط المالية",
+                s_pnum: "بدل البيع (رقماً):", s_pwords: "بدل البيع (كتابةً):",
+                s_earnest: "مبلغ العربون:", s_penalty: "غرامة النكول:", s_fee: "نسبة الدلالية (%):",
+                s_handover: "موعد التسليم:", s_note: "ملاحظات إضافية (إن وجدت):",
+
+                // Form Rent Labels
+                r_sec1: "📅 ١. رقم العقد والتاريخ",
+                r_cno: "رقم العقد:",
+                r_date: "تاريخ التوقيع:",
+                r_sec2: "👤 ٢. المؤجر والمستأجر",
+                r_owner: "المؤجر (صاحب العقار):",
+                r_ophone: "هاتف المؤجر:",
+                r_tenant: "المستأجر:",
+                r_tphone: "هاتف المستأجر:",
+                r_sec3: "🏢 ٣. تفاصيل وموقع العقار",
+                r_type: "نوع العقار:", r_city: "المدينة:", r_neigh: "الحي / المنطقة:", r_street: "الشارع:",
+                r_sec4: "💵 ٤. المدة والبدل المالي",
+                r_sdate: "مدة الإيجار (من تاريخ):", r_edate: "إلى تاريخ:",
+                r_rent: "بدل الإيجار الشهري:", r_dep: "مبلغ التأمينات:", r_usage: "الغرض من الاستخدام:",
+                r_note: "ملاحظات إضافية (إن وجدت):",
+
+                w_sec: "👥 الشهود (Witnesses)",
+                w1: "الشاهد الأول:", w2: "الشاهد الثاني:",
+
+                // Contracts Preview (Sales)
+                s_main_title: "عقد بيع عقار رسمي",
+                s_mob: "الموبايل", s_sub: "الاتصال والخدمات العقارية", s_loc: "📍 دهوك - سوق العقارات",
+                s_cno_lbl: "رقم العقد", s_date_lbl: "التاريخ",
+                s_seller_h: "الطرف الأول (البائع)", s_buyer_h: "الطرف الثاني (المشتري)",
+                name_lbl: "الاسم:", phone_lbl: "الهاتف:",
+                th_area: "مساحة العقار (المساحة الإجمالية)", th_bldg: "تفاصيل المبنى / الشقة",
+                th_donam: "دونم", th_ulk: "أولك", th_meter: "متر", th_dm: "دسم",
+                th_building: "عمارة", th_floor: "طابق", th_apt: "رقم الشقة", th_proj: "المشروع",
+                th_ptype: "نوع العقار", th_hno: "رقم الدار", th_chain: "التسلسل", th_neigh: "المحلة/الحي",
+                th_plot: "رقم القطعة", th_secno: "رقم المقاطعة", th_secname: "اسم المقاطعة",
+                sig_seller: "اسم وتوقيع البائع", sig_buyer: "اسم وتوقيع المشتري",
+                sig_w1: "الشاهد الأول", sig_w2: "الشاهد الثاني",
+                sig_sub: "الختم والتوقيع",
+
+                // Contracts Preview (Rent)
+                r_main_title: "عقد إيجار عقار رسمي",
+                r_box_type: "نوع العقار:", r_box_loc: "موقع العقار:", r_box_street: "الشارع / الحي:",
+                r_owner_h: "الطرف الأول (المؤجر)", r_tenant_h: "الطرف الثاني (المستأجر)",
+                r_name_lbl: "الاسم الثلاثي:", r_phone_lbl: "رقم الهاتف:",
+                sig_owner: "اسم وتوقيع المؤجر", sig_tenant: "اسم وتوقيع المستأجر",
+
+                // Modal Archive
+                modal_title: "📂 أرشيف العقود المحفوظة (عقارات دهوك)",
+                modal_search: "🔍 بحث برقم العقد، الأسماء، أو التاريخ...",
+                th_cno: "رقم العقد", th_type: "النوع", th_parties: "أطراف العقد", th_date: "التاريخ", th_act: "الإجراء",
+                act_open: "فتح", act_del: "حذف",
+                confirm_del: "هل أنت متأكد من رغبتك في حذف هذا العقد نهائياً؟",
+                toast_saved: "✅ تم حفظ العقد بنجاح في الأرشيف!",
+                toast_loaded: "📄 تم فتح بيانات العقد بنجاح!",
+                toast_deleted: "🗑️ تم حذف العقد من الأرشيف."
+            }
+        };
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            document.getElementById('lang_btn_ku').classList.toggle('active', lang === 'ku');
+            document.getElementById('lang_btn_ar').classList.toggle('active', lang === 'ar');
+
+            const t = i18n[lang];
+
+            // Navbar
+            document.getElementById('ui_nav_title').textContent = t.brand_title;
+            document.getElementById('ui_nav_subtitle').textContent = t.brand_sub;
+            document.getElementById('ui_tab_sales').textContent = t.tab_sales;
+            document.getElementById('ui_tab_rent').textContent = t.tab_rent;
+            document.getElementById('ui_btn_save').textContent = t.btn_save;
+            document.getElementById('ui_btn_archive').textContent = t.btn_archive;
+            document.getElementById('ui_btn_demo').textContent = t.btn_demo;
+            document.getElementById('ui_btn_print').textContent = t.btn_print;
+
+            // Form Sales
+            document.getElementById('lbl_s_sec1').textContent = t.s_sec1;
+            document.getElementById('lbl_s_contract_no').textContent = t.s_cno;
+            document.getElementById('lbl_s_date').textContent = t.s_date;
+            document.getElementById('lbl_s_sec2').textContent = t.s_sec2;
+            document.getElementById('lbl_s_seller_name').textContent = t.s_sname;
+            document.getElementById('lbl_s_seller_phone').textContent = t.s_sphone;
+            document.getElementById('lbl_s_buyer_name').textContent = t.s_bname;
+            document.getElementById('lbl_s_buyer_phone').textContent = t.s_bphone;
+            document.getElementById('lbl_s_sec3').textContent = t.s_sec3;
+            document.getElementById('lbl_s_donam').textContent = t.s_donam;
+            document.getElementById('lbl_s_ulk').textContent = t.s_ulk;
+            document.getElementById('lbl_s_meter').textContent = t.s_meter;
+            document.getElementById('lbl_s_dm').textContent = t.s_dm;
+            document.getElementById('lbl_s_building').textContent = t.s_building;
+            document.getElementById('lbl_s_floor').textContent = t.s_floor;
+            document.getElementById('lbl_s_apt_no').textContent = t.s_apt;
+            document.getElementById('lbl_s_project').textContent = t.s_project;
+            document.getElementById('lbl_s_sec4').textContent = t.s_sec4;
+            document.getElementById('lbl_s_prop_type').textContent = t.s_ptype;
+            document.getElementById('lbl_s_house_no').textContent = t.s_hno;
+            document.getElementById('lbl_s_chain_no').textContent = t.s_chain;
+            document.getElementById('lbl_s_neighbor').textContent = t.s_neigh;
+            document.getElementById('lbl_s_plot_no').textContent = t.s_plot;
+            document.getElementById('lbl_s_sector_no').textContent = t.s_secno;
+            document.getElementById('lbl_s_sector_name').textContent = t.s_secname;
+            document.getElementById('lbl_s_sec5').textContent = t.s_sec5;
+            document.getElementById('lbl_s_price_num').textContent = t.s_pnum;
+            document.getElementById('lbl_s_price_words').textContent = t.s_pwords;
+            document.getElementById('lbl_s_earnest_money').textContent = t.s_earnest;
+            document.getElementById('lbl_s_seller_penalty').textContent = t.s_penalty;
+            document.getElementById('lbl_s_broker_fee').textContent = t.s_fee;
+            document.getElementById('lbl_s_handover_date').textContent = t.s_handover;
+            document.getElementById('lbl_s_custom_note').textContent = t.s_note;
+
+            // Form Rent
+            document.getElementById('lbl_r_sec1').textContent = t.r_sec1;
+            document.getElementById('lbl_r_contract_no').textContent = t.r_cno;
+            document.getElementById('lbl_r_date').textContent = t.r_date;
+            document.getElementById('lbl_r_sec2').textContent = t.r_sec2;
+            document.getElementById('lbl_r_owner').textContent = t.r_owner;
+            document.getElementById('lbl_r_owner_phone').textContent = t.r_ophone;
+            document.getElementById('lbl_r_tenant').textContent = t.r_tenant;
+            document.getElementById('lbl_r_tenant_phone').textContent = t.r_tphone;
+            document.getElementById('lbl_r_sec3').textContent = t.r_sec3;
+            document.getElementById('lbl_r_type').textContent = t.r_type;
+            document.getElementById('lbl_r_city').textContent = t.r_city;
+            document.getElementById('lbl_r_neighbor').textContent = t.r_neigh;
+            document.getElementById('lbl_r_street').textContent = t.r_street;
+            document.getElementById('lbl_r_sec4').textContent = t.r_sec4;
+            document.getElementById('lbl_r_start_date').textContent = t.r_sdate;
+            document.getElementById('lbl_r_end_date').textContent = t.r_edate;
+            document.getElementById('lbl_r_rent_amount').textContent = t.r_rent;
+            document.getElementById('lbl_r_deposit').textContent = t.r_dep;
+            document.getElementById('lbl_r_usage').textContent = t.r_usage;
+            document.getElementById('lbl_r_custom_note').textContent = t.r_note;
+
+            // Witnesses
+            document.getElementById('lbl_w_sec').textContent = t.w_sec;
+            document.getElementById('lbl_witness1').textContent = t.w1;
+            document.getElementById('lbl_witness2').textContent = t.w2;
+
+            // Contract Preview (Sales)
+            document.getElementById('txt_s_mob').textContent = t.s_mob;
+            document.getElementById('txt_s_header_sub').textContent = t.s_sub;
+            document.getElementById('txt_s_cno_lbl').textContent = t.s_cno_lbl;
+            document.getElementById('txt_s_date_lbl').textContent = t.s_date_lbl;
+            document.getElementById('txt_s_loc').textContent = t.s_loc;
+            document.getElementById('txt_s_main_title').textContent = t.s_main_title;
+            document.getElementById('txt_s_seller_header').textContent = t.s_seller_h;
+            document.getElementById('txt_s_buyer_header').textContent = t.s_buyer_h;
+            document.getElementById('txt_s_p1_name').textContent = t.name_lbl;
+            document.getElementById('txt_s_p1_phone').textContent = t.phone_lbl;
+            document.getElementById('txt_s_p2_name').textContent = t.name_lbl;
+            document.getElementById('txt_s_p2_phone').textContent = t.phone_lbl;
+            document.getElementById('tbl_s_th_area').textContent = t.th_area;
+            document.getElementById('tbl_s_th_bldg').textContent = t.th_bldg;
+            document.getElementById('th_donam').textContent = t.th_donam;
+            document.getElementById('th_ulk').textContent = t.th_ulk;
+            document.getElementById('th_meter').textContent = t.th_meter;
+            document.getElementById('th_dm').textContent = t.th_dm;
+            document.getElementById('th_building').textContent = t.th_building;
+            document.getElementById('th_floor').textContent = t.th_floor;
+            document.getElementById('th_apt_no').textContent = t.th_apt;
+            document.getElementById('th_project').textContent = t.th_proj;
+            document.getElementById('th_prop_type').textContent = t.th_ptype;
+            document.getElementById('th_house_no').textContent = t.th_hno;
+            document.getElementById('th_chain_no').textContent = t.th_chain;
+            document.getElementById('th_neighbor').textContent = t.th_neigh;
+            document.getElementById('th_plot_no').textContent = t.th_plot;
+            document.getElementById('th_sector_no').textContent = t.th_secno;
+            document.getElementById('th_sector_name').textContent = t.th_secname;
+            document.getElementById('sig_s_seller').textContent = t.sig_seller;
+            document.getElementById('sig_s_buyer').textContent = t.sig_buyer;
+            document.getElementById('sig_s_w1').textContent = t.sig_w1;
+            document.getElementById('sig_s_w2').textContent = t.sig_w2;
+            document.getElementById('sig_sub1').textContent = t.sig_sub;
+            document.getElementById('sig_sub2').textContent = t.sig_sub;
+
+            // Contract Preview (Rent)
+            document.getElementById('txt_r_mob').textContent = t.s_mob;
+            document.getElementById('txt_r_header_sub').textContent = t.s_sub;
+            document.getElementById('txt_r_cno_lbl').textContent = t.s_cno_lbl;
+            document.getElementById('txt_r_date_lbl').textContent = t.s_date_lbl;
+            document.getElementById('txt_r_loc').textContent = t.s_loc;
+            document.getElementById('txt_r_main_title').textContent = t.r_main_title;
+            document.getElementById('lbl_r_box_type').textContent = t.r_box_type;
+            document.getElementById('lbl_r_box_loc').textContent = t.r_box_loc;
+            document.getElementById('lbl_r_box_street').textContent = t.r_box_street;
+            document.getElementById('txt_r_owner_header').textContent = t.r_owner_h;
+            document.getElementById('txt_r_tenant_header').textContent = t.r_tenant_h;
+            document.getElementById('txt_r_p1_name').textContent = t.r_name_lbl;
+            document.getElementById('txt_r_p1_phone').textContent = t.r_phone_lbl;
+            document.getElementById('txt_r_p2_name').textContent = t.r_name_lbl;
+            document.getElementById('txt_r_p2_phone').textContent = t.r_phone_lbl;
+            document.getElementById('sig_r_owner').textContent = t.sig_owner;
+            document.getElementById('sig_r_tenant').textContent = t.sig_tenant;
+            document.getElementById('sig_r_w1').textContent = t.sig_w1;
+            document.getElementById('sig_r_w2').textContent = t.sig_w2;
+            document.getElementById('sig_sub3').textContent = t.sig_sub;
+            document.getElementById('sig_sub4').textContent = t.sig_sub;
+
+            // Modal Archive
+            document.getElementById('txt_modal_title').textContent = t.modal_title;
+            document.getElementById('archiveSearchInput').placeholder = t.modal_search;
+            document.getElementById('th_arc_cno').textContent = t.th_cno;
+            document.getElementById('th_arc_type').textContent = t.th_type;
+            document.getElementById('th_arc_parties').textContent = t.th_parties;
+            document.getElementById('th_arc_date').textContent = t.th_date;
+            document.getElementById('th_arc_act').textContent = t.th_act;
+
+            renderClauses();
+            updateContracts();
+        }
+
+        function renderClauses() {
+            const sContainer = document.getElementById('sales_clauses_container');
+            const rContainer = document.getElementById('rent_clauses_container');
+
+            if (currentLang === 'ku') {
+                sContainer.innerHTML = `
+                    <div class="c-clause-item"><div class="c-cnum">١</div><div class="c-ctext">فرۆشیار دووپات دکەت کو ئەڤ مۆلکێ ساخلەتێن وی ل سەرێ هاتی یێ فرۆتییە بکری ل دویف ڤان مەرجان.</div></div>
+                    <div class="c-clause-item"><div class="c-cnum">٢</div><div class="c-ctext">بهایێ فرۆتنێ پێکهاتییە ل سەر ب کۆژمێ (<span id="out_price_num" class="dyn-text">.........</span>) ب نڤیسین (<span id="out_price_words" class="dyn-text">....................................</span>) کو بڕێ (<span id="out_earnest_money" class="dyn-text">.........</span>) وەک دەسبەع هاتییە وەرگرتن و یێ مای پشتی تاپۆیی دێ هێتە دان.</div></div>
+                    <div class="c-clause-item"><div class="c-cnum">٣</div><div class="c-ctext">ئەگەر فرۆشیار لێڤەبوو پێدڤییە دەسبەعی بزڤڕینیت و کۆژمێ (<span id="out_seller_penalty" class="dyn-text">.........</span>) بدەتە بکری بێی هوشدارییا فەرمی.</div></div>
+                    <div class="c-clause-item"><div class="c-cnum">٤</div><div class="c-ctext">ئەگەر بکر ژ کڕینێ لێڤەبوو مافێ دەسبەعی نینە و دێ کۆژمێ سزایی دەتە فرۆشیاری.</div></div>
+                    <div class="c-clause-item"><div class="c-cnum">٥</div><div class="c-ctext">باجێن وەرگێڕان، جوداکرن، راستڤەکرن، خویکا مۆلکی و ئاڤ و کارەب ل سەر فرۆشیاری بن، و حەقێ پارێزەری دێ هەڤپشک بیت.</div></div>
+                    <div class="c-clause-item"><div class="c-cnum">٦</div><div class="c-ctext">رسوماتێن خانووبەرە (مصاریف طابو و تحویل) ل سەر لایەنێ <b>بکری</b> نە.</div></div>
+                    <div class="c-clause-item"><div class="c-cnum">٧</div><div class="c-ctext">حەقێ دەلالیێ ب رێژا (<span id="out_broker_fee" class="dyn-text" style="width:25px; text-align:center;">2</span> %) دێ هێتە دان بۆ نڤیسینگەهێ.</div></div>
+                    <div class="c-clause-item"><div class="c-cnum">٨</div><div class="c-ctext">ژڤانێ رادەستکرن و ڤالاکرنا مۆلکی ل رێکەفتی (<span id="out_handover_date" class="dyn-text">... / ... / ٢٠٢...</span>) دەستنیشانکری یە.</div></div>
+                    
+                    <div class="c-custom-note-wrap">
+                        <span class="c-custom-note-title">تێبینی:</span>
+                        <span id="out_custom_note" class="c-custom-note-content">.............................................................................................................................................................................................................</span>
+                    </div>
+
+                    <div class="c-note-box-lawyer">
+                        <div>⚠️ <b>ئاگەهداری:</b> د ماوێ (١٥) رۆژان دا پێدڤییە مامەلە ب دووماهی بهێت، بەروڤاژی وێ نڤیسینگەهـ نە یا بەرپرسە.</div>
+                        <div>⚖️ پارێزەر: طالب موسى حامد (<span dir="ltr">0750 459 8521</span>)</div>
+                    </div>
+                `;
+
+                rContainer.innerHTML = `
                     <div class="c-clause-item"><div class="c-cnum">١</div><div class="c-ctext">خودانێ ئاڤاهی مۆلکێ خوە دا ب کرێ بۆ کرێچی ژ رێکەفتی (<span id="out_r_start_date" class="dyn-text">... / ... / ٢٠٢...</span>) هەتا رۆژا (<span id="out_r_end_date" class="dyn-text">... / ... / ٢٠٢...</span>).</div></div>
                     <div class="c-clause-item"><div class="c-cnum">٢</div><div class="c-ctext">کرێیا هەیڤانە پێکهاتییە ل سەر ب کۆژمێ (<span id="out_r_rent_amount" class="dyn-text">...............</span>) دینار / دۆلار، پێدڤییە سەرێ هەر مەهـ بهێتە دان.</div></div>
                     <div class="c-clause-item"><div class="c-cnum">٣</div><div class="c-ctext">ئەوێ ئاڤاهی ب کرێ دای بڕێ (<span id="out_r_deposit" class="dyn-text">...............</span>) دینار / دۆلار وەک تامینات (دەسبەع) وەرگرتن.</div></div>
@@ -797,36 +1299,62 @@
                     <div class="c-clause-item"><div class="c-cnum">٨</div><div class="c-ctext">ژبلی خویکا ئاڤاهی، هەمی مەزاختی و پشکا ئاڤ، کارەب، مۆلیدە و باژێڕڤانیێ دێ ل سەر <b>کرێچی</b> بن.</div></div>
                     <div class="c-clause-item"><div class="c-cnum">٩</div><div class="c-ctext">پێدڤییە کرێچی ئاڤاهی ب دروستی بپارێزیت و پشتی ب دووماهی هاتنا دەمێ کرێکرنێ بێی زیان رادەستی خودانی بکەت.</div></div>
 
-                    <!-- بەشێ تێبینیێ یێ ئیجارێ -->
                     <div class="c-custom-note-wrap">
                         <span class="c-custom-note-title">تێبینی:</span>
                         <span id="out_r_custom_note" class="c-custom-note-content">.............................................................................................................................................................................................................</span>
                     </div>
-                </div>
 
-                <!-- Footer Section (Rent) -->
-                <div class="c-footer-wrap">
-                    <div class="c-note">
+                    <div class="c-note-box-lawyer">
                         <div>⚠️ هەردوو لا ب ڤان مەرجێن ل سەرێ رازی بوون و ئەڤ گرێبەستە هاتە ئیمزاکرن.</div>
-                        <div>📍 نڤیسینگەها ٢٤ - دهۆک</div>
+                        <div>📍 عەقارات دهۆک - دهۆک</div>
+                    </div>
+                `;
+            } else {
+                // Arabic Clauses
+                sContainer.innerHTML = `
+                    <div class="c-clause-item"><div class="c-cnum">١</div><div class="c-ctext">يؤكد البائع بأنه قد باع العقار المذكورة مواصفاته أعلاه إلى المشتري وفقاً لهذه الشروط والأحكام.</div></div>
+                    <div class="c-clause-item"><div class="c-cnum">٢</div><div class="c-ctext">تم الاتفاق على بدل البيع بمبلغ قدره (<span id="out_price_num" class="dyn-text">.........</span>) كتابةً (<span id="out_price_words" class="dyn-text">....................................</span>)، حيث تم دفع (<span id="out_earnest_money" class="dyn-text">.........</span>) كعربون والباقي يدفع عند إكمال التحويل.</div></div>
+                    <div class="c-clause-item"><div class="c-cnum">٣</div><div class="c-ctext">إذا نكل البائع عن البيع يلتزم بإعادة مبلغ العربون ودفع غرامة نكول قدرها (<span id="out_seller_penalty" class="dyn-text">.........</span>) للمشتري دون الحاجة لإنذار.</div></div>
+                    <div class="c-clause-item"><div class="c-cnum">٤</div><div class="c-ctext">إذا نكل المشتري عن الشراء فليس له حق المطالبة بالعربون ويدفع مبلغ الغرامة المتفق عليه للبائع.</div></div>
+                    <div class="c-clause-item"><div class="c-cnum">٥</div><div class="c-ctext">تقع على عاتق البائع كافة الضرائب، رسوم الإفراز، تصحيح الصنف، أجور الماء والكهرباء، وتكون أتعاب المحاماة مناصفة.</div></div>
+                    <div class="c-clause-item"><div class="c-cnum">٦</div><div class="c-ctext">رسومات ومصاريف التسجيل العقاري (مصاريف الطابو ونقل الملكية) تقع بالكامل على عاتق <b>المشتري</b>.</div></div>
+                    <div class="c-clause-item"><div class="c-cnum">٧</div><div class="c-ctext">تدفع عمولة الدلالية وأتعاب المكتب بنسبة (<span id="out_broker_fee" class="dyn-text" style="width:25px; text-align:center;">2</span> %) من قيمة العقار.</div></div>
+                    <div class="c-clause-item"><div class="c-cnum">٨</div><div class="c-ctext">تم تحديد موعد تسليم وإخلاء العقار بتاريخ (<span id="out_handover_date" class="dyn-text">... / ... / ٢٠٢...</span>).</div></div>
+                    
+                    <div class="c-custom-note-wrap">
+                        <span class="c-custom-note-title">ملاحظات:</span>
+                        <span id="out_custom_note" class="c-custom-note-content">.............................................................................................................................................................................................................</span>
                     </div>
 
-                    <div class="c-sigs">
-                        <div class="c-sig-box"><div class="c-sig-title">خودانێ ئاڤاهی (مؤجر)</div><div class="c-sig-sub">مۆر و ئیمزا</div></div>
-                        <div class="c-sig-box"><div class="c-sig-title">دیدەڤانێ ئێکێ</div><div class="c-sig-sub" id="out_r_witness1">ئیمزا</div></div>
-                        <div class="c-sig-box"><div class="c-sig-title">دیدەڤانێ دووێ</div><div class="c-sig-sub" id="out_r_witness2">ئیمزا</div></div>
-                        <div class="c-sig-box"><div class="c-sig-title">ئەوێ ب کرێ کری (کرێچی)</div><div class="c-sig-sub">مۆر و ئیمزا</div></div>
+                    <div class="c-note-box-lawyer">
+                        <div>⚠️ <b>تنبيه:</b> يجب إكمال معاملة نقل الملكية خلال (١٥) يوماً، وخلاف ذلك فالمكتب غير مسؤول.</div>
+                        <div>⚖️ المحامي: طالب موسى حامد (<span dir="ltr">0750 459 8521</span>)</div>
                     </div>
-                </div>
-            </div>
+                `;
 
-        </div>
+                rContainer.innerHTML = `
+                    <div class="c-clause-item"><div class="c-cnum">١</div><div class="c-ctext">أجر المؤجر العقار المذكور للمستأجر اعتباراً من تاريخ (<span id="out_r_start_date" class="dyn-text">... / ... / ٢٠٢...</span>) ولغاية (<span id="out_r_end_date" class="dyn-text">... / ... / ٢٠٢...</span>).</div></div>
+                    <div class="c-clause-item"><div class="c-cnum">٢</div><div class="c-ctext">اتفق الطرفان على بدل إيجار شهري قدره (<span id="out_r_rent_amount" class="dyn-text">...............</span>)، يدفع مقدماً بداية كل شهر.</div></div>
+                    <div class="c-clause-item"><div class="c-cnum">٣</div><div class="c-ctext">استلم المؤجر مبلغ قدره (<span id="out_r_deposit" class="dyn-text">...............</span>) كتأمينات عن الأضرار تعاد عند إخلاء المأجور سالماً.</div></div>
+                    <div class="c-clause-item"><div class="c-cnum">٤</div><div class="c-ctext">تم تأجير العقار لغرض (<span id="out_r_usage" class="dyn-text">السكن العائلي</span>) فقط، ولا يحق للمستأجر تغيير الغرض دون موافقة المؤجر.</div></div>
+                    <div class="c-clause-item"><div class="c-cnum">٥</div><div class="c-ctext">لا يحق للمؤجر تأجير أي جزء من العقار لشخص آخر خلال فترة سريان هذا العقد.</div></div>
+                    <div class="c-clause-item"><div class="c-cnum">٦</div><div class="c-ctext">لا يحق للمستأجر تأجير العقار من الباطن أو التنازل عنه للغير بدون موافقة خطية من المؤجر.</div></div>
+                    <div class="c-clause-item"><div class="c-cnum">٧</div><div class="c-ctext">لا يجوز للمؤجر إشغال العقار من قبل الغير إلا بموافقة صريحة من المستأجر.</div></div>
+                    <div class="c-clause-item"><div class="c-cnum">٨</div><div class="c-ctext">يتحمل <b>المستأجر</b> كافة مصاريف استهلاك الماء والكهرباء والمولد ورسوم البلدية طيلة فترة الإيجار.</div></div>
+                    <div class="c-clause-item"><div class="c-cnum">٩</div><div class="c-ctext">يلتزم المستأجر بالمحافظة التامة على المأجور وتسليمه بحالة جيدة وسليمة عند انتهاء العقد.</div></div>
 
-    </main>
+                    <div class="c-custom-note-wrap">
+                        <span class="c-custom-note-title">ملاحظات:</span>
+                        <span id="out_r_custom_note" class="c-custom-note-content">.............................................................................................................................................................................................................</span>
+                    </div>
 
-    <!-- JavaScript Interactions -->
-    <script>
-        let currentTab = 'sales';
+                    <div class="c-note-box-lawyer">
+                        <div>⚠️ اتفق الطرفان على كافة الشروط والبنود الواردة أعلاه وتم توقيع العقد برضاهما.</div>
+                        <div>📍 عقارات دهوك - دهوك</div>
+                    </div>
+                `;
+            }
+        }
 
         function switchContract(type) {
             currentTab = type;
@@ -841,7 +1369,7 @@
         }
 
         const salesFields = [
-            'date', 'seller_name', 'seller_phone', 'buyer_name', 'buyer_phone',
+            'contract_no', 'date', 'seller_name', 'seller_phone', 'buyer_name', 'buyer_phone',
             'donam', 'ulk', 'meter', 'dm', 'building', 'floor', 'apt_no', 'project',
             'prop_type', 'house_no', 'chain_no', 'neighbor', 'plot_no', 'sector_no', 'sector_name',
             'price_num', 'price_words', 'earnest_money', 'seller_penalty',
@@ -849,12 +1377,11 @@
         ];
 
         const rentFields = [
-            'r_date', 'r_owner', 'r_owner_phone', 'r_tenant', 'r_tenant_phone',
-            'r_type', 'r_neighbor', 'r_street', 'r_start_date', 'r_end_date',
+            'r_contract_no', 'r_date', 'r_owner', 'r_owner_phone', 'r_tenant', 'r_tenant_phone',
+            'r_type', 'r_city', 'r_neighbor', 'r_street', 'r_start_date', 'r_end_date',
             'r_rent_amount', 'r_deposit', 'r_usage', 'r_custom_note'
         ];
 
-        // دەسکاری کرنا خالا ڤالاهیێ دا گەلەک درێژ نەبیت
         const defaultDots = '.............................................................................................................................................................................................................';
 
         function updateContracts() {
@@ -884,71 +1411,277 @@
                 }
             });
 
-            // Update Shared Witnesses
+            const cityEl = document.getElementById('in_r_city');
+            if (cityEl) {
+                document.getElementById('out_r_city_txt').textContent = cityEl.value.trim() !== '' ? cityEl.value : (currentLang === 'ku' ? 'دهۆک' : 'دهوك');
+            }
+
+            // Update Witnesses
             const w1 = document.getElementById('in_witness1').value.trim();
             const w2 = document.getElementById('in_witness2').value.trim();
+            const defaultSig = currentLang === 'ku' ? 'ئیمزا' : 'توقيع';
             
-            document.getElementById('out_witness1').textContent = w1 !== '' ? w1 : 'ئیمزا';
-            document.getElementById('out_witness2').textContent = w2 !== '' ? w2 : 'ئیمزا';
-            document.getElementById('out_r_witness1').textContent = w1 !== '' ? w1 : 'ئیمزا';
-            document.getElementById('out_r_witness2').textContent = w2 !== '' ? w2 : 'ئیمزا';
+            document.getElementById('out_witness1').textContent = w1 !== '' ? w1 : defaultSig;
+            document.getElementById('out_witness2').textContent = w2 !== '' ? w2 : defaultSig;
+            document.getElementById('out_r_witness1').textContent = w1 !== '' ? w1 : defaultSig;
+            document.getElementById('out_r_witness2').textContent = w2 !== '' ? w2 : defaultSig;
         }
 
         function fillDemoData() {
-            if (currentTab === 'sales') {
-                document.getElementById('in_date').value = '2024 / 09 / 20';
-                document.getElementById('in_seller_name').value = 'ئەحمەد سەعید مەحمود';
-                document.getElementById('in_seller_phone').value = '0750 456 7123';
-                document.getElementById('in_buyer_name').value = 'رێبوار عەلی حەسەن';
-                document.getElementById('in_buyer_phone').value = '0750 654 3987';
-                document.getElementById('in_donam').value = '-';
-                document.getElementById('in_ulk').value = '-';
-                document.getElementById('in_meter').value = '240';
-                document.getElementById('in_dm').value = '-';
-                document.getElementById('in_building').value = 'A';
-                document.getElementById('in_floor').value = '3';
-                document.getElementById('in_apt_no').value = '12';
-                document.getElementById('in_project').value = 'ئاڤرۆ ستی';
-                document.getElementById('in_prop_type').value = 'شققە';
-                document.getElementById('in_house_no').value = 'B12';
-                document.getElementById('in_chain_no').value = '104';
-                document.getElementById('in_neighbor').value = 'ماسیکێ';
-                document.getElementById('in_plot_no').value = '345/12';
-                document.getElementById('in_sector_no').value = '45';
-                document.getElementById('in_sector_name').value = 'دۆمیز';
-                document.getElementById('in_price_num').value = '115,000 $';
-                document.getElementById('in_price_words').value = 'سەد و پازدە هزار دۆلارێن ئەمریکی';
-                document.getElementById('in_earnest_money').value = '10,000 $';
-                document.getElementById('in_seller_penalty').value = '10,000 $';
-                document.getElementById('in_broker_fee').value = '2';
-                document.getElementById('in_handover_date').value = '2024 / 11 / 01';
-                document.getElementById('in_custom_note').value = 'هەمی کەلوپەلێن ناڤمالێ دگەل فرۆتنا شققێ نە بێی جوداهی.';
+            if (currentLang === 'ku') {
+                if (currentTab === 'sales') {
+                    document.getElementById('in_contract_no').value = '2024/108';
+                    document.getElementById('in_date').value = '2024 / 09 / 20';
+                    document.getElementById('in_seller_name').value = 'ئەحمەد سەعید مەحمود';
+                    document.getElementById('in_seller_phone').value = '0750 456 7123';
+                    document.getElementById('in_buyer_name').value = 'رێبوار عەلی حەسەن';
+                    document.getElementById('in_buyer_phone').value = '0750 654 3987';
+                    document.getElementById('in_donam').value = '-';
+                    document.getElementById('in_ulk').value = '-';
+                    document.getElementById('in_meter').value = '240';
+                    document.getElementById('in_dm').value = '-';
+                    document.getElementById('in_building').value = 'A';
+                    document.getElementById('in_floor').value = '3';
+                    document.getElementById('in_apt_no').value = '12';
+                    document.getElementById('in_project').value = 'ئاڤرۆ ستی';
+                    document.getElementById('in_prop_type').value = 'شققە';
+                    document.getElementById('in_house_no').value = 'B12';
+                    document.getElementById('in_chain_no').value = '104';
+                    document.getElementById('in_neighbor').value = 'ماسیکێ';
+                    document.getElementById('in_plot_no').value = '345/12';
+                    document.getElementById('in_sector_no').value = '45';
+                    document.getElementById('in_sector_name').value = 'دۆمیز';
+                    document.getElementById('in_price_num').value = '115,000 $';
+                    document.getElementById('in_price_words').value = 'سەد و پازدە هزار دۆلارێن ئەمریکی';
+                    document.getElementById('in_earnest_money').value = '10,000 $';
+                    document.getElementById('in_seller_penalty').value = '10,000 $';
+                    document.getElementById('in_broker_fee').value = '2';
+                    document.getElementById('in_handover_date').value = '2024 / 11 / 01';
+                    document.getElementById('in_custom_note').value = 'هەمی کەلوپەلێن ناڤمالێ دگەل فرۆتنا شققێ نە بێی جوداهی.';
+                } else {
+                    document.getElementById('in_r_contract_no').value = '2024/045';
+                    document.getElementById('in_r_date').value = '2024 / 09 / 20';
+                    document.getElementById('in_r_owner').value = 'حاجی مەحمود دهۆکی';
+                    document.getElementById('in_r_owner_phone').value = '0750 450 1122';
+                    document.getElementById('in_r_tenant').value = 'شێرزاد کاروان مستەفا';
+                    document.getElementById('in_r_tenant_phone').value = '0750 780 3344';
+                    document.getElementById('in_r_type').value = 'خانیێ دووقات';
+                    document.getElementById('in_r_city').value = 'دهۆک';
+                    document.getElementById('in_r_neighbor').value = 'نەورۆز';
+                    document.getElementById('in_r_street').value = 'جادا ٢٠ مەتری';
+                    document.getElementById('in_r_start_date').value = '2024 / 10 / 01';
+                    document.getElementById('in_r_end_date').value = '2025 / 10 / 01';
+                    document.getElementById('in_r_rent_amount').value = '500 $ (پێنجسەد دۆلار)';
+                    document.getElementById('in_r_deposit').value = '500 $';
+                    document.getElementById('in_r_usage').value = 'تنێ بۆ ئاکنجیبوونا خێزانێ';
+                    document.getElementById('in_r_custom_note').value = 'کرێیا هەیڤانە دێ ل دەستپێکا هەر مەهەکێ هێتە رادەستکرن.';
+                }
+                document.getElementById('in_witness1').value = 'سەردار خالد';
+                document.getElementById('in_witness2').value = 'هەڤال یاسین';
             } else {
-                document.getElementById('in_r_date').value = '2024 / 09 / 20';
-                document.getElementById('in_r_owner').value = 'حاجی مەحمود دهۆکی';
-                document.getElementById('in_r_owner_phone').value = '0750 450 1122';
-                document.getElementById('in_r_tenant').value = 'شێرزاد کاروان مستەفا';
-                document.getElementById('in_r_tenant_phone').value = '0750 780 3344';
-                document.getElementById('in_r_type').value = 'خانیێ دووقات';
-                document.getElementById('in_r_city').value = 'دهۆک';
-                document.getElementById('in_r_neighbor').value = 'نەورۆز';
-                document.getElementById('in_r_street').value = 'جادا ٢٠ مەتری';
-                document.getElementById('in_r_start_date').value = '2024 / 10 / 01';
-                document.getElementById('in_r_end_date').value = '2025 / 10 / 01';
-                document.getElementById('in_r_rent_amount').value = '500 $ (پێنجسەد دۆلار)';
-                document.getElementById('in_r_deposit').value = '500 $';
-                document.getElementById('in_r_usage').value = 'تنێ بۆ ئاکنجیبوونا خێزانێ';
-                document.getElementById('in_r_custom_note').value = 'کرێیا هەیڤانە دێ ل دەستپێکا هەر مەهەکێ هێتە رادەستکرن.';
+                // Arabic Demo Data
+                if (currentTab === 'sales') {
+                    document.getElementById('in_contract_no').value = '2024/108';
+                    document.getElementById('in_date').value = '2024 / 09 / 20';
+                    document.getElementById('in_seller_name').value = 'أحمد سعيد محمود';
+                    document.getElementById('in_seller_phone').value = '0750 456 7123';
+                    document.getElementById('in_buyer_name').value = 'ريبوار علي حسن';
+                    document.getElementById('in_buyer_phone').value = '0750 654 3987';
+                    document.getElementById('in_donam').value = '-';
+                    document.getElementById('in_ulk').value = '-';
+                    document.getElementById('in_meter').value = '240';
+                    document.getElementById('in_dm').value = '-';
+                    document.getElementById('in_building').value = 'A';
+                    document.getElementById('in_floor').value = '3';
+                    document.getElementById('in_apt_no').value = '12';
+                    document.getElementById('in_project').value = 'أفرو ستي';
+                    document.getElementById('in_prop_type').value = 'شقة سكنية';
+                    document.getElementById('in_house_no').value = 'B12';
+                    document.getElementById('in_chain_no').value = '104';
+                    document.getElementById('in_neighbor').value = 'ماسيكي';
+                    document.getElementById('in_plot_no').value = '345/12';
+                    document.getElementById('in_sector_no').value = '45';
+                    document.getElementById('in_sector_name').value = 'دوميز';
+                    document.getElementById('in_price_num').value = '115,000 $';
+                    document.getElementById('in_price_words').value = 'مائة وخمسة عشر ألف دولار أمريكي';
+                    document.getElementById('in_earnest_money').value = '10,000 $';
+                    document.getElementById('in_seller_penalty').value = '10,000 $';
+                    document.getElementById('in_broker_fee').value = '2';
+                    document.getElementById('in_handover_date').value = '2024 / 11 / 01';
+                    document.getElementById('in_custom_note').value = 'يشمل البيع جميع الأثاث والأجهزة الكهربائية الموجودة داخل الشقة.';
+                } else {
+                    document.getElementById('in_r_contract_no').value = '2024/045';
+                    document.getElementById('in_r_date').value = '2024 / 09 / 20';
+                    document.getElementById('in_r_owner').value = 'حاجي محمود الدهوكي';
+                    document.getElementById('in_r_owner_phone').value = '0750 450 1122';
+                    document.getElementById('in_r_tenant').value = 'شيرزاد كاروان مصطفى';
+                    document.getElementById('in_r_tenant_phone').value = '0750 780 3344';
+                    document.getElementById('in_r_type').value = 'دار سكني طابقين';
+                    document.getElementById('in_r_city').value = 'دهوك';
+                    document.getElementById('in_r_neighbor').value = 'نوروز';
+                    document.getElementById('in_r_street').value = 'شارع ٢٠ متري';
+                    document.getElementById('in_r_start_date').value = '2024 / 10 / 01';
+                    document.getElementById('in_r_end_date').value = '2025 / 10 / 01';
+                    document.getElementById('in_r_rent_amount').value = '500 $ (خمسمائة دولار)';
+                    document.getElementById('in_r_deposit').value = '500 $';
+                    document.getElementById('in_r_usage').value = 'للسكن العائلي فقط';
+                    document.getElementById('in_r_custom_note').value = 'يتم تسديد الإيجار مقدماً في اليوم الأول من كل شهر ميلادي.';
+                }
+                document.getElementById('in_witness1').value = 'سردار خالد';
+                document.getElementById('in_witness2').value = 'هفال ياسين';
             }
-            document.getElementById('in_witness1').value = 'سەردار خالد';
-            document.getElementById('in_witness2').value = 'هەڤال یاسین';
             updateContracts();
+        }
+
+        /* ================= STORAGE & ARCHIVE ================= */
+        function getSavedContracts() {
+            return JSON.parse(localStorage.getItem('duhok_re_contracts') || '[]');
+        }
+
+        function setSavedContracts(data) {
+            localStorage.setItem('duhok_re_contracts', JSON.stringify(data));
+            updateArchiveBadge();
+        }
+
+        function updateArchiveBadge() {
+            const list = getSavedContracts();
+            document.getElementById('archive_count').textContent = list.length;
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 3000);
+        }
+
+        function saveCurrentContract() {
+            const list = getSavedContracts();
+            const t = i18n[currentLang];
+            let record = {
+                id: Date.now(),
+                type: currentTab,
+                lang: currentLang,
+                savedAt: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString(),
+                witness1: document.getElementById('in_witness1').value,
+                witness2: document.getElementById('in_witness2').value,
+                data: {}
+            };
+
+            if (currentTab === 'sales') {
+                salesFields.forEach(f => {
+                    record.data[f] = document.getElementById('in_' + f).value;
+                });
+                record.contractNo = record.data.contract_no || (currentLang === 'ku' ? 'بێ ژمارە' : 'بدون رقم');
+                record.parties = (record.data.seller_name || (currentLang === 'ku' ? 'فرۆشیار' : 'بائع')) + ' ⬅ ' + (record.data.buyer_name || (currentLang === 'ku' ? 'کڕیار' : 'مشتري'));
+                record.date = record.data.date || '-';
+            } else {
+                rentFields.forEach(f => {
+                    record.data[f] = document.getElementById('in_' + f).value;
+                });
+                record.contractNo = record.data.r_contract_no || (currentLang === 'ku' ? 'بێ ژمارە' : 'بدون رقم');
+                record.parties = (record.data.r_owner || (currentLang === 'ku' ? 'خودان' : 'مؤجر')) + ' ⬅ ' + (record.data.r_tenant || (currentLang === 'ku' ? 'کرێچی' : 'مستأجر'));
+                record.date = record.data.r_date || '-';
+            }
+
+            list.unshift(record);
+            setSavedContracts(list);
+            showToast(t.toast_saved);
+        }
+
+        function openArchiveModal() {
+            document.getElementById('archiveModal').style.display = 'flex';
+            renderArchiveTable();
+        }
+
+        function closeArchiveModal() {
+            document.getElementById('archiveModal').style.display = 'none';
+        }
+
+        function renderArchiveTable() {
+            const query = document.getElementById('archiveSearchInput').value.toLowerCase().trim();
+            const list = getSavedContracts();
+            const tbody = document.getElementById('archiveTableBody');
+            const t = i18n[currentLang];
+            tbody.innerHTML = '';
+
+            const filtered = list.filter(item => {
+                return (item.contractNo && item.contractNo.toLowerCase().includes(query)) ||
+                       (item.parties && item.parties.toLowerCase().includes(query)) ||
+                       (item.date && item.date.toLowerCase().includes(query));
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:15px; color:#94a3b8;">${currentLang === 'ku' ? 'چ گرێبەست نەهاتنە دیتن.' : 'لا توجد عقود محفوظة.'}</td></tr>`;
+                return;
+            }
+
+            filtered.forEach(item => {
+                const tr = document.createElement('tr');
+                const typeName = item.type === 'sales' 
+                    ? `<span style="color:#eab308; font-weight:bold;">${currentLang === 'ku' ? 'فرۆتن' : 'بيع'}</span>` 
+                    : `<span style="color:#38bdf8; font-weight:bold;">${currentLang === 'ku' ? 'ئیجار' : 'إيجار'}</span>`;
+                tr.innerHTML = `
+                    <td style="font-weight:bold;">${item.contractNo}</td>
+                    <td>${typeName}</td>
+                    <td>${item.parties}</td>
+                    <td>${item.date}</td>
+                    <td style="text-align:center;">
+                        <button class="btn-act btn-act-load" onclick="loadContract(${item.id})">${t.act_open}</button>
+                        <button class="btn-act btn-act-del" onclick="deleteContract(${item.id})">${t.act_del}</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function loadContract(id) {
+            const list = getSavedContracts();
+            const item = list.find(x => x.id === id);
+            if (!item) return;
+
+            if (item.lang && item.lang !== currentLang) {
+                setLanguage(item.lang);
+            }
+
+            switchContract(item.type);
+
+            if (item.type === 'sales') {
+                salesFields.forEach(f => {
+                    const el = document.getElementById('in_' + f);
+                    if (el) el.value = item.data[f] || '';
+                });
+            } else {
+                rentFields.forEach(f => {
+                    const el = document.getElementById('in_' + f);
+                    if (el) el.value = item.data[f] || '';
+                });
+            }
+
+            document.getElementById('in_witness1').value = item.witness1 || '';
+            document.getElementById('in_witness2').value = item.witness2 || '';
+
+            updateContracts();
+            closeArchiveModal();
+            showToast(i18n[currentLang].toast_loaded);
+        }
+
+        function deleteContract(id) {
+            const t = i18n[currentLang];
+            if (!confirm(t.confirm_del)) return;
+            let list = getSavedContracts();
+            list = list.filter(x => x.id !== id);
+            setSavedContracts(list);
+            renderArchiveTable();
+            showToast(t.toast_deleted);
         }
 
         function exportPDF() {
             const activeId = currentTab === 'sales' ? 'contract-sales' : 'contract-rent';
             const element = document.getElementById(activeId);
-            const fileName = currentTab === 'sales' ? 'Grebasta_Frotne_24.pdf' : 'Grebasta_Ijar_24.pdf';
+            const prefix = currentLang === 'ar' ? 'Aqd' : 'Grebast';
+            const type = currentTab === 'sales' ? 'Sales' : 'Rent';
+            const fileName = `${prefix}_${type}_Duhok.pdf`;
             
             const opt = {
                 margin: 0,
@@ -959,6 +1692,11 @@
             };
             html2pdf().set(opt).from(element).save();
         }
+
+        window.onload = function() {
+            setLanguage('ku');
+            updateArchiveBadge();
+        };
     </script>
 </body>
 </html>
