@@ -2,1701 +2,1692 @@
 <html lang="ku" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>سیستەمێ گرێبەستان - عەقارات دهۆک</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سیستەمێ عەقارات و عەقدێن فەرمی - دهۆک</title>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- فۆنتێن فەرمی -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;600;700;900&family=Vazirmatn:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-    
-    <!-- کتێبخانەیا داگرتنا PDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- Firebase SDK (Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <style>
         :root {
-            --primary: #0f172a;
-            --primary-light: #1e293b;
-            --accent: #b48516;
-            --accent-hover: #946d10;
-            --accent-light: #fef9ed;
-            --border: #cbd5e1;
-            --bg-app: #0b1120;
-            --card-bg: #131d31;
-            --text-light: #f8fafc;
-            --text-muted: #94a3b8;
-            --success: #10b981;
-            --danger: #e11d48;
+            --bg-body: #090d16;
+            --bg-card: #121824;
+            --bg-card-alt: #182030;
+            --accent-blue: #38bdf8;
+            --accent-green: #10b981;
+            --accent-gold: #fbbf24;
+            --accent-rose: #f43f5e;
+            --text-white: #ffffff;
+            --text-gray: #94a3b8;
+            --border: #222d42;
+            --radius-lg: 14px;
+            --radius-md: 8px;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Vazirmatn', 'Noto Kufi Arabic', Tahoma, sans-serif;
-            -webkit-font-smoothing: antialiased;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            background-color: var(--bg-app);
-            color: var(--text-light);
+            background-color: var(--bg-body);
+            color: var(--text-white);
+            padding-bottom: 90px;
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            direction: rtl;
         }
 
-        /* سەرپەرێ بەرنامەی */
-        .app-navbar {
-            background: rgba(19, 29, 49, 0.98);
-            border-bottom: 1px solid rgba(180, 133, 22, 0.3);
-            padding: 10px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .brand-wrap {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .brand-logo {
-            background: linear-gradient(135deg, var(--accent), #eab308);
-            color: #0f172a;
-            padding: 6px 12px;
-            border-radius: 8px;
+        /* PASSWORD LOCK SCREEN */
+        #lock-screen {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: #060911;
+            z-index: 99999;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 900;
-            font-size: 14px;
+            padding: 20px;
         }
-
-        .brand-text h1 { font-size: 15px; font-weight: 900; color: #fff; }
-        .brand-text span { font-size: 10.5px; color: var(--accent); }
-
-        .center-controls {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .tab-switcher, .lang-switcher {
-            display: flex;
-            background: #090d16;
-            padding: 4px;
-            border-radius: 30px;
-            border: 1px solid #28354f;
-            gap: 4px;
-        }
-
-        .tab-btn, .lang-btn {
-            background: transparent;
-            color: var(--text-muted);
-            border: none;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .tab-btn.active, .lang-btn.active {
-            background: var(--accent);
-            color: #0f172a;
-        }
-
-        .nav-actions { display: flex; gap: 6px; align-items: center; }
-
-        .btn {
-            border: none;
-            padding: 7px 12px;
-            font-size: 11.5px;
-            font-weight: 700;
-            border-radius: 6px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            transition: all 0.2s ease;
-        }
-        .btn-save { background: var(--success); color: #fff; }
-        .btn-save:hover { background: #059669; }
-        .btn-archive { background: #6366f1; color: #fff; }
-        .btn-archive:hover { background: #4f46e5; }
-        .btn-pdf { background: var(--danger); color: #fff; }
-        .btn-pdf:hover { background: #be123c; }
-        .btn-print { background: var(--accent); color: #0f172a; }
-        .btn-print:hover { background: #c59b27; }
-        .btn-demo { background: #334155; color: #fff; }
-        .btn-demo:hover { background: #475569; }
-
-        /* Main Split View */
-        .app-main {
-            display: grid;
-            grid-template-columns: 450px 1fr;
-            gap: 20px;
-            padding: 15px 20px;
-            flex: 1;
-            max-width: 1750px;
-            margin: 0 auto;
-            width: 100%;
-        }
-
-        /* Form Panel */
-        .form-panel {
-            background: var(--card-bg);
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 16px;
-            height: calc(100vh - 85px);
-            overflow-y: auto;
-        }
-
-        .form-section-title {
-            font-size: 12.5px;
-            font-weight: 800;
-            color: var(--accent);
-            margin: 12px 0 8px 0;
-            padding-bottom: 3px;
-            border-bottom: 1px solid rgba(180, 133, 22, 0.25);
-        }
-        .form-section-title:first-child { margin-top: 0; }
-
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .form-group { display: flex; flex-direction: column; gap: 3px; margin-bottom: 6px; }
-        .form-group.full-width { grid-column: span 2; }
-        .form-group label { font-size: 11px; color: var(--text-muted); font-weight: 600; }
-        .form-control {
-            background: #090d16;
-            border: 1px solid #28354f;
-            color: #fff;
-            padding: 6px 10px;
-            border-radius: 5px;
-            font-size: 11.5px;
-            outline: none;
-        }
-        .form-control:focus { border-color: var(--accent); }
-
-        /* Preview Panel */
-        .preview-panel {
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            overflow-y: auto;
-            height: calc(100vh - 85px);
-            padding-bottom: 15px;
-        }
-
-        /* ==================== A4 EXACT CONTRACT STYLES ==================== */
-        .a4-page {
-            width: 210mm;
-            height: 296mm; 
-            max-height: 296mm;
-            min-height: 296mm;
-            background: #ffffff;
-            color: #0f172a;
-            padding: 8mm 12mm;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            position: relative;
-            box-sizing: border-box;
-            display: none;
-            flex-direction: column;
-            justify-content: flex-start;
-            gap: 6px;
-            overflow: hidden; 
-        }
-
-        .a4-page.active-contract {
-            display: flex !important;
-        }
-
-        /* Header */
-        .c-header {
-            display: grid;
-            grid-template-columns: 1.1fr 1.4fr 1.1fr;
-            align-items: center;
-            border-bottom: 2px solid var(--accent);
-            padding-bottom: 5px;
-        }
-        .c-contact { font-size: 11px; font-weight: 700; line-height: 1.5; color: #0f172a; }
-        .c-contact span { color: #b48516; direction: ltr; display: inline-block; }
-
-        .c-logo-box { text-align: center; }
-        .c-badge {
-            background: #0f172a;
-            color: #fff;
-            font-size: 8.5px;
-            padding: 2px 8px;
-            border-radius: 12px;
-            display: inline-block;
-            border: 1px solid var(--accent);
-        }
-        .c-title {
-            font-family: 'Noto Kufi Arabic', sans-serif;
-            font-size: 18px;
-            font-weight: 900;
-            color: #0f172a;
-            line-height: 1.2;
-            margin-top: 2px;
-        }
-        .c-subtitle { font-size: 10.5px; color: #b48516; font-weight: 700; letter-spacing: 0.5px; }
-        .c-meta { text-align: left; font-size: 10.5px; font-weight: 700; }
-
-        /* Title */
-        .c-title-strip { text-align: center; margin: 2px 0; }
-        .c-main-title {
-            display: inline-block;
-            background: #0f172a;
-            color: #fff;
-            padding: 3px 26px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 800;
-            border: 1.5px solid var(--accent);
-        }
-
-        /* Parties */
-        .c-parties { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 2px 0; }
-        .c-party-box {
+        .lock-card {
+            background: #111726;
             border: 1px solid var(--border);
-            border-right: 4px solid var(--accent);
-            border-radius: 5px;
-            padding: 6px 10px;
-            background: #fdfdfd;
-        }
-        .c-party-h {
-            font-size: 11px;
-            font-weight: 800;
-            color: #0f172a;
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 4px;
-            border-bottom: 1px dashed #e2e8f0;
-            padding-bottom: 2px;
-        }
-        .c-party-row {
-            display: flex;
-            align-items: center;
-            font-size: 10.5px;
-            gap: 4px;
-            margin-top: 3px;
-        }
-
-        .dyn-text {
-            color: #034694;
-            font-weight: 800;
-            border-bottom: 1px dashed #94a3b8;
-            padding: 0 4px;
-            min-height: 16px;
-            display: inline-block;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .phone-text {
-            direction: ltr !important;
-            unicode-bidi: embed;
-            text-align: right;
-        }
-
-        /* Tables (Sales) */
-        .c-table {
+            border-radius: 20px;
+            padding: 35px 25px;
             width: 100%;
-            border-collapse: collapse;
-            font-size: 10.5px;
+            max-width: 380px;
             text-align: center;
-            margin-bottom: 5px;
-            table-layout: fixed;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.8);
         }
-        .c-table th {
-            background: #0f172a;
-            color: #fff;
-            padding: 3.5px 2px;
-            border: 1px solid #334155;
-            font-weight: 700;
-            font-size: 10px;
-            white-space: nowrap;
-        }
-        .c-table td {
-            border: 1px solid var(--border);
-            padding: 3.5px 2px;
-            height: 22px;
-            background: #fff;
-            font-weight: 700;
-            color: #034694;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        /* Rent Property Details Box */
-        .rent-prop-box {
-            border: 1px solid var(--border);
-            background: #f8fafc;
-            border-radius: 5px;
-            padding: 6px 10px;
-            margin: 2px 0;
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 6px;
-            font-size: 10.5px;
-        }
-
-        /* Clauses */
-        .c-clauses {
-            border: 1px solid var(--border);
-            border-radius: 5px;
-            padding: 6px 10px;
-            font-size: 10.2px;
-            line-height: 1.5;
-            color: #0f172a;
-            background: #fff;
-        }
-        .c-clause-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 6px;
-            margin-bottom: 3.5px;
-            text-align: justify;
-        }
-        .c-clause-item:last-child { margin-bottom: 0; }
-        .c-cnum {
-            background: var(--accent-light);
-            color: #8c6a11;
-            border: 1px solid #ebd492;
-            width: 16px;
-            height: 16px;
+        .lock-icon {
+            font-size: 35px;
+            color: var(--accent-blue);
+            background: rgba(56, 189, 248, 0.1);
+            width: 75px;
+            height: 75px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 9px;
-            font-weight: 800;
-            flex-shrink: 0;
-            margin-top: 1px;
+            margin: 0 auto 15px auto;
+            border: 1px solid rgba(56, 189, 248, 0.2);
         }
-        .c-ctext { flex: 1; }
-
-        /* بەشێ تێبینیێ */
-        .c-custom-note-wrap {
-            margin-top: 4px;
-            border-top: 1px dashed #cbd5e1;
-            padding-top: 4px;
-            font-size: 10px;
-            line-height: 1.4;
-            color: #1e293b;
-            height: 32px;
-            overflow: hidden;
+        .lock-card h2 { font-size: 18px; margin-bottom: 5px; color: #fff; }
+        .lock-card p { font-size: 12px; color: var(--text-gray); margin-bottom: 20px; }
+        .lock-input-group { position: relative; margin-bottom: 15px; }
+        .lock-input {
+            width: 100%;
+            background: #090d16;
+            border: 1px solid var(--border);
+            color: #fff;
+            padding: 12px 14px;
+            border-radius: var(--radius-md);
+            outline: none;
+            font-size: 15px;
+            text-align: center;
+            letter-spacing: 2px;
         }
-        .c-custom-note-title {
-            font-weight: 800;
-            color: #b48516;
-            display: inline-block;
-            margin-left: 4px;
-        }
-        .c-custom-note-content {
-            display: inline;
-            color: #034694;
-            font-weight: 700;
-            word-break: break-word;
+        .lock-input:focus { border-color: var(--accent-blue); }
+        .lock-error {
+            color: var(--accent-rose);
+            font-size: 12px;
+            margin-top: 8px;
+            display: none;
+            font-weight: bold;
         }
 
-        /* قوتییا ئاگەهداری و ناڤێ پارێزەری (ل ژێر تێبینیێ) */
-        .c-note-box-lawyer {
-            background: #fffbeb;
-            border: 1px dashed #d97706;
-            border-radius: 5px;
-            padding: 4px 8px;
-            font-size: 9.8px;
-            color: #92400e;
-            font-weight: 700;
+        .phone-text, input[type="tel"], .phone-input {
+            direction: ltr !important;
+            text-align: right;
+            unicode-bidi: plaintext;
+        }
+
+        header {
+            background: rgba(18, 24, 36, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 12px 18px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 4px;
         }
 
-        /* بەشێ خوارێ (Signatures) */
-        .c-footer-wrap {
-            margin-top: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
+        .brand { display: flex; align-items: center; gap: 10px; }
+        .brand i {
+            font-size: 22px;
+            color: var(--accent-blue);
+            background: rgba(56, 189, 248, 0.1);
+            padding: 8px;
+            border-radius: 10px;
+        }
+        .brand-text h1 { font-size: 16px; font-weight: 700; }
+        .brand-text p { font-size: 11px; color: var(--text-gray); }
+
+        .container {
+            max-width: 1250px;
+            margin: 15px auto;
+            padding: 0 12px;
         }
 
-        /* Signatures */
-        .c-sigs {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr;
-            gap: 6px;
-        }
-        .c-sig-box {
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .box {
+            background: var(--bg-card);
             border: 1px solid var(--border);
-            background: #f8fafc;
-            border-radius: 5px;
-            padding: 6px 4px;
-            text-align: center;
-            height: 56px;
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .box-title {
+            font-size: 15px;
+            font-weight: bold;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+        .form-group { display: flex; flex-direction: column; gap: 4px; }
+        .form-group.full { grid-column: 1 / -1; }
+
+        label { font-size: 12px; font-weight: 600; color: var(--text-gray); }
+        input, select, textarea {
+            width: 100%;
+            background: #0b101a;
+            border: 1px solid var(--border);
+            color: #fff;
+            padding: 10px 12px;
+            border-radius: var(--radius-md);
+            outline: none;
+            font-size: 13px;
+        }
+
+        .btn {
+            background: var(--accent-blue);
+            color: #000;
+            border: none;
+            padding: 9px 15px;
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: 0.2s;
+        }
+        .btn:hover { opacity: 0.9; }
+        .btn-green { background: var(--accent-green); color: #fff; }
+        .btn-gold { background: var(--accent-gold); color: #000; }
+        .btn-rose { background: var(--accent-rose); color: #fff; }
+        .btn-purple { background: var(--accent-purple); color: #fff; }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: #fff; }
+        .btn-active { background: #0284c7 !important; color: #fff !important; }
+
+        /* PROPERTY CARDS */
+        .prop-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 14px;
+        }
+        .prop-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
             display: flex;
             flex-direction: column;
+        }
+        .prop-head {
+            padding: 10px 14px;
+            background: var(--bg-card-alt);
+            display: flex;
             justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
         }
-        .c-sig-title {
-            font-size: 10px;
-            font-weight: 800;
-            color: #0f172a;
-            border-bottom: 1px solid #e2e8f0;
-            padding-bottom: 2px;
+        .badge {
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-weight: bold;
         }
-        .c-sig-sub { font-size: 9px; color: #64748b; font-weight: 600; }
+        .badge-sale { background: rgba(56, 189, 248, 0.15); color: var(--accent-blue); }
+        .badge-rent { background: rgba(251, 191, 36, 0.15); color: var(--accent-gold); }
 
-        /* Modal ئەرشیفێ عەقدان */
-        .modal-backdrop {
+        .prop-body { padding: 14px; flex-grow: 1; }
+        .prop-title { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+        .prop-price-tag { font-size: 18px; font-weight: 800; color: var(--accent-green); margin-bottom: 8px; }
+
+        .prop-info-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px;
+            margin-bottom: 10px;
+            background: #0b101a;
+            padding: 8px;
+            border-radius: var(--radius-md);
+        }
+        .prop-info-item { font-size: 11px; color: var(--text-gray); }
+        .prop-info-item strong { color: #fff; display: block; font-size: 12px; }
+
+        .directions-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+        }
+        .direction-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            background: #0b101a;
+            border: 1px solid var(--border);
+            padding: 8px 4px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .direction-label:has(input:checked) {
+            background: rgba(56, 189, 248, 0.12);
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+            font-weight: bold;
+        }
+
+        /* TABLES */
+        .table-responsive { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; text-align: right; font-size: 13px; }
+        th { background: #0b101a; color: var(--text-gray); padding: 10px; border-bottom: 1px solid var(--border); font-weight: 600; }
+        td { padding: 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.04); }
+
+        /* BOTTOM TASKBAR */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            height: 70px;
+            background: rgba(13, 18, 30, 0.98);
+            backdrop-filter: blur(16px);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 0 5px;
+            z-index: 1000;
+        }
+        .nav-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-gray);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            padding: 6px 8px;
+            border-radius: var(--radius-md);
+        }
+        .nav-btn i { font-size: 18px; }
+        .nav-btn.active { color: var(--accent-blue); background: rgba(56, 189, 248, 0.12); }
+        .nav-btn.special-add { color: var(--accent-green); }
+
+        /* MODALS */
+        .modal {
+            display: none;
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.75);
-            display: none;
-            justify-content: center;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 20000;
             align-items: center;
-            z-index: 2000;
-            backdrop-filter: blur(4px);
+            justify-content: center;
+            padding: 15px;
         }
-        .modal-box {
-            background: var(--card-bg);
-            border: 1px solid var(--accent);
-            border-radius: 12px;
-            width: 90%;
-            max-width: 780px;
-            max-height: 85vh;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+        .modal.open { display: flex; }
+        .modal-body {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 550px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 22px;
         }
-        .modal-header {
-            padding: 14px 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+        .modal-head {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 18px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
         }
-        .modal-header h3 { font-size: 15px; color: var(--accent); }
-        .modal-close { background: none; border: none; color: #fff; font-size: 18px; cursor: pointer; }
-        .modal-body {
-            padding: 16px;
-            overflow-y: auto;
-            flex: 1;
-        }
-        .archive-search {
-            width: 100%;
-            padding: 8px 12px;
-            background: #090d16;
-            border: 1px solid #28354f;
-            border-radius: 6px;
-            color: #fff;
-            font-size: 12px;
-            margin-bottom: 12px;
-            outline: none;
-        }
-        .archive-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 12px;
-            text-align: right;
-        }
-        .archive-table th {
-            background: #090d16;
-            padding: 8px;
-            color: var(--accent);
-            border-bottom: 1px solid #28354f;
-        }
-        .archive-table td {
-            padding: 8px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            color: #e2e8f0;
-        }
-        .btn-act {
-            padding: 4px 8px;
-            font-size: 11px;
-            border-radius: 4px;
-            border: none;
-            cursor: pointer;
-            font-weight: 700;
-        }
-        .btn-act-load { background: #3b82f6; color: #fff; }
-        .btn-act-del { background: #ef4444; color: #fff; margin-right: 4px; }
+        .close-btn { background: none; border: none; color: var(--text-gray); font-size: 20px; cursor: pointer; }
 
-        /* Notification Toast */
-        #toast {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #10b981;
-            color: #fff;
-            padding: 10px 20px;
-            border-radius: 8px;
+        /* A4 PRESENTATION WITH TEXT WRAPPING */
+        .a4-outer-viewport {
+            width: 100%;
+            overflow-x: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px 0;
+            background: #060910;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+        }
+        .a4-scaler-wrapper {
+            transform-origin: top center;
+            transition: transform 0.2s ease;
+        }
+        .a4-sheet {
+            background: #ffffff !important;
+            color: #000000 !important;
+            width: 794px;
+            min-width: 794px;
+            max-width: 794px;
+            min-height: 1123px;
+            padding: 35px 42px;
+            font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+            box-sizing: border-box;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            border-radius: 4px;
+        }
+
+        .c-in {
+            border: none;
+            border-bottom: 1.5px dotted #0284c7;
+            color: #0369a1 !important;
             font-weight: 700;
             font-size: 13px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-            display: none;
-            z-index: 3000;
+            background: transparent;
+            padding: 0 4px;
+            outline: none;
+            display: inline-block;
+            min-width: 45px;
+            text-align: center;
+            vertical-align: baseline;
+            white-space: normal;
+            word-break: break-word;
+            line-height: 1.5;
+        }
+        .c-in:focus { background: #f0f9ff; border-bottom-style: solid; }
+
+        .c-header {
+            display: grid;
+            grid-template-columns: 210px 1fr 210px;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+        .c-header-phone { text-align: right; font-size: 12px; font-weight: 700; line-height: 1.4; }
+        .c-header-phone .num { color: #0284c7; font-size: 15px; direction: ltr; display: inline-block; }
+
+        .c-header-logo { text-align: center; }
+        .c-logo-tag {
+            background: #1e293b;
+            color: #fff;
+            font-size: 9.5px;
+            padding: 2px 10px;
+            border-radius: 10px;
+            display: inline-block;
+        }
+        .c-logo-title { font-size: 24px; font-weight: 900; color: #0f172a; line-height: 1.1; }
+        .c-logo-sub { font-size: 10.5px; font-weight: 800; color: #d97706; }
+
+        .c-header-meta { text-align: left; font-size: 12px; font-weight: 700; line-height: 1.4; }
+
+        .c-pill-title {
+            background: #0f172a;
+            color: #fff;
+            text-align: center;
+            padding: 5px 22px;
+            border-radius: 20px;
+            width: fit-content;
+            margin: 6px auto 10px auto;
+            font-size: 15px;
+            font-weight: 800;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
         }
 
-        /* PRINT STYLES */
+        .c-top-strip {
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 7px 15px;
+            display: flex;
+            justify-content: space-between;
+            font-weight: 700;
+            font-size: 13px;
+            background: #f8fafc;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .c-parties-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+        .c-party-box {
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 8px 12px;
+            position: relative;
+            background: #ffffff;
+        }
+        .c-party-tag {
+            position: absolute;
+            top: -8px;
+            font-size: 9px;
+            font-weight: 800;
+            color: #b45309;
+            background: #fff;
+            padding: 0 5px;
+        }
+        .c-party-title { font-size: 13px; font-weight: 800; color: #0f172a; margin-bottom: 5px; }
+        .c-party-line { font-size: 12.5px; display: flex; align-items: baseline; margin-bottom: 4px; flex-wrap: wrap; }
+
+        .c-specs-tbl {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+            font-size: 12px;
+            text-align: center;
+        }
+        .c-specs-tbl th {
+            background: #0f172a;
+            color: #fff;
+            font-weight: 700;
+            padding: 5px;
+            border: 1px solid #334155;
+        }
+        .c-specs-tbl td {
+            border: 1px solid #cbd5e1;
+            padding: 4px;
+            color: #000;
+            font-weight: 600;
+        }
+
+        .c-terms-box {
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 10px 14px;
+            margin-bottom: 10px;
+        }
+        .c-term-row {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+            font-size: 12.5px;
+            line-height: 1.8;
+            margin-bottom: 5px;
+            color: #1e293b;
+            font-weight: 600;
+            flex-wrap: wrap;
+        }
+        .c-term-num {
+            border: 1px solid #cbd5e1;
+            color: #b45309;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10.5px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        .c-term-note {
+            font-size: 11.5px;
+            color: #b45309;
+            font-weight: bold;
+            margin-top: 6px;
+            padding-top: 6px;
+            border-top: 1px dashed #cbd5e1;
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .c-warning-strip {
+            border: 1.2px dashed #f59e0b;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 11px;
+            font-weight: 800;
+            color: #92400e;
+            background: #fffbeb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        /* 4 SIGNATURE BOXES */
+        .c-sig-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            text-align: center;
+        }
+        .c-sig-box {
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 10px 4px;
+            background: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+        .c-sig-title { font-size: 11.5px; font-weight: 800; color: #0f172a; }
+        .c-sig-name { font-size: 11.5px; color: #0369a1; font-weight: 700; }
+        .c-sig-label { font-size: 10.5px; color: #64748b; font-weight: 600; }
+
+        /* ================= PRINT RULES ================= */
         @media print {
-            body { background: none; padding: 0; margin: 0; }
-            .app-navbar, .form-panel, .modal-backdrop, #toast { display: none !important; }
-            .app-main { display: block; padding: 0; margin: 0; max-width: none; }
-            .preview-panel { height: auto; overflow: hidden; padding: 0; margin: 0; }
-            .a4-page {
-                box-shadow: none;
-                padding: 8mm 12mm;
-                width: 210mm;
-                height: 296mm !important;
-                max-height: 296mm !important;
-                overflow: hidden !important;
-                page-break-inside: avoid;
-                page-break-after: avoid;
-            }
-            .a4-page:not(.active-contract) { display: none !important; }
             @page { size: A4 portrait; margin: 0; }
-            html, body { width: 210mm; height: 296mm; overflow: hidden; }
+            body { background: #fff !important; padding: 0 !important; margin: 0 !important; color: #000 !important; }
+            header, .bottom-nav, .no-print, .btn, .box, #lock-screen, .a4-outer-viewport > div:first-child {
+                display: none !important;
+            }
+            .a4-outer-viewport { background: transparent !important; border: none !important; padding: 0 !important; display: block !important; }
+            .a4-scaler-wrapper { transform: none !important; }
+            .a4-sheet {
+                box-shadow: none !important; border: none !important; margin: 0 auto !important;
+                width: 210mm !important; min-width: 210mm !important; max-width: 210mm !important;
+                height: 297mm !important; max-height: 297mm !important; padding: 12mm 15mm !important;
+                page-break-inside: avoid !important; page-break-after: avoid !important; overflow: hidden !important;
+            }
+            #inventory-print-sheet { display: block !important; padding: 15mm !important; }
+            #inventory-print-sheet table { font-size: 10px !important; width: 100% !important; border-collapse: collapse !important; }
+            #inventory-print-sheet th { background: #0f172a !important; color: #fff !important; padding: 4px !important; border: 1px solid #334155 !important; }
+            #inventory-print-sheet td { padding: 4px !important; border: 1px solid #cbd5e1 !important; color: #000 !important; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Header Navigation -->
-    <header class="app-navbar">
-        <div class="brand-wrap">
-            <div class="brand-logo" id="ui_logo_text">دهۆک</div>
-            <div class="brand-text">
-                <h1 id="ui_nav_title">سیستەمێ ئەلیکترۆنی یێ عەقارات دهۆک</h1>
-                <span id="ui_nav_subtitle">گرێبەستێن فەرمی یێن فرۆتن و کرێدانێ</span>
+    <!-- ================= 0. LOCK SCREEN ================= -->
+    <div id="lock-screen">
+        <div class="lock-card">
+            <div class="lock-icon"><i class="fa-solid fa-shield-halved"></i></div>
+            <h2>عەقارات دهۆک</h2>
+            <p>تکایە پاسوۆردێ سیستەمی لێدە دا دەستپێبکەی</p>
+            <div class="lock-input-group">
+                <input type="password" id="pass-input" class="lock-input" placeholder="••••••••" onkeyup="checkEnter(event)">
             </div>
-        </div>
-
-        <div class="center-controls">
-            <!-- زمان Switcher -->
-            <div class="lang-switcher">
-                <button class="lang-btn active" id="lang_btn_ku" onclick="setLanguage('ku')">کوردی</button>
-                <button class="lang-btn" id="lang_btn_ar" onclick="setLanguage('ar')">عربي</button>
-            </div>
-
-            <!-- جۆرێ گرێبەستێ -->
-            <div class="tab-switcher">
-                <button class="tab-btn active" id="tab_btn_sales" onclick="switchContract('sales')">📑 <span id="ui_tab_sales">گرێبەستا فرۆتنێ</span></button>
-                <button class="tab-btn" id="tab_btn_rent" onclick="switchContract('rent')">🔑 <span id="ui_tab_rent">گرێبەستا کرێدانێ (ئیجار)</span></button>
-            </div>
-        </div>
-
-        <div class="nav-actions">
-            <button class="btn btn-save" onclick="saveCurrentContract()"><span id="ui_btn_save">💾 خەزنکرن</span></button>
-            <button class="btn btn-archive" onclick="openArchiveModal()">📂 <span id="ui_btn_archive">ئەرشیف</span> (<span id="archive_count">0</span>)</button>
-            <button class="btn btn-demo" onclick="fillDemoData()">⚡ <span id="ui_btn_demo">نموونە</span></button>
-            <button class="btn btn-pdf" onclick="exportPDF()">📥 PDF</button>
-            <button class="btn btn-print" onclick="window.print()">🖨️ <span id="ui_btn_print">چاپ (Print)</span></button>
-        </div>
-    </header>
-
-    <!-- Main Content -->
-    <main class="app-main">
-        
-        <!-- ١. فۆرمێ داخڵکرنا زانیاریان -->
-        <div class="form-panel">
-            
-            <!-- ====== فۆرمێ فرۆتنێ ====== -->
-            <div id="form_sales_wrap">
-                <div class="form-section-title" id="lbl_s_sec1">📅 ١. ژمارا عەقدی و رێکەفت</div>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label id="lbl_s_contract_no">ژمارا گرێبەستێ (عەقدی):</label>
-                        <input type="text" id="in_contract_no" class="form-control" maxlength="20" placeholder="2024/001" oninput="updateContracts()">
-                    </div>
-                    <div class="form-group">
-                        <label id="lbl_s_date">مێژوویا ئیمزاکرنێ:</label>
-                        <input type="text" id="in_date" class="form-control" maxlength="25" placeholder="2024 / 09 / 20" oninput="updateContracts()">
-                    </div>
-                </div>
-
-                <div class="form-section-title" id="lbl_s_sec2">👤 ٢. فرۆشیار و بکر</div>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label id="lbl_s_seller_name">ناڤێ فرۆشیاری (سیانی):</label>
-                        <input type="text" id="in_seller_name" class="form-control" maxlength="40" placeholder="ناڤێ فرۆشیاری" oninput="updateContracts()">
-                    </div>
-                    <div class="form-group">
-                        <label id="lbl_s_seller_phone">تەلەفۆنا فرۆشیاری:</label>
-                        <input type="text" id="in_seller_phone" class="form-control" maxlength="20" placeholder="0750 123 4567" oninput="updateContracts()">
-                    </div>
-                    <div class="form-group">
-                        <label id="lbl_s_buyer_name">ناڤێ کڕیاری (سیانی):</label>
-                        <input type="text" id="in_buyer_name" class="form-control" maxlength="40" placeholder="ناڤێ کڕیاری" oninput="updateContracts()">
-                    </div>
-                    <div class="form-group">
-                        <label id="lbl_s_buyer_phone">تەلەفۆنا کڕیاری:</label>
-                        <input type="text" id="in_buyer_phone" class="form-control" maxlength="20" placeholder="0750 987 6543" oninput="updateContracts()">
-                    </div>
-                </div>
-
-                <div class="form-section-title" id="lbl_s_sec3">📐 ٣. رووبەر و هوورکاریێن ئاڤاهی</div>
-                <div class="form-grid">
-                    <div class="form-group"><label id="lbl_s_donam">دۆنەم:</label><input type="text" id="in_donam" class="form-control" maxlength="10" placeholder="-" oninput="updateContracts()"></div>
-                    <div class="form-group"><label id="lbl_s_ulk">ئولک:</label><input type="text" id="in_ulk" class="form-control" maxlength="10" placeholder="-" oninput="updateContracts()"></div>
-                    <div class="form-group"><label id="lbl_s_meter">مەتر:</label><input type="text" id="in_meter" class="form-control" maxlength="10" placeholder="240" oninput="updateContracts()"></div>
-                    <div class="form-group"><label id="lbl_s_dm">دیسیمەتر:</label><input type="text" id="in_dm" class="form-control" maxlength="10" placeholder="-" oninput="updateContracts()"></div>
-                    <div class="form-group"><label id="lbl_s_building">عیمارە:</label><input type="text" id="in_building" class="form-control" maxlength="10" placeholder="A" oninput="updateContracts()"></div>
-                    <div class="form-group"><label id="lbl_s_floor">قات:</label><input type="text" id="in_floor" class="form-control" maxlength="10" placeholder="3" oninput="updateContracts()"></div>
-                    <div class="form-group"><label id="lbl_s_apt_no">ژمارا شققێ:</label><input type="text" id="in_apt_no" class="form-control" maxlength="10" placeholder="12" oninput="updateContracts()"></div>
-                    <div class="form-group"><label id="lbl_s_project">پڕۆژە:</label><input type="text" id="in_project" class="form-control" maxlength="25" placeholder="ئاڤرۆ ستی" oninput="updateContracts()"></div>
-                </div>
-
-                <div class="form-section-title" id="lbl_s_sec4">📑 ٤. زانیاریێن تاپۆیی</div>
-                <div class="form-grid">
-                    <div class="form-group"><label id="lbl_s_prop_type">جۆرێ ئاڤاهی:</label><input type="text" id="in_prop_type" class="form-control" maxlength="20" placeholder="شققە" oninput="updateContracts()"></div>
-                    <div class="form-group"><label id="lbl_s_house_no">ژمارا خانی:</label><input type="text" id="in_house_no" class="form-control" maxlength="20" placeholder="B12" oninput="updateContracts()"></div>
-                    <div class="form-group"><label id="lbl_s_chain_no">زنجیرە:</label><input type="text" id="in_chain_no" class="form-control" maxlength="20" placeholder="104" oninput="updateContracts()"></div>
-                    <div class="form-group"><label id="lbl_s_neighbor">تاخ (گەڕەک):</label><input type="text" id="in_neighbor" class="form-control" maxlength="20" placeholder="ماسیکێ" oninput="updateContracts()"></div>
-                    <div class="form-group"><label id="lbl_s_plot_no">ژمارا پارچێ:</label><input type="text" id="in_plot_no" class="form-control" maxlength="20" placeholder="345/12" oninput="updateContracts()"></div>
-                    <div class="form-group"><label id="lbl_s_sector_no">ژمارا کەرتی:</label><input type="text" id="in_sector_no" class="form-control" maxlength="20" placeholder="45" oninput="updateContracts()"></div>
-                    <div class="form-group full-width"><label id="lbl_s_sector_name">ناڤێ کەرتی:</label><input type="text" id="in_sector_name" class="form-control" maxlength="40" placeholder="دۆمیز" oninput="updateContracts()"></div>
-                </div>
-
-                <div class="form-section-title" id="lbl_s_sec5">💰 ٥. بها و مەرجێن دراڤی</div>
-                <div class="form-grid">
-                    <div class="form-group"><label id="lbl_s_price_num">بهایێ فرۆتنێ (ژمارە):</label><input type="text" id="in_price_num" class="form-control" maxlength="25" placeholder="115,000 $" oninput="updateContracts()"></div>
-                    <div class="form-group"><label id="lbl_s_price_words">بهایێ فرۆتنێ (نڤیسین):</label><input type="text" id="in_price_words" class="form-control" maxlength="50" placeholder="سەد و پازدە هزار دۆلار" oninput="updateContracts()"></div>
-                    <div class="form-group"><label id="lbl_s_earnest_money">بڕێ دەسبەعی:</label><input type="text" id="in_earnest_money" class="form-control" maxlength="25" placeholder="10,000 $" oninput="updateContracts()"></div>
-                    <div class="form-group"><label id="lbl_s_seller_penalty">سزایێ لێڤەبوونێ:</label><input type="text" id="in_seller_penalty" class="form-control" maxlength="25" placeholder="10,000 $" oninput="updateContracts()"></div>
-                    <div class="form-group"><label id="lbl_s_broker_fee">رێژا دەلالیێ (%):</label><input type="text" id="in_broker_fee" class="form-control" maxlength="10" placeholder="2" oninput="updateContracts()"></div>
-                    <div class="form-group"><label id="lbl_s_handover_date">ژڤانێ رادەستکرنێ:</label><input type="text" id="in_handover_date" class="form-control" maxlength="25" placeholder="2024 / 11 / 01" oninput="updateContracts()"></div>
-                    <div class="form-group full-width">
-                        <label id="lbl_s_custom_note">تێبینیێن زێدە (ئەگەر هەبن):</label>
-                        <input type="text" id="in_custom_note" class="form-control" maxlength="180" placeholder="هەر تێبینیەکا زێدە..." oninput="updateContracts()">
-                    </div>
-                </div>
-            </div>
-
-            <!-- ====== فۆرمێ ئیجارێ ====== -->
-            <div id="form_rent_wrap" style="display: none;">
-                <div class="form-section-title" id="lbl_r_sec1">📅 ١. ژمارا عەقدی و رێکەفت</div>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label id="lbl_r_contract_no">ژمارا گرێبەستێ (عەقدی):</label>
-                        <input type="text" id="in_r_contract_no" class="form-control" maxlength="20" placeholder="2024/001" oninput="updateContracts()">
-                    </div>
-                    <div class="form-group">
-                        <label id="lbl_r_date">مێژوویا ئیمزاکرنێ:</label>
-                        <input type="text" id="in_r_date" class="form-control" maxlength="25" placeholder="2024 / 09 / 20" oninput="updateContracts()">
-                    </div>
-                </div>
-
-                <div class="form-section-title" id="lbl_r_sec2">👤 ٢. خودانێ ئاڤاهی و کرێچی</div>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label id="lbl_r_owner">خودانێ ئاڤاهی (مؤجر):</label>
-                        <input type="text" id="in_r_owner" class="form-control" maxlength="40" placeholder="ناڤێ خودانی" oninput="updateContracts()">
-                    </div>
-                    <div class="form-group">
-                        <label id="lbl_r_owner_phone">تەلەفۆنا خودانی:</label>
-                        <input type="text" id="in_r_owner_phone" class="form-control" maxlength="20" placeholder="0750 450 1122" oninput="updateContracts()">
-                    </div>
-                    <div class="form-group">
-                        <label id="lbl_r_tenant">ئەوێ ب کرێ کری (کرێچی):</label>
-                        <input type="text" id="in_r_tenant" class="form-control" maxlength="40" placeholder="ناڤێ کرێچی" oninput="updateContracts()">
-                    </div>
-                    <div class="form-group">
-                        <label id="lbl_r_tenant_phone">تەلەفۆنا کرێچی:</label>
-                        <input type="text" id="in_r_tenant_phone" class="form-control" maxlength="20" placeholder="0750 780 3344" oninput="updateContracts()">
-                    </div>
-                </div>
-
-                <div class="form-section-title" id="lbl_r_sec3">🏢 ٣. زانیاری و جهێ ئاڤاهی</div>
-                <div class="form-grid">
-                    <div class="form-group"><label id="lbl_r_type">جۆرێ ئاڤاهی:</label><input type="text" id="in_r_type" class="form-control" maxlength="25" placeholder="خانی / شققە" oninput="updateContracts()"></div>
-                    <div class="form-group"><label id="lbl_r_city">باژێڕ:</label><input type="text" id="in_r_city" class="form-control" maxlength="25" placeholder="دهۆک" oninput="updateContracts()"></div>
-                    <div class="form-group"><label id="lbl_r_neighbor">تاخ (گەڕەک):</label><input type="text" id="in_r_neighbor" class="form-control" maxlength="25" placeholder="نەورۆز" oninput="updateContracts()"></div>
-                    <div class="form-group"><label id="lbl_r_street">جادە:</label><input type="text" id="in_r_street" class="form-control" maxlength="25" placeholder="جادا سەرەکی" oninput="updateContracts()"></div>
-                </div>
-
-                <div class="form-section-title" id="lbl_r_sec4">💵 ٤. ماوە و مەرجێن دراڤی</div>
-                <div class="form-grid">
-                    <div class="form-group"><label id="lbl_r_start_date">ماوێ کرێکرنێ (ژ رۆژا):</label><input type="text" id="in_r_start_date" class="form-control" maxlength="25" placeholder="2024 / 10 / 01" oninput="updateContracts()"></div>
-                    <div class="form-group"><label id="lbl_r_end_date">هەتا رۆژا:</label><input type="text" id="in_r_end_date" class="form-control" maxlength="25" placeholder="2025 / 10 / 01" oninput="updateContracts()"></div>
-                    <div class="form-group"><label id="lbl_r_rent_amount">کرێیا هەیڤانە:</label><input type="text" id="in_r_rent_amount" class="form-control" maxlength="30" placeholder="500 $" oninput="updateContracts()"></div>
-                    <div class="form-group"><label id="lbl_r_deposit">تامینات / دەسبەع:</label><input type="text" id="in_r_deposit" class="form-control" maxlength="30" placeholder="500 $" oninput="updateContracts()"></div>
-                    <div class="form-group full-width"><label id="lbl_r_usage">مەرجێ بکارئینانێ (مەبەست):</label><input type="text" id="in_r_usage" class="form-control" maxlength="40" placeholder="تنێ بۆ ئاکنجیبوونێ" oninput="updateContracts()"></div>
-                    <div class="form-group full-width">
-                        <label id="lbl_r_custom_note">تێبینیێن زێدە (ئەگەر هەبن):</label>
-                        <input type="text" id="in_r_custom_note" class="form-control" maxlength="180" placeholder="هەر تێبینیەکا زێدە..." oninput="updateContracts()">
-                    </div>
-                </div>
-            </div>
-
-            <!-- بەشێ دیدەڤانان -->
-            <div class="form-section-title" id="lbl_w_sec">👥 دیدەڤان (الشهود)</div>
-            <div class="form-grid">
-                <div class="form-group"><label id="lbl_witness1">دیدەڤانێ ئێکێ (الشاهد الأول):</label><input type="text" id="in_witness1" class="form-control" maxlength="30" placeholder="ناڤێ دیدەڤانی" oninput="updateContracts()"></div>
-                <div class="form-group"><label id="lbl_witness2">دیدەڤانێ دووێ (الشاهد الثاني):</label><input type="text" id="in_witness2" class="form-control" maxlength="30" placeholder="ناڤێ دیدەڤانی" oninput="updateContracts()"></div>
-            </div>
-
-        </div>
-
-        <!-- ٢. پێشاندانا زیندی یا لاپەرێ عەقدی -->
-        <div class="preview-panel">
-            
-            <!-- ==================== عەقدا ١: فرۆتن ==================== -->
-            <div class="a4-page active-contract" id="contract-sales">
-                <!-- Header -->
-                <div class="c-header">
-                    <div class="c-contact">
-                        <div><span id="txt_s_mob">مۆبایل</span>: <span>0750 710 0238</span></div>
-                        <div style="font-size: 9.5px; color: #64748b; margin-top:2px;" id="txt_s_header_sub">پەیوەندی و خزمەتگوزاری</div>
-                    </div>
-                    <div class="c-logo-box">
-                        <span class="c-badge">REAL ESTATE • عەقارات</span>
-                        <h1 class="c-title" id="txt_s_office_name">عەقارات دهۆک</h1>
-                        <div class="c-subtitle">DUHOK REAL ESTATE</div>
-                    </div>
-                    <div class="c-meta">
-                        <div><span id="txt_s_cno_lbl">ژمارا عەقدی</span>: <span id="out_contract_no" class="dyn-text" style="width: 60px;">...</span></div>
-                        <div style="margin-top:2px;"><span id="txt_s_date_lbl">مێژوو</span>: <span id="out_date" class="dyn-text" style="width: 75px;">...</span></div>
-                        <div style="font-size: 9.5px; color: #b48516; margin-top:2px;" id="txt_s_loc">📍 دهۆک - بازاڕێ ئەرد و خانیان</div>
-                    </div>
-                </div>
-
-                <!-- Title -->
-                <div class="c-title-strip">
-                    <div class="c-main-title" id="txt_s_main_title">گرێبەستا فرۆتنا مۆلکی (عەقد)</div>
-                </div>
-
-                <!-- Parties -->
-                <div class="c-parties">
-                    <div class="c-party-box">
-                        <div class="c-party-h"><span id="txt_s_seller_header">لایەنێ ئێکێ (فرۆشیار)</span><span style="font-size: 8.5px; color: #b48516;">SELLER</span></div>
-                        <div class="c-party-row"><span id="txt_s_p1_name">ناڤ:</span><span id="out_seller_name" class="dyn-text" style="flex:1;">...........................</span></div>
-                        <div class="c-party-row"><span id="txt_s_p1_phone">تەلەفۆن:</span><span id="out_seller_phone" class="dyn-text phone-text" style="flex:1;">...........................</span></div>
-                    </div>
-                    <div class="c-party-box">
-                        <div class="c-party-h"><span id="txt_s_buyer_header">لایەنێ دووێ (بکر)</span><span style="font-size: 8.5px; color: #b48516;">BUYER</span></div>
-                        <div class="c-party-row"><span id="txt_s_p2_name">ناڤ:</span><span id="out_buyer_name" class="dyn-text" style="flex:1;">...........................</span></div>
-                        <div class="c-party-row"><span id="txt_s_p2_phone">تەلەفۆن:</span><span id="out_buyer_phone" class="dyn-text phone-text" style="flex:1;">...........................</span></div>
-                    </div>
-                </div>
-
-                <!-- Tables -->
-                <div>
-                    <table class="c-table">
-                        <thead>
-                            <tr>
-                                <th colspan="4" style="background:#0f172a;" id="tbl_s_th_area">رووبەرێ مۆلکی (المساحة)</th>
-                                <th colspan="4" style="background:#1e293b;" id="tbl_s_th_bldg">هوورکاریێن ئاڤاهی / شققە</th>
-                            </tr>
-                            <tr style="background:#334155;">
-                                <th id="th_donam">دۆنەم</th><th id="th_ulk">ئولک</th><th id="th_meter">مەتر</th><th id="th_dm">دیسیمەتر</th>
-                                <th id="th_building">عیمارە</th><th id="th_floor">قات</th><th id="th_apt_no">ژماراشققێ</th><th id="th_project">پڕۆژە</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td id="out_donam">-</td><td id="out_ulk">-</td><td id="out_meter">-</td><td id="out_dm">-</td>
-                                <td id="out_building">-</td><td id="out_floor">-</td><td id="out_apt_no">-</td><td id="out_project">-</td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <table class="c-table">
-                        <thead>
-                            <tr>
-                                <th id="th_prop_type">جۆرێ ئاڤاهی</th><th id="th_house_no">ژمارا خانی</th><th id="th_chain_no">زنجیرە</th><th id="th_neighbor">تاخ (گەڕەک)</th>
-                                <th id="th_plot_no">ژمارا پارچێ</th><th id="th_sector_no">ژمارا کەرتی</th><th id="th_sector_name">ناڤێ کەرتی</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td id="out_prop_type">-</td><td id="out_house_no">-</td><td id="out_chain_no">-</td>
-                                <td id="out_neighbor">-</td><td id="out_plot_no">-</td><td id="out_sector_no">-</td><td id="out_sector_name">-</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Clauses (بەندێن فرۆتنێ) -->
-                <div class="c-clauses" id="sales_clauses_container">
-                    <!-- Dynamic Clauses Rendered in JS -->
-                </div>
-
-                <!-- Footer (Signatures) -->
-                <div class="c-footer-wrap">
-                    <div class="c-sigs">
-                        <div class="c-sig-box"><div class="c-sig-title" id="sig_s_seller">ناڤ و ئیمزا فرۆشیاری</div><div class="c-sig-sub" id="sig_sub1">مۆر و ئیمزا</div></div>
-                        <div class="c-sig-box"><div class="c-sig-title" id="sig_s_w1">دیدەڤانێ ئێکێ</div><div class="c-sig-sub" id="out_witness1">ئیمزا</div></div>
-                        <div class="c-sig-box"><div class="c-sig-title" id="sig_s_w2">دیدەڤانێ دووێ</div><div class="c-sig-sub" id="out_witness2">ئیمزا</div></div>
-                        <div class="c-sig-box"><div class="c-sig-title" id="sig_s_buyer">ناڤ و ئیمزا بکری</div><div class="c-sig-sub" id="sig_sub2">مۆر و ئیمزا</div></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ==================== عەقدا ٢: ئیجار ==================== -->
-            <div class="a4-page" id="contract-rent">
-                <!-- Header -->
-                <div class="c-header">
-                    <div class="c-contact">
-                        <div><span id="txt_r_mob">مۆبایل</span>: <span>0750 710 0238</span></div>
-                        <div style="font-size: 9.5px; color: #64748b; margin-top:2px;" id="txt_r_header_sub">پەیوەندی و خزمەتگوزاری</div>
-                    </div>
-                    <div class="c-logo-box">
-                        <span class="c-badge">REAL ESTATE • عەقارات</span>
-                        <h1 class="c-title" id="txt_r_office_name">عەقارات دهۆک</h1>
-                        <div class="c-subtitle">DUHOK REAL ESTATE</div>
-                    </div>
-                    <div class="c-meta">
-                        <div><span id="txt_r_cno_lbl">ژمارا عەقدی</span>: <span id="out_r_contract_no" class="dyn-text" style="width: 60px;">...</span></div>
-                        <div style="margin-top:2px;"><span id="txt_r_date_lbl">مێژوو</span>: <span id="out_r_date" class="dyn-text" style="width: 75px;">...</span></div>
-                        <div style="font-size: 9.5px; color: #b48516; margin-top:2px;" id="txt_r_loc">📍 دهۆک - بازاڕێ ئەرد و خانیان</div>
-                    </div>
-                </div>
-
-                <!-- Title -->
-                <div class="c-title-strip">
-                    <div class="c-main-title" id="txt_r_main_title">هەڤبەستا کرێکرن و ب کرێدانێ (عەقدا ئیجارێ)</div>
-                </div>
-
-                <!-- جهێ ئاڤاهی -->
-                <div class="rent-prop-box">
-                    <div><b id="lbl_r_box_type">جۆرێ ئاڤاهی:</b> <span id="out_r_type" class="dyn-text">..........</span></div>
-                    <div><b id="lbl_r_box_loc">جهێ ئاڤاهی:</b> <span id="out_r_city_txt">دهۆک</span> - <span id="out_r_neighbor" class="dyn-text">..........</span></div>
-                    <div><b id="lbl_r_box_street">جادە / تاخ:</b> <span id="out_r_street" class="dyn-text">..........</span></div>
-                </div>
-
-                <!-- Parties -->
-                <div class="c-parties">
-                    <div class="c-party-box">
-                        <div class="c-party-h"><span id="txt_r_owner_header">خودانێ ئاڤاهی (مؤجر)</span><span style="font-size: 8.5px; color: #b48516;">LANDLORD</span></div>
-                        <div class="c-party-row"><span id="txt_r_p1_name">ناڤێ سیانی:</span><span id="out_r_owner" class="dyn-text" style="flex:1;">...........................</span></div>
-                        <div class="c-party-row"><span id="txt_r_p1_phone">ژمارا مۆبایلێ:</span><span id="out_r_owner_phone" class="dyn-text phone-text" style="flex:1;">...........................</span></div>
-                    </div>
-                    <div class="c-party-box">
-                        <div class="c-party-h"><span id="txt_r_tenant_header">ئەوێ ئاڤاهی ب کرێ کری (کرێچی)</span><span style="font-size: 8.5px; color: #b48516;">TENANT</span></div>
-                        <div class="c-party-row"><span id="txt_r_p2_name">ناڤێ سیانی:</span><span id="out_r_tenant" class="dyn-text" style="flex:1;">...........................</span></div>
-                        <div class="c-party-row"><span id="txt_r_p2_phone">ژمارا مۆبایلێ:</span><span id="out_r_tenant_phone" class="dyn-text phone-text" style="flex:1;">...........................</span></div>
-                    </div>
-                </div>
-
-                <!-- Clauses (بەندێن ئیجارێ) -->
-                <div class="c-clauses" id="rent_clauses_container">
-                    <!-- Dynamic Clauses Rendered in JS -->
-                </div>
-
-                <!-- Footer Section (Rent) -->
-                <div class="c-footer-wrap">
-                    <div class="c-sigs">
-                        <div class="c-sig-box"><div class="c-sig-title" id="sig_r_owner">خودانێ ئاڤاهی (مؤجر)</div><div class="c-sig-sub" id="sig_sub3">مۆر و ئیمزا</div></div>
-                        <div class="c-sig-box"><div class="c-sig-title" id="sig_r_w1">دیدەڤانێ ئێکێ</div><div class="c-sig-sub" id="out_r_witness1">ئیمزا</div></div>
-                        <div class="c-sig-box"><div class="c-sig-title" id="sig_r_w2">دیدەڤانێ دووێ</div><div class="c-sig-sub" id="out_r_witness2">ئیمزا</div></div>
-                        <div class="c-sig-box"><div class="c-sig-title" id="sig_r_tenant">ئەوێ ب کرێ کری (کرێچی)</div><div class="c-sig-sub" id="sig_sub4">مۆر و ئیمزا</div></div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-    </main>
-
-    <!-- Archive Modal -->
-    <div class="modal-backdrop" id="archiveModal">
-        <div class="modal-box">
-            <div class="modal-header">
-                <h3 id="txt_modal_title">📂 ئەرشیفێ عەقدێن خەزنکری (عەقارات دهۆک)</h3>
-                <button class="modal-close" onclick="closeArchiveModal()">✕</button>
-            </div>
-            <div class="modal-body">
-                <input type="text" id="archiveSearchInput" class="archive-search" placeholder="🔍 لێگەڕیان..." oninput="renderArchiveTable()">
-                <table class="archive-table">
-                    <thead>
-                        <tr>
-                            <th id="th_arc_cno">ژمارا عەقدی</th>
-                            <th id="th_arc_type">جۆر</th>
-                            <th id="th_arc_parties">لایەنێن گرێبەستێ</th>
-                            <th id="th_arc_date">مێژوو</th>
-                            <th style="text-align:center;" id="th_arc_act">کردار</th>
-                        </tr>
-                    </thead>
-                    <tbody id="archiveTableBody"></tbody>
-                </table>
-            </div>
+            <button class="btn btn-blue" style="width:100%; padding:12px;" onclick="verifyPassword()">
+                <i class="fa-solid fa-lock-open"></i> ڤەکرنا بەرنامەی
+            </button>
+            <div id="lock-error-msg" class="lock-error">پاسوۆرد شاشە! تکایە دووبارە بکەڤە.</div>
         </div>
     </div>
 
-    <!-- Notification Toast -->
-    <div id="toast">✅ عەقد ب سەرکەفتی هاتە خەزنکرن!</div>
+    <!-- HEADER -->
+    <header class="no-print">
+        <div class="brand">
+            <i class="fa-solid fa-building-user"></i>
+            <div class="brand-text">
+                <h1>عەقارات دهۆک</h1>
+                <p>سیستەمێ موڵک و عەقدێن فەرمی (Firebase Online)</p>
+            </div>
+        </div>
+        <div style="display:flex; gap:8px;">
+            <button class="btn btn-gold" onclick="printInventoryStatement()">
+                <i class="fa-solid fa-file-pdf"></i> کەشفا موڵکان
+            </button>
+            <button class="btn btn-outline" style="padding:6px 10px;" onclick="lockApp()" title="قوفڵکرن">
+                <i class="fa-solid fa-lock"></i>
+            </button>
+        </div>
+    </header>
 
-    <!-- JavaScript Translations & Interactions -->
+    <div class="container">
+
+        <!-- =================== 1. TAB: PROPERTIES =================== -->
+        <section id="tab-properties" class="tab-content active">
+            <div class="box">
+                <div class="box-title"><i class="fa-solid fa-filter" style="color:var(--accent-blue);"></i> فلتەر و لێگەڕیان</div>
+                <div class="form-grid">
+                    <input type="text" id="f-search" placeholder="🔍 ناڤ، تاخ، پارچە، خودان...">
+                    <select id="f-type">
+                        <option value="">هەمی جۆر</option>
+                        <option value="خانی">خانی</option>
+                        <option value="شوقە">شوقە</option>
+                        <option value="ڤێلا">ڤێلا</option>
+                        <option value="ئەرد">ئەرد</option>
+                        <option value="دوکان">دوکان</option>
+                    </select>
+                    <select id="f-status">
+                        <option value="">هەمی بارودۆخ</option>
+                        <option value="فروتن">بۆ فروتنێ</option>
+                        <option value="کڕێ">بۆ کڕێدانێ</option>
+                    </select>
+                </div>
+                <div style="display:flex; gap:10px; margin-top:12px;">
+                    <button class="btn btn-blue" onclick="applyFilters()" style="flex:1;"><i class="fa-solid fa-magnifying-glass"></i> لێگەڕیان</button>
+                    <button class="btn btn-outline" onclick="resetFilters()"><i class="fa-solid fa-rotate-left"></i> پاقژکرن</button>
+                </div>
+            </div>
+            <div class="prop-grid" id="properties-list"></div>
+        </section>
+
+        <!-- =================== 2. TAB: ADD PROPERTY =================== -->
+        <section id="tab-add-property" class="tab-content">
+            <div class="box">
+                <div class="box-title" style="color:var(--accent-green);"><i class="fa-solid fa-circle-plus"></i> زێدەکرنا موڵکی</div>
+                <form onsubmit="saveProperty(event)">
+                    <div class="form-grid">
+                        <div class="form-group full">
+                            <label>سەردێڕێ موڵکی</label>
+                            <input type="text" id="prop-title" required>
+                        </div>
+                        <div class="form-group">
+                            <label>جۆرێ موڵکی</label>
+                            <select id="prop-type" required>
+                                <option value="خانی">خانی</option>
+                                <option value="شوقە">شوقە</option>
+                                <option value="ڤێلا">ڤێلا</option>
+                                <option value="ئەرد">ئەرد</option>
+                                <option value="دوکان">دوکان</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>حاڵەت</label>
+                            <select id="prop-status" required>
+                                <option value="فروتن">بۆ فروتنێ</option>
+                                <option value="کڕێ">بۆ کڕێدانێ</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>تاخ / گەڕەک</label>
+                            <input type="text" id="prop-location" required>
+                        </div>
+                        <div class="form-group">
+                            <label>ژمارا پارچێ</label>
+                            <input type="text" id="prop-plot" required>
+                        </div>
+                        <div class="form-group">
+                            <label>ڕووبەر</label>
+                            <input type="text" id="prop-area" required>
+                        </div>
+                        <div class="form-group">
+                            <label>بها ($)</label>
+                            <input type="number" id="prop-price" required>
+                        </div>
+                        <div class="form-group full">
+                            <label>ئاراستە:</label>
+                            <div class="directions-container">
+                                <label class="direction-label"><input type="checkbox" name="direction" value="باکوور"> باکوور</label>
+                                <label class="direction-label"><input type="checkbox" name="direction" value="باشوور"> باشوور</label>
+                                <label class="direction-label"><input type="checkbox" name="direction" value="ڕۆژهەڵات"> ڕۆژهەڵات</label>
+                                <label class="direction-label"><input type="checkbox" name="direction" value="ڕۆژئاوا"> ڕۆژئاوا</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>ناڤێ خودانی</label>
+                            <input type="text" id="prop-owner" required>
+                        </div>
+                        <div class="form-group">
+                            <label>مۆبایل</label>
+                            <input type="tel" id="prop-phone" class="phone-input" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-green" style="width:100%; margin-top:15px;">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> تۆمارکرن د فایربەیس دا
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- =================== 3. TAB: CLIENT REQUESTS =================== -->
+        <section id="tab-requests" class="tab-content">
+            <div class="box">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+                    <div class="box-title" style="color:var(--accent-gold); margin-bottom:0;">
+                        <i class="fa-solid fa-clipboard-list"></i> داخوازیێن موشتەریان
+                    </div>
+                    <button class="btn btn-gold" onclick="openModal('addReqModal')">
+                        <i class="fa-solid fa-plus"></i> زێدەکرنا داخوازیەکێ
+                    </button>
+                </div>
+                <div id="requests-list" class="form-grid"></div>
+            </div>
+        </section>
+
+        <!-- =================== 4. TAB: EXPENSES =================== -->
+        <section id="tab-expenses" class="tab-content">
+            <div class="box">
+                <div class="box-title" style="color:var(--accent-rose);"><i class="fa-solid fa-coins"></i> مەساریف</div>
+                <form onsubmit="saveExpense(event)">
+                    <div class="form-grid">
+                        <div class="form-group"><label>بابەت</label><input type="text" id="exp-title" required></div>
+                        <div class="form-group">
+                            <label>دراو</label>
+                            <select id="exp-currency"><option value="USD">دۆلار ($)</option><option value="IQD">دینار (د.ع)</option></select>
+                        </div>
+                        <div class="form-group"><label>بڕێ پارەی</label><input type="number" id="exp-amount" required></div>
+                        <div class="form-group"><label>مێژوو</label><input type="date" id="exp-date" required></div>
+                        <div class="form-group full"><button type="submit" class="btn btn-rose" style="width:100%;">تۆمارکرن د فایربەیس دا</button></div>
+                    </div>
+                </form>
+            </div>
+            <div class="box">
+                <div class="table-responsive">
+                    <table>
+                        <thead><tr><th>بابەت</th><th>بڕ</th><th>دراو</th><th>مێژوو</th><th>ژێبرن</th></tr></thead>
+                        <tbody id="expenses-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================== 5. TAB: CONTRACTS & ARCHIVE =================== -->
+        <section id="tab-contracts" class="tab-content">
+            <div class="box no-print">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                    <div style="display:flex; gap:8px;">
+                        <button class="btn btn-active" id="btn-rent" onclick="selectContract('rent')">
+                            <i class="fa-solid fa-file-contract"></i> عەقدا ئیجاری (کرێ)
+                        </button>
+                        <button class="btn btn-outline" id="btn-sale" onclick="selectContract('sale')">
+                            <i class="fa-solid fa-file-signature"></i> گرێبەستا فرۆتنی
+                        </button>
+                    </div>
+                    <div style="display:flex; gap:8px;">
+                        <button class="btn btn-gold" onclick="saveToArchive()">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> خەزنکرن د فایربەیس دا
+                        </button>
+                        <button class="btn btn-green" onclick="window.print()">
+                            <i class="fa-solid fa-print"></i> چاپکرن (PDF)
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SMART A4 VIEWPORT -->
+            <div class="a4-outer-viewport">
+                <div class="no-print" style="margin-bottom:12px; display:flex; gap:8px;">
+                    <button class="btn btn-outline" style="font-size:11px; padding:6px 12px;" onclick="setZoomMode('fit')">
+                        <i class="fa-solid fa-mobile-screen"></i> قیاسێ مۆبایلێ (Fit)
+                    </button>
+                    <button class="btn btn-outline" style="font-size:11px; padding:6px 12px;" onclick="setZoomMode('full')">
+                        <i class="fa-solid fa-magnifying-glass-plus"></i> زووم ١٠٠٪
+                    </button>
+                </div>
+
+                <div class="a4-scaler-wrapper" id="a4-scaler-wrapper">
+                    
+                    <!-- ================= 1. RENT A4 CONTRACT ================= -->
+                    <div id="rent-a4" class="a4-sheet">
+                        <div>
+                            <div class="c-header">
+                                <div class="c-header-phone">
+                                    مۆبایل: <span class="num">0750 710 0238</span><br>
+                                    <span style="font-size:10.5px; color:#64748b;">پەیوەندی و خزمەتگۆزاری</span>
+                                </div>
+                                <div class="c-header-logo">
+                                    <div class="c-logo-tag">عەقارات ESTATE</div><br>
+                                    <span class="c-logo-title">عەقارات دهۆک</span><br>
+                                    <span class="c-logo-sub">DUHOK REAL ESTATE</span>
+                                </div>
+                                <div class="c-header-meta">
+                                    ژماراعەقدی: <span contenteditable="true" class="c-in rent-seq-val">NO: 5000</span><br>
+                                    مێژوو: <span contenteditable="true" class="c-in rent-date-val">2026 / 08 / 29</span><br>
+                                    <span style="font-size:11px; color:#b45309;">📍 دهۆک - بازاری ئەرد وخانیان</span>
+                                </div>
+                            </div>
+
+                            <div class="c-pill-title">هەڤبەستا کرێکرن و ب کرێدانی عەقدا(ئیجاری)</div>
+
+                            <div class="c-top-strip">
+                                <div>جۆری:ئاڤاهی <span contenteditable="true" id="r-prop-type" class="c-in">خانیێ دووقات</span></div>
+                                <div>جهی:ئاڤاهی دهۆک - <span contenteditable="true" id="r-prop-loc" class="c-in">نەورۆز</span></div>
+                                <div>/ جاده:تاخ - <span contenteditable="true" id="r-prop-street" class="c-in">جادا ٢٠مەتری</span></div>
+                            </div>
+
+                            <div class="c-parties-grid">
+                                <div class="c-party-box">
+                                    <span class="c-party-tag">LANDLORD</span>
+                                    <div class="c-party-title">خودانێ ئاڤاهی(مؤجر)</div>
+                                    <div class="c-party-line">ناڤی:سیانی <span contenteditable="true" id="r-seller-name" class="c-in" style="flex:1;">حاجی مەحموود دهۆکی</span></div>
+                                    <div class="c-party-line">ژمارا:مۆبایلی <span contenteditable="true" id="r-seller-phone" class="c-in phone-text" style="flex:1;">0750 450 1122</span></div>
+                                </div>
+                                <div class="c-party-box">
+                                    <span class="c-party-tag">TENANT</span>
+                                    <div class="c-party-title">ئەوی ئاڤاهی ب کڕێ کڕی(کڕێچی)</div>
+                                    <div class="c-party-line">ناڤی:سیانی <span contenteditable="true" id="r-buyer-name" class="c-in" style="flex:1;">شێرزاد کاروان مستەفا</span></div>
+                                    <div class="c-party-line">ژمارا:مۆبایلی <span contenteditable="true" id="r-buyer-phone" class="c-in phone-text" style="flex:1;">0750 780 3344</span></div>
+                                </div>
+                            </div>
+
+                            <div class="c-terms-box">
+                                <div class="c-term-row">
+                                    <span class="c-term-num">١</span>
+                                    <span>خودانی ئاڤاهی مۆلکی خۆە دا ب کڕێ بۆ کڕێچی ژ ڕێکەفتی( <span contenteditable="true" class="c-in">01/10/2026</span> ) هەتا ڕۆژا( <span contenteditable="true" class="c-in">01/10/2027</span> ).</span>
+                                </div>
+                                <div class="c-term-row">
+                                    <span class="c-term-num">٢</span>
+                                    <span>کڕێیا مەهیانە پێکهاتییە ل سەر ب گوژمێ( <span contenteditable="true" id="r-price" class="c-in">500 $ پێنجسەد دۆلار</span> ) / دینار، دۆلار پێدڤییە سه‌ری هەر مەهـ بهێتە دان.</span>
+                                </div>
+                                <div class="c-term-row">
+                                    <span class="c-term-num">٣</span>
+                                    <span>ئەوی ئاڤاهی ب کڕێ دای بڕی( <span contenteditable="true" class="c-in">500 $</span> ) دینار دۆلار وەک تأمينات (دەستبەع) وەرگرتن.</span>
+                                </div>
+                                <div class="c-term-row">
+                                    <span class="c-term-num">٤</span>
+                                    <span>ئاڤاهی هاتییە دان بتنێ بۆ مەبەستا( <span contenteditable="true" class="c-in">بتنێ بۆ ئاکنجیبوونان خێزانی</span> ) و کڕێچی ماف نینە بکارئینانا وی بگۆهۆڕیت.</span>
+                                </div>
+                                <div class="c-term-row">
+                                    <span class="c-term-num">٥</span>
+                                    <span>نابیت خودانی ئاڤاهی پشکەکێ ژ وی ئاڤاهی ب دەتە کەسەکێ دی بێی ڕازیبوونا فەرمی یا کڕێچی.</span>
+                                </div>
+                                <div class="c-term-row">
+                                    <span class="c-term-num">٦</span>
+                                    <span>بێی ڕازیبوونا خودانی ئاڤاهی نابیت کڕێچی ئاڤاهی ب دەتە کەسەکێ دی یان هەڤپشکەکێ بۆ خۆ بگریت.</span>
+                                </div>
+                                <div class="c-term-row">
+                                    <span class="c-term-num">٧</span>
+                                    <span>نابیت خودانی ئاڤاهی داگیرانیی بۆ ئێکێ دی بکەت ئەگەر ب ڕازیبوونا ئەوی ب کڕێ کری نەبیت.</span>
+                                </div>
+                                <div class="c-term-row">
+                                    <span class="c-term-num">٨</span>
+                                    <span>ژبلی خویڕکا ئاڤاهی هەمی مەزاختی و پشکا ئاڤ، کارەب مۆلیدە و باژێرڤانیی دێ ل سەر کڕێچی بن.</span>
+                                </div>
+                                <div class="c-term-row">
+                                    <span class="c-term-num">٩</span>
+                                    <span>پێدڤییە کڕێچی ئاڤاهی ب دروستی بپارێزیت و پشتی ب دووماهی هاتنا دەمێ کڕێکرنێ بێی زیان ڕادەستی خودانی بکەت.</span>
+                                </div>
+                                
+                                <div class="c-term-note">
+                                    <span>:تیبینی:</span>
+                                    <span contenteditable="true" class="c-in" style="flex:1; text-align:right;">کڕێیا مەهیانە دێ ل دەستپێکا هەر مەهەکێ هێتە ڕادەستکرن</span>
+                                </div>
+                            </div>
+
+                            <div class="c-warning-strip">
+                                <div>⚠️ هەردوو لا ب ڤان مەرجین ل سەری ڕازی بوون و ئەڤ گرێبەستە هاتە ئیمزاکرن</div>
+                                <div>
+                                    ⚖️ <span contenteditable="true" class="c-in">پارێزەر: طالب موسی حامد</span> : 
+                                    <span contenteditable="true" class="c-in phone-text">0750 459 8521</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 4 SIGNATURES -->
+                        <div class="c-sig-grid">
+                            <div class="c-sig-box">
+                                <div class="c-sig-title">خودانی ئاڤاهی(مؤجر)</div>
+                                <div class="c-sig-label">مۆر یان ئیمزا</div>
+                            </div>
+                            <div class="c-sig-box">
+                                <div class="c-sig-title">دیدەڤانی ئێکێ</div>
+                                <div class="c-sig-name"><span contenteditable="true" class="c-in">سەردار خالد</span></div>
+                                <div class="c-sig-label">مۆر یان ئیمزا</div>
+                            </div>
+                            <div class="c-sig-box">
+                                <div class="c-sig-title">دیدەڤانی دووێ</div>
+                                <div class="c-sig-name"><span contenteditable="true" class="c-in">هەڤاڵ یاسین</span></div>
+                                <div class="c-sig-label">مۆر یان ئیمزا</div>
+                            </div>
+                            <div class="c-sig-box">
+                                <div class="c-sig-title">ئەوی ب کڕێ کری (کڕێچی)</div>
+                                <div class="c-sig-label">مۆر یان ئیمزا</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ================= 2. SALE A4 CONTRACT ================= -->
+                    <div id="sale-a4" class="a4-sheet" style="display:none;">
+                        <div>
+                            <div class="c-header">
+                                <div class="c-header-phone">
+                                    مۆبایل: <span class="num">0750 710 0238</span><br>
+                                    <span style="font-size:10.5px; color:#64748b;">پەیوەندی و خزمەتگۆزاری</span>
+                                </div>
+                                <div class="c-header-logo">
+                                    <div class="c-logo-tag">عەقارات ESTATE</div><br>
+                                    <span class="c-logo-title">عەقارات دهۆک</span><br>
+                                    <span class="c-logo-sub">DUHOK REAL ESTATE</span>
+                                </div>
+                                <div class="c-header-meta">
+                                    ژماراعەقدی: <span contenteditable="true" class="c-in sale-seq-val">NO: 5000</span><br>
+                                    مێژوو: <span contenteditable="true" class="c-in sale-date-val">2026 / 08 / 29</span><br>
+                                    <span style="font-size:11px; color:#b45309;">📍 دهۆک - بازاری ئەرد وخانیان</span>
+                                </div>
+                            </div>
+
+                            <div class="c-pill-title">گرێبەستا فرۆتنا مۆلکی (عەقد)</div>
+
+                            <div class="c-parties-grid">
+                                <div class="c-party-box">
+                                    <span class="c-party-tag">SELLER</span>
+                                    <div class="c-party-title">لایەنی ئێکێ(فرۆشیار)</div>
+                                    <div class="c-party-line">ناڤ: <span contenteditable="true" id="s-seller-name" class="c-in" style="flex:1;">ئەحمەد سەعید مەحموود</span></div>
+                                    <div class="c-party-line">تەلەفۆن: <span contenteditable="true" id="s-seller-phone" class="c-in phone-text" style="flex:1;">0750 456 7123</span></div>
+                                </div>
+                                <div class="c-party-box">
+                                    <span class="c-party-tag">BUYER</span>
+                                    <div class="c-party-title">لایەنی دووێ(بکڕ)</div>
+                                    <div class="c-party-line">ناڤ: <span contenteditable="true" id="s-buyer-name" class="c-in" style="flex:1;">ڕێبوار عەلی حەسەن</span></div>
+                                    <div class="c-party-line">تەلەفۆن: <span contenteditable="true" id="s-buyer-phone" class="c-in phone-text" style="flex:1;">0750 654 3987</span></div>
+                                </div>
+                            </div>
+
+                            <table class="c-specs-tbl">
+                                <thead>
+                                    <tr>
+                                        <th colspan="4">رووبەری مۆلکی (المساحة)</th>
+                                        <th colspan="4">هوورکاریێن / ئاڤاهی شوقە</th>
+                                    </tr>
+                                    <tr>
+                                        <th>دۆنەم</th><th>ئۆلک</th><th>مەتر</th><th>دیسیمەتر</th>
+                                        <th>عیمارە</th><th>قات</th><th>ژماراشوقێ</th><th>پڕۆژە</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><span contenteditable="true" class="c-in">-</span></td>
+                                        <td><span contenteditable="true" class="c-in">-</span></td>
+                                        <td><span contenteditable="true" class="c-in">240</span></td>
+                                        <td><span contenteditable="true" class="c-in">-</span></td>
+                                        <td><span contenteditable="true" class="c-in">A</span></td>
+                                        <td><span contenteditable="true" class="c-in">3</span></td>
+                                        <td><span contenteditable="true" class="c-in">12</span></td>
+                                        <td><span contenteditable="true" class="c-in">ئاڤرۆسیتی</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <table class="c-specs-tbl" style="margin-top:-5px;">
+                                <thead>
+                                    <tr>
+                                        <th>جۆری ئاڤاهی</th><th>ژماراخانی</th><th>زنجیرە</th><th>تاخ (گەڕەک)</th><th>ژماراپارچی</th><th>ژماراکەرتی</th><th>ناڤێ کەرتی</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><span contenteditable="true" class="c-in">شققە</span></td>
+                                        <td><span contenteditable="true" class="c-in">B12</span></td>
+                                        <td><span contenteditable="true" class="c-in">104</span></td>
+                                        <td><span contenteditable="true" class="c-in">ماسیکێ</span></td>
+                                        <td><span contenteditable="true" class="c-in">345/12</span></td>
+                                        <td><span contenteditable="true" class="c-in">45</span></td>
+                                        <td><span contenteditable="true" class="c-in">دۆمیز</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <div class="c-terms-box">
+                                <div class="c-term-row">
+                                    <span class="c-term-num">١</span>
+                                    <span>فرۆشیار دووپات دکەت کو ئەڤ مۆلکێ ساخلەتێن وی ل سەری هاتی یێ فرۆتییە بکڕی ل دویڤ ڤان مەرجان.</span>
+                                </div>
+                                <div class="c-term-row">
+                                    <span class="c-term-num">٢</span>
+                                    <span>بهایێ فرۆتنی پێکهاتییە ل سەر ب گوژمێ( <span contenteditable="true" id="s-price" class="c-in">$115,000</span> ) (ب نڤیسین: <span contenteditable="true" class="c-in">سەد و پازدە هزار دۆلارێن ئەمریکی</span> ) (کو بڕی( <span contenteditable="true" class="c-in">$10,000</span> ) وەک دەستبەع هاتییە وەرگرتن و یێ مایی پشتی تاپۆیی دێ هێتە دان.</span>
+                                </div>
+                                <div class="c-term-row">
+                                    <span class="c-term-num">٣</span>
+                                    <span>ئەگەر فرۆشیار لێڤەبوو پێدڤییە دەستبەعی بزڤڕینیت و گوژمێ( <span contenteditable="true" class="c-in">$10,000</span> ) بدەتە بکڕی بێی هوشدارییا فەرمی.</span>
+                                </div>
+                                <div class="c-term-row">
+                                    <span class="c-term-num">٤</span>
+                                    <span>ئەگەر بکڕ ژ کڕینی لێڤەبوو مافێ دەستبەعی نینە و دێ گوژمێ سزایی دەتە فرۆشیاری.</span>
+                                </div>
+                                <div class="c-term-row">
+                                    <span class="c-term-num">٥</span>
+                                    <span>باجێن ،وەرگێڕان ،جوداکرن ،ڕاستڤەکرن خوویکا مۆلکی و ئاڤ و کارەب ل سەر فرۆشیاری ،بن و حەقێ پارێزەری دێ هەڤپشک بیت.</span>
+                                </div>
+                                <div class="c-term-row">
+                                    <span class="c-term-num">٦</span>
+                                    <span>رسوماتێن خانووبەرە مەساریف (طابو و تحویل) ل سەر لایەنێ بکڕی نە.</span>
+                                </div>
+                                <div class="c-term-row">
+                                    <span class="c-term-num">٧</span>
+                                    <span>حەقێ دەڵاڵی ب ڕێژا( <span contenteditable="true" class="c-in">2</span> %) دێ هێتە دان بۆ نڤیسینگەهێ.</span>
+                                </div>
+                                <div class="c-term-row">
+                                    <span class="c-term-num">٨</span>
+                                    <span>ژڤانی ڕادەستکرن و ڤالاکرنا مۆلکی ل ڕێکەفتی( <span contenteditable="true" class="c-in">01/11/2026</span> ) (دەستنیشانکری)یە.</span>
+                                </div>
+                                
+                                <div class="c-term-note">
+                                    <span>:تیبینی:</span>
+                                    <span contenteditable="true" class="c-in" style="flex:1; text-align:right;">هەمی کەلوپەلێن ناڤمالی دگەل فرۆتنا شققێ نە بەشەکن ژێ یان ب جوداهی</span>
+                                </div>
+                            </div>
+
+                            <div class="c-warning-strip">
+                                <div>⚠️ ئاگەهداری: د ماوێ (١٥) رۆژان دا پێدڤییە مامەلە ب دووماهی بهێت بەروڤاژی وی نڤیسینگەهـ نە یا بەرپرسە.</div>
+                                <div>
+                                    ⚖️ <span contenteditable="true" class="c-in">پارێزەر: طالب موسی حامد</span> : 
+                                    <span contenteditable="true" class="c-in phone-text">0750 459 8521</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 4 SIGNATURES -->
+                        <div class="c-sig-grid">
+                            <div class="c-sig-box">
+                                <div class="c-sig-title">ناڤ و ئیمزافڕۆشیاری</div>
+                                <div class="c-sig-label">مۆر یان ئیمزا</div>
+                            </div>
+                            <div class="c-sig-box">
+                                <div class="c-sig-title">دیدەڤانی ئێکێ</div>
+                                <div class="c-sig-name"><span contenteditable="true" class="c-in">سەردار خالد</span></div>
+                                <div class="c-sig-label">مۆر یان ئیمزا</div>
+                            </div>
+                            <div class="c-sig-box">
+                                <div class="c-sig-title">دیدەڤانی دووێ</div>
+                                <div class="c-sig-name"><span contenteditable="true" class="c-in">هەڤاڵ یاسین</span></div>
+                                <div class="c-sig-label">مۆر یان ئیمزا</div>
+                            </div>
+                            <div class="c-sig-box">
+                                <div class="c-sig-title">ناڤ و ئیمزابکڕی</div>
+                                <div class="c-sig-label">مۆر یان ئیمزا</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ARCHIVE TABLE -->
+            <div class="box no-print" style="margin-top:20px;">
+                <div class="box-title" style="color:var(--accent-gold);">
+                    <i class="fa-solid fa-box-archive"></i>
+                    <span>ئەرشیفا عەقدێن هاتینە خەزنکرن (Firebase Firestore)</span>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ژمارا عەقدی</th>
+                                <th>جۆرێ عەقدی</th>
+                                <th>فرۆشیار / خودان</th>
+                                <th>کڕیار / کڕێچی</th>
+                                <th>بها</th>
+                                <th>مێژوو</th>
+                                <th>کردار</th>
+                            </tr>
+                        </thead>
+                        <tbody id="archive-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================== 6. TAB: FINANCE =================== -->
+        <section id="tab-finance" class="tab-content">
+            <div class="box">
+                <div class="box-title" style="color:var(--accent-gold);"><i class="fa-solid fa-wallet"></i> داراییا گشتی</div>
+                <div class="table-responsive">
+                    <table>
+                        <thead><tr><th>کۆی مەسڕەفێن دۆلاری ($)</th><th>کۆی مەسڕەفێن دیناری (د.ع)</th></tr></thead>
+                        <tbody>
+                            <tr>
+                                <td id="stat-exp-usd" style="color:var(--accent-rose); font-size:18px; font-weight:bold;">$0</td>
+                                <td id="stat-exp-iqd" style="color:var(--accent-rose); font-size:18px; font-weight:bold;">0 د.ع</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- ================= MODAL: ADD CLIENT REQUEST ================= -->
+    <div class="modal" id="addReqModal">
+        <div class="modal-body">
+            <div class="modal-head">
+                <h3 style="color:var(--accent-gold);"><i class="fa-solid fa-user-plus"></i> زێدەکرنا داخوازیا موشتەری</h3>
+                <button class="close-btn" onclick="closeModal('addReqModal')">&times;</button>
+            </div>
+            <form onsubmit="saveClientRequest(event)">
+                <div class="form-grid">
+                    <div class="form-group full">
+                        <label>ناڤێ موشتەری</label>
+                        <input type="text" id="req-name" placeholder="ناڤێ سیانی بنڤیسە" required>
+                    </div>
+                    <div class="form-group">
+                        <label>ژمارا مۆبایلێ</label>
+                        <input type="tel" id="req-phone" class="phone-input" placeholder="0750 xxx xxxx" required>
+                    </div>
+                    <div class="form-group">
+                        <label>جۆرێ موڵکێ دڤێت</label>
+                        <select id="req-type">
+                            <option value="خانی">خانی</option>
+                            <option value="شوقە">شوقە</option>
+                            <option value="ڤێلا">ڤێلا</option>
+                            <option value="ئەرد">ئەرد</option>
+                            <option value="دوکان">دوکان</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>تاخ / جهێ پێ باش</label>
+                        <input type="text" id="req-loc" placeholder="بۆ نموونە: ماسیکێ" required>
+                    </div>
+                    <div class="form-group">
+                        <label>بودجە ($ دۆلار)</label>
+                        <input type="number" id="req-budget" placeholder="بهایێ پێ چێدبیت" required>
+                    </div>
+                    <div class="form-group full">
+                        <label>تێبینیێن تایبەت</label>
+                        <textarea id="req-notes" rows="2" placeholder="مەرجێن تایبەت ئەگەر هەبن..."></textarea>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-gold" style="width:100%; margin-top:15px;">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> تۆمارکرن د فایربەیس دا
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- INVENTORY PRINT SHEET -->
+    <div id="inventory-print-sheet" style="display:none;">
+        <div style="text-align:center; margin-bottom:10px; border-bottom:2px solid #0f172a; padding-bottom:6px;">
+            <h2 style="font-size:17px; margin-bottom:2px;">عەقارات دهۆک - DUHOK REAL ESTATE</h2>
+            <h4 style="font-size:12px; color:#475569;">کەشفا گشتی یا موڵکێن بەردەست</h4>
+            <p style="font-size:9.5px; margin-top:2px;">مێژوو: <span id="inv-print-date"></span> | ژمارا موڵکان: <span id="inv-print-count"></span></p>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>ز</th><th>کۆد</th><th>سەردێڕ</th><th>جۆر</th><th>حاڵەت</th><th>تاخ</th><th>پارچە</th><th>ڕووبەر</th><th>ئاراستە</th><th>بها ($)</th><th>خودان</th><th>مۆبایل</th>
+                </tr>
+            </thead>
+            <tbody id="inv-table-rows"></tbody>
+        </table>
+    </div>
+
+    <!-- BOTTOM TASKBAR -->
+    <nav class="bottom-nav no-print">
+        <button class="nav-btn active" onclick="navTab('tab-properties', this)"><i class="fa-solid fa-city"></i><span>موڵک</span></button>
+        <button class="nav-btn special-add" onclick="navTab('tab-add-property', this)"><i class="fa-solid fa-square-plus"></i><span>زێدەکرن</span></button>
+        <button class="nav-btn" onclick="navTab('tab-requests', this)"><i class="fa-solid fa-clipboard-list"></i><span>داخوازی</span></button>
+        <button class="nav-btn" onclick="navTab('tab-expenses', this)"><i class="fa-solid fa-coins"></i><span>مەساریف</span></button>
+        <button class="nav-btn" onclick="navTab('tab-contracts', this)"><i class="fa-solid fa-file-contract"></i><span>عەقد و ئەرشیف</span></button>
+        <button class="nav-btn" onclick="navTab('tab-finance', this)"><i class="fa-solid fa-chart-pie"></i><span>دارایی</span></button>
+    </nav>
+
+    <!-- ================= JAVASCRIPT & FIREBASE INITIALIZATION ================= -->
     <script>
-        let currentTab = 'sales';
-        let currentLang = 'ku'; // 'ku' or 'ar'
-
-        const i18n = {
-            ku: {
-                brand_title: "سیستەمێ ئەلیکترۆنی یێ عەقارات دهۆک",
-                brand_sub: "گرێبەستێن فەرمی یێن فرۆتن و کرێدانێ",
-                tab_sales: "گرێبەستا فرۆتنێ",
-                tab_rent: "گرێبەستا کرێدانێ (ئیجار)",
-                btn_save: "💾 خەزنکرن",
-                btn_archive: "ئەرشیف",
-                btn_demo: "نموونە",
-                btn_print: "چاپ (Print)",
-                
-                // Form Sales Labels
-                s_sec1: "📅 ١. ژمارا عەقدی و رێکەفت",
-                s_cno: "ژمارا گرێبەستێ (عەقدی):",
-                s_date: "مێژوویا ئیمزاکرنێ:",
-                s_sec2: "👤 ٢. فرۆشیار و بکر",
-                s_sname: "ناڤێ فرۆشیاری (سیانی):",
-                s_sphone: "تەلەفۆنا فرۆشیاری:",
-                s_bname: "ناڤێ کڕیاری (سیانی):",
-                s_bphone: "تەلەفۆنا کڕیاری:",
-                s_sec3: "📐 ٣. رووبەر و هوورکاریێن ئاڤاهی",
-                s_donam: "دۆنەم:", s_ulk: "ئولک:", s_meter: "مەتر:", s_dm: "دیسیمەتر:",
-                s_building: "عیمارە:", s_floor: "قات:", s_apt: "ژمارا شققێ:", s_project: "پڕۆژە:",
-                s_sec4: "📑 ٤. زانیاریێن تاپۆیی",
-                s_ptype: "جۆرێ ئاڤاهی:", s_hno: "ژمارا خانی:", s_chain: "زنجیرە:",
-                s_neigh: "تاخ (گەڕەک):", s_plot: "ژمارا پارچێ:", s_secno: "ژمارا کەرتی:", s_secname: "ناڤێ کەرتی:",
-                s_sec5: "💰 ٥. بها و مەرجێن دراڤی",
-                s_pnum: "بهایێ فرۆتنێ (ژمارە):", s_pwords: "بهایێ فرۆتنێ (نڤیسین):",
-                s_earnest: "بڕێ دەسبەعی:", s_penalty: "سزایێ لێڤەبوونێ:", s_fee: "رێژا دەلالیێ (%):",
-                s_handover: "ژڤانێ رادەستکرنێ:", s_note: "تێبینیێن زێدە (ئەگەر هەبن):",
-
-                // Form Rent Labels
-                r_sec1: "📅 ١. ژمارا عەقدی و رێکەفت",
-                r_cno: "ژمارا گرێبەستێ (عەقدی):",
-                r_date: "مێژوویا ئیمزاکرنێ:",
-                r_sec2: "👤 ٢. خودانێ ئاڤاهی و کرێچی",
-                r_owner: "خودانێ ئاڤاهی (مؤجر):",
-                r_ophone: "تەلەفۆنا خودانی:",
-                r_tenant: "ئەوێ ب کرێ کری (کرێچی):",
-                r_tphone: "تەلەفۆنا کرێچی:",
-                r_sec3: "🏢 ٣. زانیاری و جهێ ئاڤاهی",
-                r_type: "جۆرێ ئاڤاهی:", r_city: "باژێڕ:", r_neigh: "تاخ (گەڕەک):", r_street: "جادە:",
-                r_sec4: "💵 ٤. ماوە و مەرجێن دراڤی",
-                r_sdate: "ماوێ کرێکرنێ (ژ رۆژا):", r_edate: "هەتا رۆژا:",
-                r_rent: "کرێیا هەیڤانە:", r_dep: "تامینات / دەسبەع:", r_usage: "مەرجێ بکارئینانێ (مەبەست):",
-                r_note: "تێبینیێن زێدە (ئەگەر هەبن):",
-
-                w_sec: "👥 دیدەڤان (الشهود)",
-                w1: "دیدەڤانێ ئێکێ:", w2: "دیدەڤانێ دووێ:",
-
-                // Contracts Preview (Sales)
-                s_main_title: "گرێبەستا فرۆتنا مۆلکی (عەقد)",
-                s_mob: "مۆبایل", s_sub: "پەیوەندی و خزمەتگوزاری", s_loc: "📍 دهۆک - بازاڕێ ئەرد و خانیان",
-                s_cno_lbl: "ژمارا عەقدی", s_date_lbl: "مێژوو",
-                s_seller_h: "لایەنێ ئێکێ (فرۆشیار)", s_buyer_h: "لایەنێ دووێ (بکر)",
-                name_lbl: "ناڤ:", phone_lbl: "تەلەفۆن:",
-                th_area: "رووبەرێ مۆلکی (المساحة)", th_bldg: "هوورکاریێن ئاڤاهی / شققە",
-                th_donam: "دۆنەم", th_ulk: "ئولک", th_meter: "مەتر", th_dm: "دیسیمەتر",
-                th_building: "عیمارە", th_floor: "قات", th_apt: "ژماراشققێ", th_proj: "پڕۆژە",
-                th_ptype: "جۆرێ ئاڤاهی", th_hno: "ژمارا خانی", th_chain: "زنجیرە", th_neigh: "تاخ (گەڕەک)",
-                th_plot: "ژمارا پارچێ", th_secno: "ژمارا کەرتی", th_secname: "ناڤێ کەرتی",
-                sig_seller: "ناڤ و ئیمزا فرۆشیاری", sig_buyer: "ناڤ و ئیمزا بکری",
-                sig_w1: "دیدەڤانێ ئێکێ", sig_w2: "دیدەڤانێ دووێ",
-                sig_sub: "مۆر و ئیمزا",
-
-                // Contracts Preview (Rent)
-                r_main_title: "هەڤبەستا کرێکرن و ب کرێدانێ (عەقدا ئیجارێ)",
-                r_box_type: "جۆرێ ئاڤاهی:", r_box_loc: "جهێ ئاڤاهی:", r_box_street: "جادە / تاخ:",
-                r_owner_h: "خودانێ ئاڤاهی (مؤجر)", r_tenant_h: "ئەوێ ئاڤاهی ب کرێ کری (کرێچی)",
-                r_name_lbl: "ناڤێ سیانی:", r_phone_lbl: "ژمارا مۆبایلێ:",
-                sig_owner: "خودانێ ئاڤاهی (مؤجر)", sig_tenant: "ئەوێ ب کرێ کری (کرێچی)",
-
-                // Modal Archive
-                modal_title: "📂 ئەرشیفێ عەقدێن خەزنکری (عەقارات دهۆک)",
-                modal_search: "🔍 لێگەڕیان ل دویف ژمارا عەقدی، ناڤ، یان بەروار...",
-                th_cno: "ژمارا عەقدی", th_type: "جۆر", th_parties: "لایەنێن گرێبەستێ", th_date: "مێژوو", th_act: "کردار",
-                act_open: "ڤەکرن", act_del: "ژێبرن",
-                confirm_del: "ئەرێ تو پشتڕاستی تە دڤێت ئەڤێ گرێبەستێ ژێببەی؟",
-                toast_saved: "✅ گرێبەست ب سەرکەفتی هاتە خەزنکرن!",
-                toast_loaded: "📄 گرێبەست هاتە ڤەکرن!",
-                toast_deleted: "🗑️ گرێبەست هاتە ژێبرن."
-            },
-            ar: {
-                brand_title: "النظام الإلكتروني - عقارات دهوك",
-                brand_sub: "عقود البيع والإيجار الرسمية للعقارات",
-                tab_sales: "عقد بيع عقار",
-                tab_rent: "عقد إيجار عقار",
-                btn_save: "💾 حفظ العقد",
-                btn_archive: "الأرشيف",
-                btn_demo: "بيانات تجريبية",
-                btn_print: "طباعة (Print)",
-                
-                // Form Sales Labels
-                s_sec1: "📅 ١. رقم العقد والتاريخ",
-                s_cno: "رقم العقد:",
-                s_date: "تاريخ التوقيع:",
-                s_sec2: "👤 ٢. طرفا العقد (البائع والمشتري)",
-                s_sname: "اسم البائع (الثلاثي):",
-                s_sphone: "هاتف البائع:",
-                s_bname: "اسم المشتري (الثلاثي):",
-                s_bphone: "هاتف المشتري:",
-                s_sec3: "📐 ٣. المساحة وتفاصيل العقار",
-                s_donam: "دونم:", s_ulk: "أولك:", s_meter: "متر:", s_dm: "دسم:",
-                s_building: "عمارة:", s_floor: "طابق:", s_apt: "رقم الشقة:", s_project: "المشروع:",
-                s_sec4: "📑 ٤. بيانات التسجيل العقاري (الطابو)",
-                s_ptype: "نوع العقار:", s_hno: "رقم الدار:", s_chain: "التسلسل:",
-                s_neigh: "المحلة / الحي:", s_plot: "رقم القطعة:", s_secno: "رقم المقاطعة:", s_secname: "اسم المقاطعة:",
-                s_sec5: "💰 ٥. المبلغ والشروط المالية",
-                s_pnum: "بدل البيع (رقماً):", s_pwords: "بدل البيع (كتابةً):",
-                s_earnest: "مبلغ العربون:", s_penalty: "غرامة النكول:", s_fee: "نسبة الدلالية (%):",
-                s_handover: "موعد التسليم:", s_note: "ملاحظات إضافية (إن وجدت):",
-
-                // Form Rent Labels
-                r_sec1: "📅 ١. رقم العقد والتاريخ",
-                r_cno: "رقم العقد:",
-                r_date: "تاريخ التوقيع:",
-                r_sec2: "👤 ٢. المؤجر والمستأجر",
-                r_owner: "المؤجر (صاحب العقار):",
-                r_ophone: "هاتف المؤجر:",
-                r_tenant: "المستأجر:",
-                r_tphone: "هاتف المستأجر:",
-                r_sec3: "🏢 ٣. تفاصيل وموقع العقار",
-                r_type: "نوع العقار:", r_city: "المدينة:", r_neigh: "الحي / المنطقة:", r_street: "الشارع:",
-                r_sec4: "💵 ٤. المدة والبدل المالي",
-                r_sdate: "مدة الإيجار (من تاريخ):", r_edate: "إلى تاريخ:",
-                r_rent: "بدل الإيجار الشهري:", r_dep: "مبلغ التأمينات:", r_usage: "الغرض من الاستخدام:",
-                r_note: "ملاحظات إضافية (إن وجدت):",
-
-                w_sec: "👥 الشهود (Witnesses)",
-                w1: "الشاهد الأول:", w2: "الشاهد الثاني:",
-
-                // Contracts Preview (Sales)
-                s_main_title: "عقد بيع عقار رسمي",
-                s_mob: "الموبايل", s_sub: "الاتصال والخدمات العقارية", s_loc: "📍 دهوك - سوق العقارات",
-                s_cno_lbl: "رقم العقد", s_date_lbl: "التاريخ",
-                s_seller_h: "الطرف الأول (البائع)", s_buyer_h: "الطرف الثاني (المشتري)",
-                name_lbl: "الاسم:", phone_lbl: "الهاتف:",
-                th_area: "مساحة العقار (المساحة الإجمالية)", th_bldg: "تفاصيل المبنى / الشقة",
-                th_donam: "دونم", th_ulk: "أولك", th_meter: "متر", th_dm: "دسم",
-                th_building: "عمارة", th_floor: "طابق", th_apt: "رقم الشقة", th_proj: "المشروع",
-                th_ptype: "نوع العقار", th_hno: "رقم الدار", th_chain: "التسلسل", th_neigh: "المحلة/الحي",
-                th_plot: "رقم القطعة", th_secno: "رقم المقاطعة", th_secname: "اسم المقاطعة",
-                sig_seller: "اسم وتوقيع البائع", sig_buyer: "اسم وتوقيع المشتري",
-                sig_w1: "الشاهد الأول", sig_w2: "الشاهد الثاني",
-                sig_sub: "الختم والتوقيع",
-
-                // Contracts Preview (Rent)
-                r_main_title: "عقد إيجار عقار رسمي",
-                r_box_type: "نوع العقار:", r_box_loc: "موقع العقار:", r_box_street: "الشارع / الحي:",
-                r_owner_h: "الطرف الأول (المؤجر)", r_tenant_h: "الطرف الثاني (المستأجر)",
-                r_name_lbl: "الاسم الثلاثي:", r_phone_lbl: "رقم الهاتف:",
-                sig_owner: "اسم وتوقيع المؤجر", sig_tenant: "اسم وتوقيع المستأجر",
-
-                // Modal Archive
-                modal_title: "📂 أرشيف العقود المحفوظة (عقارات دهوك)",
-                modal_search: "🔍 بحث برقم العقد، الأسماء، أو التاريخ...",
-                th_cno: "رقم العقد", th_type: "النوع", th_parties: "أطراف العقد", th_date: "التاريخ", th_act: "الإجراء",
-                act_open: "فتح", act_del: "حذف",
-                confirm_del: "هل أنت متأكد من رغبتك في حذف هذا العقد نهائياً؟",
-                toast_saved: "✅ تم حفظ العقد بنجاح في الأرشيف!",
-                toast_loaded: "📄 تم فتح بيانات العقد بنجاح!",
-                toast_deleted: "🗑️ تم حذف العقد من الأرشيف."
-            }
+        // 1. FIREBASE CONFIGURATION
+        const firebaseConfig = {
+            apiKey: "AIzaSyDXA_SCSPQJ9k5dkurhoTetWL1QzlcR6gE",
+            authDomain: "data-aqarat-mn.firebaseapp.com",
+            projectId: "data-aqarat-mn",
+            storageBucket: "data-aqarat-mn.firebasestorage.app",
+            messagingSenderId: "1003429944346",
+            appId: "1:1003429944346:web:edd1f52d5a85a9d4de85a3",
+            measurementId: "G-94CTZSZL1R"
         };
 
-        function setLanguage(lang) {
-            currentLang = lang;
-            document.getElementById('lang_btn_ku').classList.toggle('active', lang === 'ku');
-            document.getElementById('lang_btn_ar').classList.toggle('active', lang === 'ar');
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
 
-            const t = i18n[lang];
+        // Collections references
+        const colProps = db.collection('properties');
+        const colReqs = db.collection('requests');
+        const colExps = db.collection('expenses');
+        const colContracts = db.collection('contracts');
 
-            // Navbar
-            document.getElementById('ui_nav_title').textContent = t.brand_title;
-            document.getElementById('ui_nav_subtitle').textContent = t.brand_sub;
-            document.getElementById('ui_tab_sales').textContent = t.tab_sales;
-            document.getElementById('ui_tab_rent').textContent = t.tab_rent;
-            document.getElementById('ui_btn_save').textContent = t.btn_save;
-            document.getElementById('ui_btn_archive').textContent = t.btn_archive;
-            document.getElementById('ui_btn_demo').textContent = t.btn_demo;
-            document.getElementById('ui_btn_print').textContent = t.btn_print;
+        // PASSWORD AUTH
+        const CORRECT_PASS = "duhok@2000";
 
-            // Form Sales
-            document.getElementById('lbl_s_sec1').textContent = t.s_sec1;
-            document.getElementById('lbl_s_contract_no').textContent = t.s_cno;
-            document.getElementById('lbl_s_date').textContent = t.s_date;
-            document.getElementById('lbl_s_sec2').textContent = t.s_sec2;
-            document.getElementById('lbl_s_seller_name').textContent = t.s_sname;
-            document.getElementById('lbl_s_seller_phone').textContent = t.s_sphone;
-            document.getElementById('lbl_s_buyer_name').textContent = t.s_bname;
-            document.getElementById('lbl_s_buyer_phone').textContent = t.s_bphone;
-            document.getElementById('lbl_s_sec3').textContent = t.s_sec3;
-            document.getElementById('lbl_s_donam').textContent = t.s_donam;
-            document.getElementById('lbl_s_ulk').textContent = t.s_ulk;
-            document.getElementById('lbl_s_meter').textContent = t.s_meter;
-            document.getElementById('lbl_s_dm').textContent = t.s_dm;
-            document.getElementById('lbl_s_building').textContent = t.s_building;
-            document.getElementById('lbl_s_floor').textContent = t.s_floor;
-            document.getElementById('lbl_s_apt_no').textContent = t.s_apt;
-            document.getElementById('lbl_s_project').textContent = t.s_project;
-            document.getElementById('lbl_s_sec4').textContent = t.s_sec4;
-            document.getElementById('lbl_s_prop_type').textContent = t.s_ptype;
-            document.getElementById('lbl_s_house_no').textContent = t.s_hno;
-            document.getElementById('lbl_s_chain_no').textContent = t.s_chain;
-            document.getElementById('lbl_s_neighbor').textContent = t.s_neigh;
-            document.getElementById('lbl_s_plot_no').textContent = t.s_plot;
-            document.getElementById('lbl_s_sector_no').textContent = t.s_secno;
-            document.getElementById('lbl_s_sector_name').textContent = t.s_secname;
-            document.getElementById('lbl_s_sec5').textContent = t.s_sec5;
-            document.getElementById('lbl_s_price_num').textContent = t.s_pnum;
-            document.getElementById('lbl_s_price_words').textContent = t.s_pwords;
-            document.getElementById('lbl_s_earnest_money').textContent = t.s_earnest;
-            document.getElementById('lbl_s_seller_penalty').textContent = t.s_penalty;
-            document.getElementById('lbl_s_broker_fee').textContent = t.s_fee;
-            document.getElementById('lbl_s_handover_date').textContent = t.s_handover;
-            document.getElementById('lbl_s_custom_note').textContent = t.s_note;
-
-            // Form Rent
-            document.getElementById('lbl_r_sec1').textContent = t.r_sec1;
-            document.getElementById('lbl_r_contract_no').textContent = t.r_cno;
-            document.getElementById('lbl_r_date').textContent = t.r_date;
-            document.getElementById('lbl_r_sec2').textContent = t.r_sec2;
-            document.getElementById('lbl_r_owner').textContent = t.r_owner;
-            document.getElementById('lbl_r_owner_phone').textContent = t.r_ophone;
-            document.getElementById('lbl_r_tenant').textContent = t.r_tenant;
-            document.getElementById('lbl_r_tenant_phone').textContent = t.r_tphone;
-            document.getElementById('lbl_r_sec3').textContent = t.r_sec3;
-            document.getElementById('lbl_r_type').textContent = t.r_type;
-            document.getElementById('lbl_r_city').textContent = t.r_city;
-            document.getElementById('lbl_r_neighbor').textContent = t.r_neigh;
-            document.getElementById('lbl_r_street').textContent = t.r_street;
-            document.getElementById('lbl_r_sec4').textContent = t.r_sec4;
-            document.getElementById('lbl_r_start_date').textContent = t.r_sdate;
-            document.getElementById('lbl_r_end_date').textContent = t.r_edate;
-            document.getElementById('lbl_r_rent_amount').textContent = t.r_rent;
-            document.getElementById('lbl_r_deposit').textContent = t.r_dep;
-            document.getElementById('lbl_r_usage').textContent = t.r_usage;
-            document.getElementById('lbl_r_custom_note').textContent = t.r_note;
-
-            // Witnesses
-            document.getElementById('lbl_w_sec').textContent = t.w_sec;
-            document.getElementById('lbl_witness1').textContent = t.w1;
-            document.getElementById('lbl_witness2').textContent = t.w2;
-
-            // Contract Preview (Sales)
-            document.getElementById('txt_s_mob').textContent = t.s_mob;
-            document.getElementById('txt_s_header_sub').textContent = t.s_sub;
-            document.getElementById('txt_s_cno_lbl').textContent = t.s_cno_lbl;
-            document.getElementById('txt_s_date_lbl').textContent = t.s_date_lbl;
-            document.getElementById('txt_s_loc').textContent = t.s_loc;
-            document.getElementById('txt_s_main_title').textContent = t.s_main_title;
-            document.getElementById('txt_s_seller_header').textContent = t.s_seller_h;
-            document.getElementById('txt_s_buyer_header').textContent = t.s_buyer_h;
-            document.getElementById('txt_s_p1_name').textContent = t.name_lbl;
-            document.getElementById('txt_s_p1_phone').textContent = t.phone_lbl;
-            document.getElementById('txt_s_p2_name').textContent = t.name_lbl;
-            document.getElementById('txt_s_p2_phone').textContent = t.phone_lbl;
-            document.getElementById('tbl_s_th_area').textContent = t.th_area;
-            document.getElementById('tbl_s_th_bldg').textContent = t.th_bldg;
-            document.getElementById('th_donam').textContent = t.th_donam;
-            document.getElementById('th_ulk').textContent = t.th_ulk;
-            document.getElementById('th_meter').textContent = t.th_meter;
-            document.getElementById('th_dm').textContent = t.th_dm;
-            document.getElementById('th_building').textContent = t.th_building;
-            document.getElementById('th_floor').textContent = t.th_floor;
-            document.getElementById('th_apt_no').textContent = t.th_apt;
-            document.getElementById('th_project').textContent = t.th_proj;
-            document.getElementById('th_prop_type').textContent = t.th_ptype;
-            document.getElementById('th_house_no').textContent = t.th_hno;
-            document.getElementById('th_chain_no').textContent = t.th_chain;
-            document.getElementById('th_neighbor').textContent = t.th_neigh;
-            document.getElementById('th_plot_no').textContent = t.th_plot;
-            document.getElementById('th_sector_no').textContent = t.th_secno;
-            document.getElementById('th_sector_name').textContent = t.th_secname;
-            document.getElementById('sig_s_seller').textContent = t.sig_seller;
-            document.getElementById('sig_s_buyer').textContent = t.sig_buyer;
-            document.getElementById('sig_s_w1').textContent = t.sig_w1;
-            document.getElementById('sig_s_w2').textContent = t.sig_w2;
-            document.getElementById('sig_sub1').textContent = t.sig_sub;
-            document.getElementById('sig_sub2').textContent = t.sig_sub;
-
-            // Contract Preview (Rent)
-            document.getElementById('txt_r_mob').textContent = t.s_mob;
-            document.getElementById('txt_r_header_sub').textContent = t.s_sub;
-            document.getElementById('txt_r_cno_lbl').textContent = t.s_cno_lbl;
-            document.getElementById('txt_r_date_lbl').textContent = t.s_date_lbl;
-            document.getElementById('txt_r_loc').textContent = t.s_loc;
-            document.getElementById('txt_r_main_title').textContent = t.r_main_title;
-            document.getElementById('lbl_r_box_type').textContent = t.r_box_type;
-            document.getElementById('lbl_r_box_loc').textContent = t.r_box_loc;
-            document.getElementById('lbl_r_box_street').textContent = t.r_box_street;
-            document.getElementById('txt_r_owner_header').textContent = t.r_owner_h;
-            document.getElementById('txt_r_tenant_header').textContent = t.r_tenant_h;
-            document.getElementById('txt_r_p1_name').textContent = t.r_name_lbl;
-            document.getElementById('txt_r_p1_phone').textContent = t.r_phone_lbl;
-            document.getElementById('txt_r_p2_name').textContent = t.r_name_lbl;
-            document.getElementById('txt_r_p2_phone').textContent = t.r_phone_lbl;
-            document.getElementById('sig_r_owner').textContent = t.sig_owner;
-            document.getElementById('sig_r_tenant').textContent = t.sig_tenant;
-            document.getElementById('sig_r_w1').textContent = t.sig_w1;
-            document.getElementById('sig_r_w2').textContent = t.sig_w2;
-            document.getElementById('sig_sub3').textContent = t.sig_sub;
-            document.getElementById('sig_sub4').textContent = t.sig_sub;
-
-            // Modal Archive
-            document.getElementById('txt_modal_title').textContent = t.modal_title;
-            document.getElementById('archiveSearchInput').placeholder = t.modal_search;
-            document.getElementById('th_arc_cno').textContent = t.th_cno;
-            document.getElementById('th_arc_type').textContent = t.th_type;
-            document.getElementById('th_arc_parties').textContent = t.th_parties;
-            document.getElementById('th_arc_date').textContent = t.th_date;
-            document.getElementById('th_arc_act').textContent = t.th_act;
-
-            renderClauses();
-            updateContracts();
-        }
-
-        function renderClauses() {
-            const sContainer = document.getElementById('sales_clauses_container');
-            const rContainer = document.getElementById('rent_clauses_container');
-
-            if (currentLang === 'ku') {
-                sContainer.innerHTML = `
-                    <div class="c-clause-item"><div class="c-cnum">١</div><div class="c-ctext">فرۆشیار دووپات دکەت کو ئەڤ مۆلکێ ساخلەتێن وی ل سەرێ هاتی یێ فرۆتییە بکری ل دویف ڤان مەرجان.</div></div>
-                    <div class="c-clause-item"><div class="c-cnum">٢</div><div class="c-ctext">بهایێ فرۆتنێ پێکهاتییە ل سەر ب کۆژمێ (<span id="out_price_num" class="dyn-text">.........</span>) ب نڤیسین (<span id="out_price_words" class="dyn-text">....................................</span>) کو بڕێ (<span id="out_earnest_money" class="dyn-text">.........</span>) وەک دەسبەع هاتییە وەرگرتن و یێ مای پشتی تاپۆیی دێ هێتە دان.</div></div>
-                    <div class="c-clause-item"><div class="c-cnum">٣</div><div class="c-ctext">ئەگەر فرۆشیار لێڤەبوو پێدڤییە دەسبەعی بزڤڕینیت و کۆژمێ (<span id="out_seller_penalty" class="dyn-text">.........</span>) بدەتە بکری بێی هوشدارییا فەرمی.</div></div>
-                    <div class="c-clause-item"><div class="c-cnum">٤</div><div class="c-ctext">ئەگەر بکر ژ کڕینێ لێڤەبوو مافێ دەسبەعی نینە و دێ کۆژمێ سزایی دەتە فرۆشیاری.</div></div>
-                    <div class="c-clause-item"><div class="c-cnum">٥</div><div class="c-ctext">باجێن وەرگێڕان، جوداکرن، راستڤەکرن، خویکا مۆلکی و ئاڤ و کارەب ل سەر فرۆشیاری بن، و حەقێ پارێزەری دێ هەڤپشک بیت.</div></div>
-                    <div class="c-clause-item"><div class="c-cnum">٦</div><div class="c-ctext">رسوماتێن خانووبەرە (مصاریف طابو و تحویل) ل سەر لایەنێ <b>بکری</b> نە.</div></div>
-                    <div class="c-clause-item"><div class="c-cnum">٧</div><div class="c-ctext">حەقێ دەلالیێ ب رێژا (<span id="out_broker_fee" class="dyn-text" style="width:25px; text-align:center;">2</span> %) دێ هێتە دان بۆ نڤیسینگەهێ.</div></div>
-                    <div class="c-clause-item"><div class="c-cnum">٨</div><div class="c-ctext">ژڤانێ رادەستکرن و ڤالاکرنا مۆلکی ل رێکەفتی (<span id="out_handover_date" class="dyn-text">... / ... / ٢٠٢...</span>) دەستنیشانکری یە.</div></div>
-                    
-                    <div class="c-custom-note-wrap">
-                        <span class="c-custom-note-title">تێبینی:</span>
-                        <span id="out_custom_note" class="c-custom-note-content">.............................................................................................................................................................................................................</span>
-                    </div>
-
-                    <div class="c-note-box-lawyer">
-                        <div>⚠️ <b>ئاگەهداری:</b> د ماوێ (١٥) رۆژان دا پێدڤییە مامەلە ب دووماهی بهێت، بەروڤاژی وێ نڤیسینگەهـ نە یا بەرپرسە.</div>
-                        <div>⚖️ پارێزەر: طالب موسى حامد (<span dir="ltr">0750 459 8521</span>)</div>
-                    </div>
-                `;
-
-                rContainer.innerHTML = `
-                    <div class="c-clause-item"><div class="c-cnum">١</div><div class="c-ctext">خودانێ ئاڤاهی مۆلکێ خوە دا ب کرێ بۆ کرێچی ژ رێکەفتی (<span id="out_r_start_date" class="dyn-text">... / ... / ٢٠٢...</span>) هەتا رۆژا (<span id="out_r_end_date" class="dyn-text">... / ... / ٢٠٢...</span>).</div></div>
-                    <div class="c-clause-item"><div class="c-cnum">٢</div><div class="c-ctext">کرێیا هەیڤانە پێکهاتییە ل سەر ب کۆژمێ (<span id="out_r_rent_amount" class="dyn-text">...............</span>) دینار / دۆلار، پێدڤییە سەرێ هەر مەهـ بهێتە دان.</div></div>
-                    <div class="c-clause-item"><div class="c-cnum">٣</div><div class="c-ctext">ئەوێ ئاڤاهی ب کرێ دای بڕێ (<span id="out_r_deposit" class="dyn-text">...............</span>) دینار / دۆلار وەک تامینات (دەسبەع) وەرگرتن.</div></div>
-                    <div class="c-clause-item"><div class="c-cnum">٤</div><div class="c-ctext">ئاڤاهی هاتییە دان تنێ بۆ مەبەستا (<span id="out_r_usage" class="dyn-text">ئاکنجیبوونێ</span>) و کرێچی ماف نینە بکارئینانا وێ بگوهۆڕیت.</div></div>
-                    <div class="c-clause-item"><div class="c-cnum">٥</div><div class="c-ctext">نابیت خودانێ ئاڤاهی پشکەکێ ژ وی ئاڤاهی ب دەتە کەسەکێ دی بێی رازیبوونا فەرمی یا کرێچی.</div></div>
-                    <div class="c-clause-item"><div class="c-cnum">٦</div><div class="c-ctext">بێی رازیبوونا خودانێ ئاڤاهی، نابیت کرێچی ئاڤاهی ب دەتە کەسەکێ دی یان هەڤپشکەکێ بۆ خوە بگریت.</div></div>
-                    <div class="c-clause-item"><div class="c-cnum">٧</div><div class="c-ctext">نابیت خودانێ ئاڤاهی داگیرانیێ بۆ ئێکێ دی بکەت ئەگەر ب رازیبوونا ئەوێ ب کرێ کری نەبیت.</div></div>
-                    <div class="c-clause-item"><div class="c-cnum">٨</div><div class="c-ctext">ژبلی خویکا ئاڤاهی، هەمی مەزاختی و پشکا ئاڤ، کارەب، مۆلیدە و باژێڕڤانیێ دێ ل سەر <b>کرێچی</b> بن.</div></div>
-                    <div class="c-clause-item"><div class="c-cnum">٩</div><div class="c-ctext">پێدڤییە کرێچی ئاڤاهی ب دروستی بپارێزیت و پشتی ب دووماهی هاتنا دەمێ کرێکرنێ بێی زیان رادەستی خودانی بکەت.</div></div>
-
-                    <div class="c-custom-note-wrap">
-                        <span class="c-custom-note-title">تێبینی:</span>
-                        <span id="out_r_custom_note" class="c-custom-note-content">.............................................................................................................................................................................................................</span>
-                    </div>
-
-                    <div class="c-note-box-lawyer">
-                        <div>⚠️ هەردوو لا ب ڤان مەرجێن ل سەرێ رازی بوون و ئەڤ گرێبەستە هاتە ئیمزاکرن.</div>
-                        <div>📍 عەقارات دهۆک - دهۆک</div>
-                    </div>
-                `;
+        function verifyPassword() {
+            const input = document.getElementById('pass-input').value;
+            const errMsg = document.getElementById('lock-error-msg');
+            if (input === CORRECT_PASS) {
+                document.getElementById('lock-screen').style.display = 'none';
+                sessionStorage.setItem('duhok_logged', 'true');
+                errMsg.style.display = 'none';
             } else {
-                // Arabic Clauses
-                sContainer.innerHTML = `
-                    <div class="c-clause-item"><div class="c-cnum">١</div><div class="c-ctext">يؤكد البائع بأنه قد باع العقار المذكورة مواصفاته أعلاه إلى المشتري وفقاً لهذه الشروط والأحكام.</div></div>
-                    <div class="c-clause-item"><div class="c-cnum">٢</div><div class="c-ctext">تم الاتفاق على بدل البيع بمبلغ قدره (<span id="out_price_num" class="dyn-text">.........</span>) كتابةً (<span id="out_price_words" class="dyn-text">....................................</span>)، حيث تم دفع (<span id="out_earnest_money" class="dyn-text">.........</span>) كعربون والباقي يدفع عند إكمال التحويل.</div></div>
-                    <div class="c-clause-item"><div class="c-cnum">٣</div><div class="c-ctext">إذا نكل البائع عن البيع يلتزم بإعادة مبلغ العربون ودفع غرامة نكول قدرها (<span id="out_seller_penalty" class="dyn-text">.........</span>) للمشتري دون الحاجة لإنذار.</div></div>
-                    <div class="c-clause-item"><div class="c-cnum">٤</div><div class="c-ctext">إذا نكل المشتري عن الشراء فليس له حق المطالبة بالعربون ويدفع مبلغ الغرامة المتفق عليه للبائع.</div></div>
-                    <div class="c-clause-item"><div class="c-cnum">٥</div><div class="c-ctext">تقع على عاتق البائع كافة الضرائب، رسوم الإفراز، تصحيح الصنف، أجور الماء والكهرباء، وتكون أتعاب المحاماة مناصفة.</div></div>
-                    <div class="c-clause-item"><div class="c-cnum">٦</div><div class="c-ctext">رسومات ومصاريف التسجيل العقاري (مصاريف الطابو ونقل الملكية) تقع بالكامل على عاتق <b>المشتري</b>.</div></div>
-                    <div class="c-clause-item"><div class="c-cnum">٧</div><div class="c-ctext">تدفع عمولة الدلالية وأتعاب المكتب بنسبة (<span id="out_broker_fee" class="dyn-text" style="width:25px; text-align:center;">2</span> %) من قيمة العقار.</div></div>
-                    <div class="c-clause-item"><div class="c-cnum">٨</div><div class="c-ctext">تم تحديد موعد تسليم وإخلاء العقار بتاريخ (<span id="out_handover_date" class="dyn-text">... / ... / ٢٠٢...</span>).</div></div>
-                    
-                    <div class="c-custom-note-wrap">
-                        <span class="c-custom-note-title">ملاحظات:</span>
-                        <span id="out_custom_note" class="c-custom-note-content">.............................................................................................................................................................................................................</span>
-                    </div>
-
-                    <div class="c-note-box-lawyer">
-                        <div>⚠️ <b>تنبيه:</b> يجب إكمال معاملة نقل الملكية خلال (١٥) يوماً، وخلاف ذلك فالمكتب غير مسؤول.</div>
-                        <div>⚖️ المحامي: طالب موسى حامد (<span dir="ltr">0750 459 8521</span>)</div>
-                    </div>
-                `;
-
-                rContainer.innerHTML = `
-                    <div class="c-clause-item"><div class="c-cnum">١</div><div class="c-ctext">أجر المؤجر العقار المذكور للمستأجر اعتباراً من تاريخ (<span id="out_r_start_date" class="dyn-text">... / ... / ٢٠٢...</span>) ولغاية (<span id="out_r_end_date" class="dyn-text">... / ... / ٢٠٢...</span>).</div></div>
-                    <div class="c-clause-item"><div class="c-cnum">٢</div><div class="c-ctext">اتفق الطرفان على بدل إيجار شهري قدره (<span id="out_r_rent_amount" class="dyn-text">...............</span>)، يدفع مقدماً بداية كل شهر.</div></div>
-                    <div class="c-clause-item"><div class="c-cnum">٣</div><div class="c-ctext">استلم المؤجر مبلغ قدره (<span id="out_r_deposit" class="dyn-text">...............</span>) كتأمينات عن الأضرار تعاد عند إخلاء المأجور سالماً.</div></div>
-                    <div class="c-clause-item"><div class="c-cnum">٤</div><div class="c-ctext">تم تأجير العقار لغرض (<span id="out_r_usage" class="dyn-text">السكن العائلي</span>) فقط، ولا يحق للمستأجر تغيير الغرض دون موافقة المؤجر.</div></div>
-                    <div class="c-clause-item"><div class="c-cnum">٥</div><div class="c-ctext">لا يحق للمؤجر تأجير أي جزء من العقار لشخص آخر خلال فترة سريان هذا العقد.</div></div>
-                    <div class="c-clause-item"><div class="c-cnum">٦</div><div class="c-ctext">لا يحق للمستأجر تأجير العقار من الباطن أو التنازل عنه للغير بدون موافقة خطية من المؤجر.</div></div>
-                    <div class="c-clause-item"><div class="c-cnum">٧</div><div class="c-ctext">لا يجوز للمؤجر إشغال العقار من قبل الغير إلا بموافقة صريحة من المستأجر.</div></div>
-                    <div class="c-clause-item"><div class="c-cnum">٨</div><div class="c-ctext">يتحمل <b>المستأجر</b> كافة مصاريف استهلاك الماء والكهرباء والمولد ورسوم البلدية طيلة فترة الإيجار.</div></div>
-                    <div class="c-clause-item"><div class="c-cnum">٩</div><div class="c-ctext">يلتزم المستأجر بالمحافظة التامة على المأجور وتسليمه بحالة جيدة وسليمة عند انتهاء العقد.</div></div>
-
-                    <div class="c-custom-note-wrap">
-                        <span class="c-custom-note-title">ملاحظات:</span>
-                        <span id="out_r_custom_note" class="c-custom-note-content">.............................................................................................................................................................................................................</span>
-                    </div>
-
-                    <div class="c-note-box-lawyer">
-                        <div>⚠️ اتفق الطرفان على كافة الشروط والبنود الواردة أعلاه وتم توقيع العقد برضاهما.</div>
-                        <div>📍 عقارات دهوك - دهوك</div>
-                    </div>
-                `;
+                errMsg.style.display = 'block';
+                document.getElementById('pass-input').value = '';
             }
         }
 
-        function switchContract(type) {
-            currentTab = type;
-            document.getElementById('tab_btn_sales').classList.toggle('active', type === 'sales');
-            document.getElementById('tab_btn_rent').classList.toggle('active', type === 'rent');
-
-            document.getElementById('form_sales_wrap').style.display = (type === 'sales') ? 'block' : 'none';
-            document.getElementById('form_rent_wrap').style.display = (type === 'rent') ? 'block' : 'none';
-
-            document.getElementById('contract-sales').classList.toggle('active-contract', type === 'sales');
-            document.getElementById('contract-rent').classList.toggle('active-contract', type === 'rent');
+        function checkEnter(e) {
+            if (e.key === 'Enter') verifyPassword();
         }
 
-        const salesFields = [
-            'contract_no', 'date', 'seller_name', 'seller_phone', 'buyer_name', 'buyer_phone',
-            'donam', 'ulk', 'meter', 'dm', 'building', 'floor', 'apt_no', 'project',
-            'prop_type', 'house_no', 'chain_no', 'neighbor', 'plot_no', 'sector_no', 'sector_name',
-            'price_num', 'price_words', 'earnest_money', 'seller_penalty',
-            'broker_fee', 'handover_date', 'custom_note'
-        ];
-
-        const rentFields = [
-            'r_contract_no', 'r_date', 'r_owner', 'r_owner_phone', 'r_tenant', 'r_tenant_phone',
-            'r_type', 'r_city', 'r_neighbor', 'r_street', 'r_start_date', 'r_end_date',
-            'r_rent_amount', 'r_deposit', 'r_usage', 'r_custom_note'
-        ];
-
-        const defaultDots = '.............................................................................................................................................................................................................';
-
-        function updateContracts() {
-            // Update Sales
-            salesFields.forEach(f => {
-                const inEl = document.getElementById('in_' + f);
-                const outEl = document.getElementById('out_' + f);
-                if (inEl && outEl) {
-                    if (f === 'custom_note') {
-                        outEl.textContent = inEl.value.trim() !== '' ? inEl.value : defaultDots;
-                    } else {
-                        outEl.textContent = inEl.value.trim() !== '' ? inEl.value : '.........';
-                    }
-                }
-            });
-
-            // Update Rent
-            rentFields.forEach(f => {
-                const inEl = document.getElementById('in_' + f);
-                const outEl = document.getElementById('out_' + f);
-                if (inEl && outEl) {
-                    if (f === 'r_custom_note') {
-                        outEl.textContent = inEl.value.trim() !== '' ? inEl.value : defaultDots;
-                    } else {
-                        outEl.textContent = inEl.value.trim() !== '' ? inEl.value : '.........';
-                    }
-                }
-            });
-
-            const cityEl = document.getElementById('in_r_city');
-            if (cityEl) {
-                document.getElementById('out_r_city_txt').textContent = cityEl.value.trim() !== '' ? cityEl.value : (currentLang === 'ku' ? 'دهۆک' : 'دهوك');
-            }
-
-            // Update Witnesses
-            const w1 = document.getElementById('in_witness1').value.trim();
-            const w2 = document.getElementById('in_witness2').value.trim();
-            const defaultSig = currentLang === 'ku' ? 'ئیمزا' : 'توقيع';
-            
-            document.getElementById('out_witness1').textContent = w1 !== '' ? w1 : defaultSig;
-            document.getElementById('out_witness2').textContent = w2 !== '' ? w2 : defaultSig;
-            document.getElementById('out_r_witness1').textContent = w1 !== '' ? w1 : defaultSig;
-            document.getElementById('out_r_witness2').textContent = w2 !== '' ? w2 : defaultSig;
+        function lockApp() {
+            sessionStorage.removeItem('duhok_logged');
+            document.getElementById('pass-input').value = '';
+            document.getElementById('lock-screen').style.display = 'flex';
         }
 
-        function fillDemoData() {
-            if (currentLang === 'ku') {
-                if (currentTab === 'sales') {
-                    document.getElementById('in_contract_no').value = '2024/108';
-                    document.getElementById('in_date').value = '2024 / 09 / 20';
-                    document.getElementById('in_seller_name').value = 'ئەحمەد سەعید مەحمود';
-                    document.getElementById('in_seller_phone').value = '0750 456 7123';
-                    document.getElementById('in_buyer_name').value = 'رێبوار عەلی حەسەن';
-                    document.getElementById('in_buyer_phone').value = '0750 654 3987';
-                    document.getElementById('in_donam').value = '-';
-                    document.getElementById('in_ulk').value = '-';
-                    document.getElementById('in_meter').value = '240';
-                    document.getElementById('in_dm').value = '-';
-                    document.getElementById('in_building').value = 'A';
-                    document.getElementById('in_floor').value = '3';
-                    document.getElementById('in_apt_no').value = '12';
-                    document.getElementById('in_project').value = 'ئاڤرۆ ستی';
-                    document.getElementById('in_prop_type').value = 'شققە';
-                    document.getElementById('in_house_no').value = 'B12';
-                    document.getElementById('in_chain_no').value = '104';
-                    document.getElementById('in_neighbor').value = 'ماسیکێ';
-                    document.getElementById('in_plot_no').value = '345/12';
-                    document.getElementById('in_sector_no').value = '45';
-                    document.getElementById('in_sector_name').value = 'دۆمیز';
-                    document.getElementById('in_price_num').value = '115,000 $';
-                    document.getElementById('in_price_words').value = 'سەد و پازدە هزار دۆلارێن ئەمریکی';
-                    document.getElementById('in_earnest_money').value = '10,000 $';
-                    document.getElementById('in_seller_penalty').value = '10,000 $';
-                    document.getElementById('in_broker_fee').value = '2';
-                    document.getElementById('in_handover_date').value = '2024 / 11 / 01';
-                    document.getElementById('in_custom_note').value = 'هەمی کەلوپەلێن ناڤمالێ دگەل فرۆتنا شققێ نە بێی جوداهی.';
+        if (sessionStorage.getItem('duhok_logged') === 'true') {
+            document.getElementById('lock-screen').style.display = 'none';
+        }
+
+        function openModal(id) { document.getElementById(id).classList.add('open'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+        document.getElementById('exp-date').valueAsDate = new Date();
+
+        // Local reactive states
+        let properties = [];
+        let clientRequests = [];
+        let expenses = [];
+        let archivedContracts = [];
+
+        let currentContractType = 'rent';
+        let currentZoomMode = 'fit';
+
+        // 2. REAL-TIME SYNCHRONIZATION FROM FIRESTORE
+        colProps.orderBy('createdAt', 'desc').onSnapshot(snap => {
+            properties = snap.docs.map(doc => ({ docId: doc.id, ...doc.data() }));
+            renderProperties();
+        });
+
+        colReqs.orderBy('createdAt', 'desc').onSnapshot(snap => {
+            clientRequests = snap.docs.map(doc => ({ docId: doc.id, ...doc.data() }));
+            renderRequests();
+        });
+
+        colExps.orderBy('date', 'desc').onSnapshot(snap => {
+            expenses = snap.docs.map(doc => ({ docId: doc.id, ...doc.data() }));
+            renderExpenses();
+        });
+
+        colContracts.orderBy('createdAt', 'desc').onSnapshot(snap => {
+            archivedContracts = snap.docs.map(doc => ({ docId: doc.id, ...doc.data() }));
+            renderArchive();
+        });
+
+        // Mobile A4 Scale
+        function adjustA4Scale() {
+            const wrapper = document.getElementById('a4-scaler-wrapper');
+            const outer = document.querySelector('.a4-outer-viewport');
+            if (!wrapper || !outer) return;
+
+            if (currentZoomMode === 'fit') {
+                const screenWidth = outer.clientWidth - 24;
+                const a4Width = 794;
+                if (screenWidth < a4Width) {
+                    const scale = screenWidth / a4Width;
+                    wrapper.style.transform = `scale(${scale})`;
+                    outer.style.height = `${Math.ceil(1123 * scale) + 60}px`;
                 } else {
-                    document.getElementById('in_r_contract_no').value = '2024/045';
-                    document.getElementById('in_r_date').value = '2024 / 09 / 20';
-                    document.getElementById('in_r_owner').value = 'حاجی مەحمود دهۆکی';
-                    document.getElementById('in_r_owner_phone').value = '0750 450 1122';
-                    document.getElementById('in_r_tenant').value = 'شێرزاد کاروان مستەفا';
-                    document.getElementById('in_r_tenant_phone').value = '0750 780 3344';
-                    document.getElementById('in_r_type').value = 'خانیێ دووقات';
-                    document.getElementById('in_r_city').value = 'دهۆک';
-                    document.getElementById('in_r_neighbor').value = 'نەورۆز';
-                    document.getElementById('in_r_street').value = 'جادا ٢٠ مەتری';
-                    document.getElementById('in_r_start_date').value = '2024 / 10 / 01';
-                    document.getElementById('in_r_end_date').value = '2025 / 10 / 01';
-                    document.getElementById('in_r_rent_amount').value = '500 $ (پێنجسەد دۆلار)';
-                    document.getElementById('in_r_deposit').value = '500 $';
-                    document.getElementById('in_r_usage').value = 'تنێ بۆ ئاکنجیبوونا خێزانێ';
-                    document.getElementById('in_r_custom_note').value = 'کرێیا هەیڤانە دێ ل دەستپێکا هەر مەهەکێ هێتە رادەستکرن.';
+                    wrapper.style.transform = 'scale(1)';
+                    outer.style.height = 'auto';
                 }
-                document.getElementById('in_witness1').value = 'سەردار خالد';
-                document.getElementById('in_witness2').value = 'هەڤال یاسین';
             } else {
-                // Arabic Demo Data
-                if (currentTab === 'sales') {
-                    document.getElementById('in_contract_no').value = '2024/108';
-                    document.getElementById('in_date').value = '2024 / 09 / 20';
-                    document.getElementById('in_seller_name').value = 'أحمد سعيد محمود';
-                    document.getElementById('in_seller_phone').value = '0750 456 7123';
-                    document.getElementById('in_buyer_name').value = 'ريبوار علي حسن';
-                    document.getElementById('in_buyer_phone').value = '0750 654 3987';
-                    document.getElementById('in_donam').value = '-';
-                    document.getElementById('in_ulk').value = '-';
-                    document.getElementById('in_meter').value = '240';
-                    document.getElementById('in_dm').value = '-';
-                    document.getElementById('in_building').value = 'A';
-                    document.getElementById('in_floor').value = '3';
-                    document.getElementById('in_apt_no').value = '12';
-                    document.getElementById('in_project').value = 'أفرو ستي';
-                    document.getElementById('in_prop_type').value = 'شقة سكنية';
-                    document.getElementById('in_house_no').value = 'B12';
-                    document.getElementById('in_chain_no').value = '104';
-                    document.getElementById('in_neighbor').value = 'ماسيكي';
-                    document.getElementById('in_plot_no').value = '345/12';
-                    document.getElementById('in_sector_no').value = '45';
-                    document.getElementById('in_sector_name').value = 'دوميز';
-                    document.getElementById('in_price_num').value = '115,000 $';
-                    document.getElementById('in_price_words').value = 'مائة وخمسة عشر ألف دولار أمريكي';
-                    document.getElementById('in_earnest_money').value = '10,000 $';
-                    document.getElementById('in_seller_penalty').value = '10,000 $';
-                    document.getElementById('in_broker_fee').value = '2';
-                    document.getElementById('in_handover_date').value = '2024 / 11 / 01';
-                    document.getElementById('in_custom_note').value = 'يشمل البيع جميع الأثاث والأجهزة الكهربائية الموجودة داخل الشقة.';
-                } else {
-                    document.getElementById('in_r_contract_no').value = '2024/045';
-                    document.getElementById('in_r_date').value = '2024 / 09 / 20';
-                    document.getElementById('in_r_owner').value = 'حاجي محمود الدهوكي';
-                    document.getElementById('in_r_owner_phone').value = '0750 450 1122';
-                    document.getElementById('in_r_tenant').value = 'شيرزاد كاروان مصطفى';
-                    document.getElementById('in_r_tenant_phone').value = '0750 780 3344';
-                    document.getElementById('in_r_type').value = 'دار سكني طابقين';
-                    document.getElementById('in_r_city').value = 'دهوك';
-                    document.getElementById('in_r_neighbor').value = 'نوروز';
-                    document.getElementById('in_r_street').value = 'شارع ٢٠ متري';
-                    document.getElementById('in_r_start_date').value = '2024 / 10 / 01';
-                    document.getElementById('in_r_end_date').value = '2025 / 10 / 01';
-                    document.getElementById('in_r_rent_amount').value = '500 $ (خمسمائة دولار)';
-                    document.getElementById('in_r_deposit').value = '500 $';
-                    document.getElementById('in_r_usage').value = 'للسكن العائلي فقط';
-                    document.getElementById('in_r_custom_note').value = 'يتم تسديد الإيجار مقدماً في اليوم الأول من كل شهر ميلادي.';
-                }
-                document.getElementById('in_witness1').value = 'سردار خالد';
-                document.getElementById('in_witness2').value = 'هفال ياسين';
+                wrapper.style.transform = 'scale(1)';
+                outer.style.height = 'auto';
             }
-            updateContracts();
         }
 
-        /* ================= STORAGE & ARCHIVE ================= */
-        function getSavedContracts() {
-            return JSON.parse(localStorage.getItem('duhok_re_contracts') || '[]');
+        function setZoomMode(mode) {
+            currentZoomMode = mode;
+            adjustA4Scale();
         }
 
-        function setSavedContracts(data) {
-            localStorage.setItem('duhok_re_contracts', JSON.stringify(data));
-            updateArchiveBadge();
+        window.addEventListener('resize', adjustA4Scale);
+
+        function navTab(tabId, btn) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            btn.classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            if (tabId === 'tab-contracts') {
+                setTimeout(adjustA4Scale, 100);
+            }
         }
 
-        function updateArchiveBadge() {
-            const list = getSavedContracts();
-            document.getElementById('archive_count').textContent = list.length;
-        }
+        function selectContract(type) {
+            currentContractType = type;
+            const rentA4 = document.getElementById('rent-a4');
+            const saleA4 = document.getElementById('sale-a4');
+            const btnRent = document.getElementById('btn-rent');
+            const btnSale = document.getElementById('btn-sale');
 
-        function showToast(msg) {
-            const toast = document.getElementById('toast');
-            toast.textContent = msg;
-            toast.style.display = 'block';
-            setTimeout(() => { toast.style.display = 'none'; }, 3000);
-        }
-
-        function saveCurrentContract() {
-            const list = getSavedContracts();
-            const t = i18n[currentLang];
-            let record = {
-                id: Date.now(),
-                type: currentTab,
-                lang: currentLang,
-                savedAt: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString(),
-                witness1: document.getElementById('in_witness1').value,
-                witness2: document.getElementById('in_witness2').value,
-                data: {}
-            };
-
-            if (currentTab === 'sales') {
-                salesFields.forEach(f => {
-                    record.data[f] = document.getElementById('in_' + f).value;
-                });
-                record.contractNo = record.data.contract_no || (currentLang === 'ku' ? 'بێ ژمارە' : 'بدون رقم');
-                record.parties = (record.data.seller_name || (currentLang === 'ku' ? 'فرۆشیار' : 'بائع')) + ' ⬅ ' + (record.data.buyer_name || (currentLang === 'ku' ? 'کڕیار' : 'مشتري'));
-                record.date = record.data.date || '-';
+            if (type === 'rent') {
+                rentA4.style.display = 'flex';
+                saleA4.style.display = 'none';
+                btnRent.className = 'btn btn-active';
+                btnSale.className = 'btn btn-outline';
             } else {
-                rentFields.forEach(f => {
-                    record.data[f] = document.getElementById('in_' + f).value;
-                });
-                record.contractNo = record.data.r_contract_no || (currentLang === 'ku' ? 'بێ ژمارە' : 'بدون رقم');
-                record.parties = (record.data.r_owner || (currentLang === 'ku' ? 'خودان' : 'مؤجر')) + ' ⬅ ' + (record.data.r_tenant || (currentLang === 'ku' ? 'کرێچی' : 'مستأجر'));
-                record.date = record.data.r_date || '-';
+                rentA4.style.display = 'none';
+                saleA4.style.display = 'flex';
+                btnSale.className = 'btn btn-active';
+                btnRent.className = 'btn btn-outline';
             }
-
-            list.unshift(record);
-            setSavedContracts(list);
-            showToast(t.toast_saved);
+            adjustA4Scale();
         }
 
-        function openArchiveModal() {
-            document.getElementById('archiveModal').style.display = 'flex';
-            renderArchiveTable();
-        }
-
-        function closeArchiveModal() {
-            document.getElementById('archiveModal').style.display = 'none';
-        }
-
-        function renderArchiveTable() {
-            const query = document.getElementById('archiveSearchInput').value.toLowerCase().trim();
-            const list = getSavedContracts();
-            const tbody = document.getElementById('archiveTableBody');
-            const t = i18n[currentLang];
-            tbody.innerHTML = '';
-
-            const filtered = list.filter(item => {
-                return (item.contractNo && item.contractNo.toLowerCase().includes(query)) ||
-                       (item.parties && item.parties.toLowerCase().includes(query)) ||
-                       (item.date && item.date.toLowerCase().includes(query));
-            });
-
-            if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:15px; color:#94a3b8;">${currentLang === 'ku' ? 'چ گرێبەست نەهاتنە دیتن.' : 'لا توجد عقود محفوظة.'}</td></tr>`;
+        // ================= PROPERTIES LOGIC (FIRESTORE) =================
+        function renderProperties(data = properties) {
+            const list = document.getElementById('properties-list');
+            list.innerHTML = '';
+            if (data.length === 0) {
+                list.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:30px; color:var(--text-gray);">
+                    <i class="fa-regular fa-folder-open" style="font-size:32px; margin-bottom:8px;"></i>
+                    <p>چ موڵک نەهاتنە دیتن د فایربەیس دا!</p>
+                </div>`;
                 return;
             }
-
-            filtered.forEach(item => {
-                const tr = document.createElement('tr');
-                const typeName = item.type === 'sales' 
-                    ? `<span style="color:#eab308; font-weight:bold;">${currentLang === 'ku' ? 'فرۆتن' : 'بيع'}</span>` 
-                    : `<span style="color:#38bdf8; font-weight:bold;">${currentLang === 'ku' ? 'ئیجار' : 'إيجار'}</span>`;
-                tr.innerHTML = `
-                    <td style="font-weight:bold;">${item.contractNo}</td>
-                    <td>${typeName}</td>
-                    <td>${item.parties}</td>
-                    <td>${item.date}</td>
-                    <td style="text-align:center;">
-                        <button class="btn-act btn-act-load" onclick="loadContract(${item.id})">${t.act_open}</button>
-                        <button class="btn-act btn-act-del" onclick="deleteContract(${item.id})">${t.act_del}</button>
-                    </td>
+            data.forEach(p => {
+                const badgeClass = p.status === 'فروتن' ? 'badge-sale' : 'badge-rent';
+                const dirsText = p.directions && p.directions.length > 0 ? p.directions.join(' ، ') : '-';
+                list.innerHTML += `
+                    <div class="prop-card">
+                        <div class="prop-head">
+                            <span class="badge ${badgeClass}">${p.status === 'فروتن' ? 'بۆ فروتنێ' : 'بۆ کڕێ'}</span>
+                            <span style="font-size:12px; color:var(--text-gray);">${p.type}</span>
+                        </div>
+                        <div class="prop-body">
+                            <div class="prop-title">${p.title}</div>
+                            <div class="prop-price-tag">$${Number(p.price).toLocaleString()}</div>
+                            <div class="prop-info-list">
+                                <div class="prop-info-item">جهـ: <strong>${p.location}</strong></div>
+                                <div class="prop-info-item">پارچە: <strong>${p.plot}</strong></div>
+                                <div class="prop-info-item">ڕووبەر: <strong>${p.area}</strong></div>
+                                <div class="prop-info-item">ئاراستە: <strong>${dirsText}</strong></div>
+                            </div>
+                            <div style="font-size:12px; color:var(--text-gray); display:flex; justify-content:space-between; margin-bottom:8px;">
+                                <span>خودان: ${p.owner}</span>
+                                <span class="phone-text">${p.phone}</span>
+                            </div>
+                            <button class="btn btn-rose" style="width:100%; padding:5px; font-size:11px;" onclick="deleteProperty('${p.docId}')">
+                                <i class="fa-solid fa-trash"></i> ژێبرن ژ فایربەیس
+                            </button>
+                        </div>
+                    </div>
                 `;
-                tbody.appendChild(tr);
             });
         }
 
-        function loadContract(id) {
-            const list = getSavedContracts();
-            const item = list.find(x => x.id === id);
+        function applyFilters() {
+            const q = document.getElementById('f-search').value.toLowerCase();
+            const t = document.getElementById('f-type').value;
+            const s = document.getElementById('f-status').value;
+            const filtered = properties.filter(p => {
+                return (!q || p.title.toLowerCase().includes(q) || p.location.toLowerCase().includes(q)) &&
+                       (!t || p.type === t) && (!s || p.status === s);
+            });
+            renderProperties(filtered);
+        }
+
+        function resetFilters() {
+            document.getElementById('f-search').value = '';
+            document.getElementById('f-type').value = '';
+            document.getElementById('f-status').value = '';
+            renderProperties();
+        }
+
+        async function saveProperty(e) {
+            e.preventDefault();
+            const dirs = [];
+            document.querySelectorAll('input[name="direction"]:checked').forEach(c => dirs.push(c.value));
+            
+            const newProp = {
+                title: document.getElementById('prop-title').value,
+                type: document.getElementById('prop-type').value,
+                status: document.getElementById('prop-status').value,
+                location: document.getElementById('prop-location').value,
+                plot: document.getElementById('prop-plot').value,
+                area: document.getElementById('prop-area').value,
+                price: parseFloat(document.getElementById('prop-price').value),
+                directions: dirs,
+                owner: document.getElementById('prop-owner').value,
+                phone: document.getElementById('prop-phone').value,
+                createdAt: new Date().toISOString()
+            };
+
+            try {
+                await colProps.add(newProp);
+                e.target.reset();
+                alert('موڵک ب سەرکەفتیانە د فایربەیس دا هاتە خەزنکرن!');
+                navTab('tab-properties', document.querySelector('.bottom-nav .nav-btn:first-child'));
+            } catch (err) {
+                alert('خەلەتیەک ڕویدا: ' + err.message);
+            }
+        }
+
+        async function deleteProperty(docId) {
+            if (confirm('تە دڤێت ڤی موڵکی ژ فایربەیس ژێببەی؟')) {
+                try {
+                    await colProps.doc(docId).delete();
+                } catch (err) {
+                    alert('خەلەتیەک ڕویدا: ' + err.message);
+                }
+            }
+        }
+
+        // ================= CLIENT REQUESTS (FIRESTORE) =================
+        function renderRequests() {
+            const list = document.getElementById('requests-list');
+            list.innerHTML = '';
+            if (clientRequests.length === 0) {
+                list.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:30px; color:var(--text-gray);">
+                    <i class="fa-regular fa-folder-open" style="font-size:32px; margin-bottom:8px;"></i>
+                    <p>چ داخوازی نەهاتینە تۆمارکرن د فایربەیس دا!</p>
+                </div>`;
+                return;
+            }
+            clientRequests.forEach(r => {
+                list.innerHTML += `
+                    <div class="prop-card" style="border-right: 4px solid var(--accent-gold);">
+                        <div class="prop-head">
+                            <span style="font-weight:bold; color:#fff;"><i class="fa-solid fa-user" style="color:var(--accent-gold); margin-left:5px;"></i>${r.name}</span>
+                            <span class="badge badge-rent">${r.type}</span>
+                        </div>
+                        <div class="prop-body">
+                            <div style="font-size:13px; color:var(--accent-blue); margin-bottom:8px;">
+                                <i class="fa-solid fa-phone"></i> <span class="phone-text">${r.phone}</span>
+                            </div>
+                            <div class="prop-info-list">
+                                <div class="prop-info-item">جهێ دڤێت: <strong>${r.loc}</strong></div>
+                                <div class="prop-info-item">بودجە: <strong style="color:var(--accent-green);">$${Number(r.budget).toLocaleString()}</strong></div>
+                            </div>
+                            <div style="font-size:12px; color:var(--text-gray); margin-bottom:10px;">
+                                <strong>تێبینی:</strong> ${r.notes || 'نینە'}
+                            </div>
+                            <button class="btn btn-rose" style="width:100%; padding:6px; font-size:11px;" onclick="deleteRequest('${r.docId}')">
+                                <i class="fa-solid fa-trash"></i> ژێبرن
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        async function saveClientRequest(e) {
+            e.preventDefault();
+            const newReq = {
+                name: document.getElementById('req-name').value,
+                phone: document.getElementById('req-phone').value,
+                type: document.getElementById('req-type').value,
+                loc: document.getElementById('req-loc').value,
+                budget: parseFloat(document.getElementById('req-budget').value),
+                notes: document.getElementById('req-notes').value,
+                createdAt: new Date().toISOString()
+            };
+
+            try {
+                await colReqs.add(newReq);
+                closeModal('addReqModal');
+                e.target.reset();
+                alert('داخوازی د فایربەیس دا هاتە زێدەکرن!');
+            } catch (err) {
+                alert('خەلەتی: ' + err.message);
+            }
+        }
+
+        async function deleteRequest(docId) {
+            if (confirm('تە دڤێت ڤێ داخوازیێ ژ فایربەیس ژێببەی؟')) {
+                try {
+                    await colReqs.doc(docId).delete();
+                } catch (err) {
+                    alert('خەلەتی: ' + err.message);
+                }
+            }
+        }
+
+        // ================= EXPENSES (FIRESTORE) =================
+        function renderExpenses() {
+            const tbody = document.getElementById('expenses-table-body');
+            tbody.innerHTML = '';
+            expenses.forEach(exp => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${exp.title}</td>
+                        <td style="color:var(--accent-rose); font-weight:bold;">${Number(exp.amount).toLocaleString()}</td>
+                        <td>${exp.currency === 'USD' ? '$ دۆلار' : 'دینار'}</td>
+                        <td>${exp.date}</td>
+                        <td><button class="btn btn-rose" style="padding:3px 6px; font-size:10px;" onclick="deleteExpense('${exp.docId}')">ژێبرن</button></td>
+                    </tr>
+                `;
+            });
+            const expUSD = expenses.filter(e => e.currency === 'USD').reduce((s, e) => s + Number(e.amount), 0);
+            const expIQD = expenses.filter(e => e.currency === 'IQD').reduce((s, e) => s + Number(e.amount), 0);
+            document.getElementById('stat-exp-usd').innerText = '$' + expUSD.toLocaleString();
+            document.getElementById('stat-exp-iqd').innerText = expIQD.toLocaleString() + ' د.ع';
+        }
+
+        async function saveExpense(e) {
+            e.preventDefault();
+            const newExp = {
+                title: document.getElementById('exp-title').value,
+                currency: document.getElementById('exp-currency').value,
+                amount: parseFloat(document.getElementById('exp-amount').value),
+                date: document.getElementById('exp-date').value
+            };
+            try {
+                await colExps.add(newExp);
+                document.getElementById('exp-title').value = '';
+                document.getElementById('exp-amount').value = '';
+            } catch (err) {
+                alert('خەلەتی: ' + err.message);
+            }
+        }
+
+        async function deleteExpense(docId) {
+            if (confirm('ئەڤ مەسڕەفە ژ فایربەیس بهێتە ژێبرن؟')) {
+                try {
+                    await colExps.doc(docId).delete();
+                } catch (err) {
+                    alert('خەلەتی: ' + err.message);
+                }
+            }
+        }
+
+        // ================= CONTRACTS & ARCHIVE (FIRESTORE) =================
+        async function saveToArchive() {
+            const isRent = currentContractType === 'rent';
+            const activeSheetId = isRent ? 'rent-a4' : 'sale-a4';
+            const sheet = document.getElementById(activeSheetId);
+            const snapshotHTML = sheet.innerHTML;
+
+            const seq = isRent ? sheet.querySelector('.rent-seq-val').innerText : sheet.querySelector('.sale-seq-val').innerText;
+            const seller = isRent ? sheet.querySelector('#r-seller-name').innerText : sheet.querySelector('#s-seller-name').innerText;
+            const buyer = isRent ? sheet.querySelector('#r-buyer-name').innerText : sheet.querySelector('#s-buyer-name').innerText;
+            const price = isRent ? sheet.querySelector('#r-price').innerText : sheet.querySelector('#s-price').innerText;
+            const date = isRent ? sheet.querySelector('.rent-date-val').innerText : sheet.querySelector('.sale-date-val').innerText;
+
+            const contractData = {
+                contractNo: seq.trim(),
+                type: isRent ? 'عەقدا ئیجاری (کرێ)' : 'گرێبەستا فرۆتنی',
+                rawType: isRent ? 'rent' : 'sale',
+                seller: seller.trim(),
+                buyer: buyer.trim(),
+                price: price.trim(),
+                date: date.trim(),
+                savedHTML: snapshotHTML,
+                createdAt: new Date().toISOString()
+            };
+
+            try {
+                await colContracts.add(contractData);
+                alert('عەقد ب سەرکەفتیانە د فایربەیس دا هاتە ئەرشیفکرن!');
+            } catch (err) {
+                alert('خەلەتی: ' + err.message);
+            }
+        }
+
+        function renderArchive() {
+            const tbody = document.getElementById('archive-table-body');
+            tbody.innerHTML = '';
+            archivedContracts.forEach((item, index) => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${item.contractNo}</strong></td>
+                        <td><span class="badge ${item.rawType === 'rent' ? 'badge-rent' : 'badge-sale'}">${item.type}</span></td>
+                        <td>${item.seller}</td>
+                        <td>${item.buyer}</td>
+                        <td><strong>${item.price}</strong></td>
+                        <td>${item.date}</td>
+                        <td>
+                            <div style="display:flex; gap:5px;">
+                                <button class="btn btn-green" style="padding:4px 8px; font-size:11px;" onclick="printArchivedContract(${index})">
+                                    <i class="fa-solid fa-print"></i> چاپ
+                                </button>
+                                <button class="btn btn-blue" style="padding:4px 8px; font-size:11px;" onclick="loadArchivedContract(${index})">
+                                    <i class="fa-solid fa-pen-to-square"></i> ڤەکرن
+                                </button>
+                                <button class="btn btn-rose" style="padding:4px 8px; font-size:11px;" onclick="deleteArchivedContract('${item.docId}')">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function loadArchivedContract(index) {
+            const item = archivedContracts[index];
             if (!item) return;
 
-            if (item.lang && item.lang !== currentLang) {
-                setLanguage(item.lang);
+            selectContract(item.rawType);
+            const activeSheetId = item.rawType === 'rent' ? 'rent-a4' : 'sale-a4';
+            document.getElementById(activeSheetId).innerHTML = item.savedHTML;
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            adjustA4Scale();
+            alert('عەقد هاتە ڤەکرن لسەر شاشێ!');
+        }
+
+        function printArchivedContract(index) {
+            loadArchivedContract(index);
+            setTimeout(() => {
+                window.print();
+            }, 300);
+        }
+
+        async function deleteArchivedContract(docId) {
+            if (confirm('تە دڤێت ڤێ عەقدێ ژ ئەرشیفا فایربەیس ژێببەی؟')) {
+                try {
+                    await colContracts.doc(docId).delete();
+                } catch (err) {
+                    alert('خەلەتی: ' + err.message);
+                }
             }
-
-            switchContract(item.type);
-
-            if (item.type === 'sales') {
-                salesFields.forEach(f => {
-                    const el = document.getElementById('in_' + f);
-                    if (el) el.value = item.data[f] || '';
-                });
-            } else {
-                rentFields.forEach(f => {
-                    const el = document.getElementById('in_' + f);
-                    if (el) el.value = item.data[f] || '';
-                });
-            }
-
-            document.getElementById('in_witness1').value = item.witness1 || '';
-            document.getElementById('in_witness2').value = item.witness2 || '';
-
-            updateContracts();
-            closeArchiveModal();
-            showToast(i18n[currentLang].toast_loaded);
         }
 
-        function deleteContract(id) {
-            const t = i18n[currentLang];
-            if (!confirm(t.confirm_del)) return;
-            let list = getSavedContracts();
-            list = list.filter(x => x.id !== id);
-            setSavedContracts(list);
-            renderArchiveTable();
-            showToast(t.toast_deleted);
+        function printInventoryStatement() {
+            const tbody = document.getElementById('inv-table-rows');
+            tbody.innerHTML = '';
+            document.getElementById('inv-print-date').innerText = new Date().toLocaleDateString('ku-IQ');
+            document.getElementById('inv-print-count').innerText = properties.length;
+
+            properties.forEach((p, idx) => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${idx + 1}</td>
+                        <td>${p.docId ? p.docId.slice(-4) : '-'}</td>
+                        <td><strong>${p.title}</strong></td>
+                        <td>${p.type}</td>
+                        <td>${p.status}</td>
+                        <td>${p.location}</td>
+                        <td>${p.plot}</td>
+                        <td>${p.area}</td>
+                        <td>${p.directions ? p.directions.join(',') : '-'}</td>
+                        <td><strong>$${Number(p.price).toLocaleString()}</strong></td>
+                        <td>${p.owner}</td>
+                        <td style="direction:ltr;">${p.phone}</td>
+                    </tr>
+                `;
+            });
+            window.print();
         }
 
-        function exportPDF() {
-            const activeId = currentTab === 'sales' ? 'contract-sales' : 'contract-rent';
-            const element = document.getElementById(activeId);
-            const prefix = currentLang === 'ar' ? 'Aqd' : 'Grebast';
-            const type = currentTab === 'sales' ? 'Sales' : 'Rent';
-            const fileName = `${prefix}_${type}_Duhok.pdf`;
-            
-            const opt = {
-                margin: 0,
-                filename: fileName,
-                image: { type: 'jpeg', quality: 0.99 },
-                html2canvas: { scale: 2, useCORS: true, letterRendering: true },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-            html2pdf().set(opt).from(element).save();
-        }
-
-        window.onload = function() {
-            setLanguage('ku');
-            updateArchiveBadge();
-        };
+        setTimeout(adjustA4Scale, 200);
     </script>
 </body>
 </html>
