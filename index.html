@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>سیستەمێ عەقارات و عەقدێن فەرمی - دهۆک</title>
     
-    <!-- Google Font for Perfect Kurdish Ligatures (بۆ پێکڤە گرێدانا دروست یا پیتێن کوردی) -->
+    <!-- Google Font for Kurdish Ligatures -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -17,8 +17,9 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
-    <!-- HTML2PDF Library -->
+    <!-- HTML2PDF & HTML2CANVAS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <style>
         :root {
@@ -29,6 +30,7 @@
             --accent-green: #10b981;
             --accent-gold: #fbbf24;
             --accent-rose: #f43f5e;
+            --accent-purple: #818cf8;
             --text-white: #ffffff;
             --text-gray: #94a3b8;
             --border: #222d42;
@@ -350,9 +352,7 @@
         }
         .close-btn { background: none; border: none; color: var(--text-gray); font-size: 20px; cursor: pointer; }
 
-        /* =========================================================================
-           STRICT 1-PAGE A4 PREVIEW (قیاسێ ب تەمامی ١ لاپەڕەیێ بێ چ خواربوون)
-           ========================================================================= */
+        /* A4 PRESENTATION & EXACT SINGLE PAGE */
         .a4-outer-viewport {
             width: 100%;
             overflow-x: auto;
@@ -375,7 +375,7 @@
             width: 794px;
             min-width: 794px;
             max-width: 794px;
-            height: 1080px; /* Exact height to strictly guarantee 1 page in all mobile/desktop printers */
+            height: 1080px;
             min-height: 1080px;
             max-height: 1080px;
             padding: 24px 35px;
@@ -580,11 +580,11 @@
         .c-sig-name { font-size: 11px; color: #0369a1; font-weight: 700; }
         .c-sig-label { font-size: 10px; color: #64748b; font-weight: 600; }
 
-        /* ================= STRICT SINGLE PAGE A4 PRINT RULES ================= */
+        /* PRINT RULES */
         @media print {
             @page {
                 size: A4 portrait;
-                margin: 0 !important; /* Forces exact single page constraint */
+                margin: 0 !important;
             }
             html, body {
                 width: 210mm !important;
@@ -619,7 +619,7 @@
                 width: 210mm !important;
                 min-width: 210mm !important;
                 max-width: 210mm !important;
-                height: 285mm !important; /* Strictly under 297mm to never create page 2 */
+                height: 285mm !important;
                 max-height: 285mm !important;
                 padding: 8mm 12mm !important;
                 page-break-inside: avoid !important;
@@ -627,10 +627,16 @@
                 page-break-before: avoid !important;
                 overflow: hidden !important;
             }
-            #inventory-print-sheet { display: block !important; padding: 10mm !important; }
-            #inventory-print-sheet table { font-size: 10px !important; width: 100% !important; border-collapse: collapse !important; }
-            #inventory-print-sheet th { background: #0f172a !important; color: #fff !important; padding: 4px !important; border: 1px solid #334155 !important; }
-            #inventory-print-sheet td { padding: 4px !important; border: 1px solid #cbd5e1 !important; color: #000 !important; }
+            
+            /* PRINT INVENTORY & EXPENSES */
+            #inventory-print-sheet, #expenses-print-sheet {
+                display: block !important;
+                padding: 10mm !important;
+                font-family: 'Noto Naskh Arabic', Tahoma, sans-serif !important;
+            }
+            table { font-size: 10px !important; width: 100% !important; border-collapse: collapse !important; }
+            th { background: #0f172a !important; color: #fff !important; padding: 4px !important; border: 1px solid #334155 !important; }
+            td { padding: 4px !important; border: 1px solid #cbd5e1 !important; color: #000 !important; }
         }
     </style>
 </head>
@@ -661,9 +667,9 @@
                 <p>سیستەمێ موڵک و عەقدێن فەرمی</p>
             </div>
         </div>
-        <div style="display:flex; gap:8px;">
-            <button class="btn btn-gold" onclick="printInventoryStatement()">
-                <i class="fa-solid fa-file-pdf"></i> کەشفا موڵکان
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="btn btn-gold" onclick="downloadInventoryPDF()">
+                <i class="fa-solid fa-file-pdf"></i> کەشفا موڵکان (PDF)
             </button>
             <button class="btn btn-outline" style="padding:6px 10px;" onclick="lockApp()" title="قوفڵکرن">
                 <i class="fa-solid fa-lock"></i>
@@ -787,15 +793,23 @@
         <!-- =================== 4. TAB: EXPENSES =================== -->
         <section id="tab-expenses" class="tab-content">
             <div class="box">
-                <div class="box-title" style="color:var(--accent-rose);"><i class="fa-solid fa-coins"></i> مەساریف</div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
+                    <div class="box-title" style="color:var(--accent-rose); margin-bottom:0;">
+                        <i class="fa-solid fa-coins"></i> مەساریف و مەزاختی
+                    </div>
+                    <!-- EXPENSES STATEMENT PDF BUTTON -->
+                    <button class="btn btn-rose" onclick="downloadExpensesPDF()">
+                        <i class="fa-solid fa-file-pdf"></i> کەشفا مەساریفان (PDF)
+                    </button>
+                </div>
                 <form onsubmit="saveExpense(event)">
                     <div class="form-grid">
-                        <div class="form-group"><label>بابەت</label><input type="text" id="exp-title" required></div>
+                        <div class="form-group"><label>بابەتێ مەسڕەفی</label><input type="text" id="exp-title" placeholder="کڕێ، کارەب، پێداویستی..." required></div>
                         <div class="form-group">
                             <label>دراو</label>
                             <select id="exp-currency"><option value="USD">دۆلار ($)</option><option value="IQD">دینار (د.ع)</option></select>
                         </div>
-                        <div class="form-group"><label>بڕێ پارەی</label><input type="number" id="exp-amount" required></div>
+                        <div class="form-group"><label>بڕێ پارەی</label><input type="number" id="exp-amount" placeholder="بڕ" required></div>
                         <div class="form-group"><label>مێژوو</label><input type="date" id="exp-date" required></div>
                         <div class="form-group full"><button type="submit" class="btn btn-rose" style="width:100%;">تۆمارکرن د فایربەیس دا</button></div>
                     </div>
@@ -824,9 +838,11 @@
                         </button>
                     </div>
                     <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                        <!-- DIRECT DOWNLOAD PDF -->
+                        <button class="btn btn-purple" onclick="saveContractToCameraRoll()" style="background:#7c3aed; color:#fff;">
+                            <i class="fa-solid fa-image"></i> وێنە بۆ مۆبایلێ (Camera Roll)
+                        </button>
                         <button class="btn btn-green" onclick="downloadContractPDF()" style="background:#059669;">
-                            <i class="fa-solid fa-file-arrow-down"></i> داگرتنا PDF (1 Page)
+                            <i class="fa-solid fa-file-arrow-down"></i> داگرتنا PDF
                         </button>
                         <button class="btn btn-gold" onclick="saveToArchive()">
                             <i class="fa-solid fa-cloud-arrow-up"></i> خەزن د فایربەیس دا
@@ -947,10 +963,11 @@
                             </div>
                         </div>
 
-                        <!-- 4 SIGNATURES -->
+                        <!-- 4 SIGNATURE BOXES -->
                         <div class="c-sig-grid">
                             <div class="c-sig-box">
                                 <div class="c-sig-title">خودانی ئاڤاهی(مؤجر)</div>
+                                <div class="c-sig-name"><span contenteditable="true" class="c-in">حاجی مەحموود</span></div>
                                 <div class="c-sig-label">مۆر یان ئیمزا</div>
                             </div>
                             <div class="c-sig-box">
@@ -965,6 +982,7 @@
                             </div>
                             <div class="c-sig-box">
                                 <div class="c-sig-title">ئەوی ب کڕێ کری (کڕێچی)</div>
+                                <div class="c-sig-name"><span contenteditable="true" class="c-in">شێرزاد کاروان</span></div>
                                 <div class="c-sig-label">مۆر یان ئیمزا</div>
                             </div>
                         </div>
@@ -1104,6 +1122,7 @@
                         <div class="c-sig-grid">
                             <div class="c-sig-box">
                                 <div class="c-sig-title">ناڤ و ئیمزافڕۆشیاری</div>
+                                <div class="c-sig-name"><span contenteditable="true" class="c-in">ئەحمەد سەعید</span></div>
                                 <div class="c-sig-label">مۆر یان ئیمزا</div>
                             </div>
                             <div class="c-sig-box">
@@ -1118,6 +1137,7 @@
                             </div>
                             <div class="c-sig-box">
                                 <div class="c-sig-title">ناڤ و ئیمزابکڕی</div>
+                                <div class="c-sig-name"><span contenteditable="true" class="c-in">ڕێبوار عەلی</span></div>
                                 <div class="c-sig-label">مۆر یان ئیمزا</div>
                             </div>
                         </div>
@@ -1218,8 +1238,8 @@
         </div>
     </div>
 
-    <!-- INVENTORY PRINT SHEET -->
-    <div id="inventory-print-sheet" style="display:none;">
+    <!-- ================= 1. INVENTORY STATEMENT SHEET ================= -->
+    <div id="inventory-print-sheet" style="display:none; background:#fff; color:#000; padding:20px;">
         <div style="text-align:center; margin-bottom:10px; border-bottom:2px solid #0f172a; padding-bottom:6px;">
             <h2 style="font-size:17px; margin-bottom:2px;">عەقارات دهۆک - DUHOK REAL ESTATE</h2>
             <h4 style="font-size:12px; color:#475569;">کەشفا گشتی یا موڵکێن بەردەست</h4>
@@ -1232,6 +1252,39 @@
                 </tr>
             </thead>
             <tbody id="inv-table-rows"></tbody>
+            <tfoot>
+                <tr style="background:#f1f5f9; font-weight:bold;">
+                    <td colspan="9" style="text-align:center;">کۆی گشتی یێ بهایێ موڵکان:</td>
+                    <td id="inv-total-price" colspan="3" style="color:#059669; font-size:12px;">$0</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <!-- ================= 2. EXPENSES STATEMENT SHEET ================= -->
+    <div id="expenses-print-sheet" style="display:none; background:#fff; color:#000; padding:20px;">
+        <div style="text-align:center; margin-bottom:10px; border-bottom:2px solid #0f172a; padding-bottom:6px;">
+            <h2 style="font-size:17px; margin-bottom:2px;">عەقارات دهۆک - DUHOK REAL ESTATE</h2>
+            <h4 style="font-size:12px; color:#475569;">کەشفا گشتی یا مەساریف و مەزاختیان</h4>
+            <p style="font-size:9.5px; margin-top:2px;">مێژوو: <span id="exp-print-date"></span></p>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>ز</th><th>بابەتێ مەسڕەفی</th><th>بڕێ پارەی</th><th>جۆرێ دراوی</th><th>مێژوو</th>
+                </tr>
+            </thead>
+            <tbody id="exp-print-table-rows"></tbody>
+            <tfoot>
+                <tr style="background:#f8fafc; font-weight:bold;">
+                    <td colspan="2">کۆی مەسڕەفێن دۆلاری ($):</td>
+                    <td id="exp-print-usd" colspan="3" style="color:#e11d48; font-size:12px;">$0</td>
+                </tr>
+                <tr style="background:#f8fafc; font-weight:bold;">
+                    <td colspan="2">کۆی مەسڕەفێن دیناری (د.ع):</td>
+                    <td id="exp-print-iqd" colspan="3" style="color:#e11d48; font-size:12px;">0 د.ع</td>
+                </tr>
+            </tfoot>
         </table>
     </div>
 
@@ -1389,7 +1442,64 @@
             adjustA4Scale();
         }
 
-        // ================= DIRECT DOWNLOAD PERFECT 1-PAGE PDF =================
+        // SAVE TO CAMERA ROLL
+        async function saveContractToCameraRoll() {
+            const isRent = currentContractType === 'rent';
+            const sheet = document.getElementById(isRent ? 'rent-a4' : 'sale-a4');
+            const wrapper = document.getElementById('a4-scaler-wrapper');
+            
+            const currentTransform = wrapper.style.transform;
+            wrapper.style.transform = 'none';
+
+            const contractNo = isRent 
+                ? sheet.querySelector('.rent-seq-val').innerText.trim() 
+                : sheet.querySelector('.sale-seq-val').innerText.trim();
+
+            try {
+                const canvas = await html2canvas(sheet, {
+                    scale: 2.5,
+                    useCORS: true,
+                    scrollY: 0,
+                    backgroundColor: '#ffffff'
+                });
+
+                wrapper.style.transform = currentTransform;
+
+                canvas.toBlob(async (blob) => {
+                    const fileName = `عەقارات_دهۆک_${contractNo}.png`;
+                    const file = new File([blob], fileName, { type: 'image/png' });
+
+                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                        try {
+                            await navigator.share({
+                                files: [file],
+                                title: 'عەقارات دهۆک',
+                                text: `عەقدا ژمارە ${contractNo}`
+                            });
+                        } catch (err) {
+                            fallbackDownloadImage(canvas.toDataURL('image/png'), fileName);
+                        }
+                    } else {
+                        fallbackDownloadImage(canvas.toDataURL('image/png'), fileName);
+                    }
+                }, 'image/png');
+            } catch (err) {
+                wrapper.style.transform = currentTransform;
+                alert('خەلەتی: ' + err.message);
+            }
+        }
+
+        function fallbackDownloadImage(dataUrl, filename) {
+            const a = document.createElement('a');
+            a.href = dataUrl;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            alert('وێنە هاتە داگرتن بۆ مۆبایلێ!');
+        }
+
+        // DOWNLOAD 1-PAGE PDF
         function downloadContractPDF() {
             const isRent = currentContractType === 'rent';
             const sheet = document.getElementById(isRent ? 'rent-a4' : 'sale-a4');
@@ -1417,6 +1527,97 @@
 
             html2pdf().set(opt).from(sheet).save().then(() => {
                 wrapper.style.transform = currentTransform;
+            });
+        }
+
+        // ================= (1) کەشفا موڵکان PDF DIRECT DOWNLOAD =================
+        function downloadInventoryPDF() {
+            const sheet = document.getElementById('inventory-print-sheet');
+            const tbody = document.getElementById('inv-table-rows');
+            tbody.innerHTML = '';
+            
+            document.getElementById('inv-print-date').innerText = new Date().toLocaleDateString('ku-IQ');
+            document.getElementById('inv-print-count').innerText = properties.length;
+
+            let totalPrice = 0;
+            properties.forEach((p, idx) => {
+                totalPrice += Number(p.price) || 0;
+                const dirs = p.directions && p.directions.length > 0 ? p.directions.join(',') : '-';
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${idx + 1}</td>
+                        <td>#${p.docId ? p.docId.slice(-4) : '-'}</td>
+                        <td><strong>${p.title}</strong></td>
+                        <td>${p.type}</td>
+                        <td>${p.status}</td>
+                        <td>${p.location}</td>
+                        <td>${p.plot}</td>
+                        <td>${p.area}</td>
+                        <td>${dirs}</td>
+                        <td><strong>$${Number(p.price).toLocaleString()}</strong></td>
+                        <td>${p.owner}</td>
+                        <td style="direction:ltr;">${p.phone}</td>
+                    </tr>
+                `;
+            });
+            document.getElementById('inv-total-price').innerText = '$' + totalPrice.toLocaleString();
+
+            sheet.style.display = 'block';
+
+            const opt = {
+                margin: [8, 8, 8, 8],
+                filename: `کەشفا_موڵکان_${new Date().toISOString().split('T')[0]}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+            };
+
+            html2pdf().set(opt).from(sheet).save().then(() => {
+                sheet.style.display = 'none';
+            });
+        }
+
+        // ================= (2) کەشفا مەساریفان PDF DIRECT DOWNLOAD =================
+        function downloadExpensesPDF() {
+            const sheet = document.getElementById('expenses-print-sheet');
+            const tbody = document.getElementById('exp-print-table-rows');
+            tbody.innerHTML = '';
+
+            document.getElementById('exp-print-date').innerText = new Date().toLocaleDateString('ku-IQ');
+
+            let totalUSD = 0;
+            let totalIQD = 0;
+
+            expenses.forEach((exp, idx) => {
+                if (exp.currency === 'USD') totalUSD += Number(exp.amount) || 0;
+                if (exp.currency === 'IQD') totalIQD += Number(exp.amount) || 0;
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${idx + 1}</td>
+                        <td><strong>${exp.title}</strong></td>
+                        <td style="color:#e11d48; font-weight:bold;">${Number(exp.amount).toLocaleString()}</td>
+                        <td>${exp.currency === 'USD' ? '$ دۆلار' : 'دینار'}</td>
+                        <td>${exp.date}</td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById('exp-print-usd').innerText = '$' + totalUSD.toLocaleString();
+            document.getElementById('exp-print-iqd').innerText = totalIQD.toLocaleString() + ' د.ع';
+
+            sheet.style.display = 'block';
+
+            const opt = {
+                margin: [10, 10, 10, 10],
+                filename: `کەشفا_مەساریفان_${new Date().toISOString().split('T')[0]}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(sheet).save().then(() => {
+                sheet.style.display = 'none';
             });
         }
 
@@ -1684,6 +1885,9 @@
                         <td>${item.date}</td>
                         <td>
                             <div style="display:flex; gap:5px; flex-wrap:wrap;">
+                                <button class="btn btn-purple" style="padding:4px 8px; font-size:11px;" onclick="loadAndSaveImageArchive(${index})">
+                                    <i class="fa-solid fa-image"></i> وێنە
+                                </button>
                                 <button class="btn btn-green" style="padding:4px 8px; font-size:11px;" onclick="loadAndDownloadArchivePDF(${index})">
                                     <i class="fa-solid fa-file-arrow-down"></i> PDF
                                 </button>
@@ -1720,6 +1924,13 @@
             }, 400);
         }
 
+        function loadAndSaveImageArchive(index) {
+            loadArchivedContract(index);
+            setTimeout(() => {
+                saveContractToCameraRoll();
+            }, 400);
+        }
+
         async function deleteArchivedContract(docId) {
             if (confirm('تە دڤێت ڤێ عەقدێ ژ ئەرشیفا فایربەیس ژێببەی؟')) {
                 try {
@@ -1728,33 +1939,6 @@
                     alert('خەلەتی: ' + err.message);
                 }
             }
-        }
-
-        function printInventoryStatement() {
-            const tbody = document.getElementById('inv-table-rows');
-            tbody.innerHTML = '';
-            document.getElementById('inv-print-date').innerText = new Date().toLocaleDateString('ku-IQ');
-            document.getElementById('inv-print-count').innerText = properties.length;
-
-            properties.forEach((p, idx) => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${idx + 1}</td>
-                        <td>${p.docId ? p.docId.slice(-4) : '-'}</td>
-                        <td><strong>${p.title}</strong></td>
-                        <td>${p.type}</td>
-                        <td>${p.status}</td>
-                        <td>${p.location}</td>
-                        <td>${p.plot}</td>
-                        <td>${p.area}</td>
-                        <td>${p.directions ? p.directions.join(',') : '-'}</td>
-                        <td><strong>$${Number(p.price).toLocaleString()}</strong></td>
-                        <td>${p.owner}</td>
-                        <td style="direction:ltr;">${p.phone}</td>
-                    </tr>
-                `;
-            });
-            window.print();
         }
 
         setTimeout(adjustA4Scale, 200);
